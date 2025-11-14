@@ -34,7 +34,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const fetchUser = async () => {
     // Don't try to fetch user on login or signup page
-    if (typeof window !== 'undefined' && (window.location.pathname === '/login' || window.location.pathname === '/signup')) {
+    if (
+      typeof window !== 'undefined' &&
+      (window.location.pathname === '/login' ||
+        window.location.pathname === '/signup' ||
+        window.location.pathname.startsWith('/success'))
+    ) {
       setLoading(false);
       return;
     }
@@ -46,7 +51,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error('Failed to fetch user:', error);
       setUser(null);
       // Only redirect if we're not already on the login/signup page
-      if (typeof window !== 'undefined' && window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
+      if (
+        typeof window !== 'undefined' &&
+        window.location.pathname !== '/login' &&
+        window.location.pathname !== '/signup' &&
+        !window.location.pathname.startsWith('/success')
+      ) {
         window.location.href = '/login';
       }
     } finally {

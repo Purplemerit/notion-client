@@ -736,14 +736,11 @@ export default function Chat() {
   // Enhanced cleanup function with better stream management
   const cleanupCall = useCallback(() => {
     try {
-      console.log('Starting call cleanup...');
-      
       // Stop and clean up all tracked streams
       streamCleanupRef.current.forEach(stream => {
         stream.getTracks().forEach(track => {
           if (track.readyState !== 'ended') {
             track.stop();
-            console.log(`Stopped ${track.kind} track`);
           }
         });
       });

@@ -67,12 +67,9 @@ async function tryRefreshToken(): Promise<boolean> {
 
       if (response.ok) {
         const data = await response.json();
-        if (data.accessToken) {
-          // Update access token in localStorage
-          const currentRefreshToken = getRefreshToken();
-          if (currentRefreshToken) {
-            setTokens(data.accessToken, currentRefreshToken);
-          }
+        if (data.accessToken && data.refreshToken) {
+          // Update BOTH tokens in localStorage (backend rotates refresh tokens for security)
+          setTokens(data.accessToken, data.refreshToken);
           return true;
         }
       }

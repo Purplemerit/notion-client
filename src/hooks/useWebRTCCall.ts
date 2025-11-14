@@ -87,14 +87,11 @@ export const useWebRTCCall = ({ currentUser, onCallStateChange }: UseWebRTCCallC
   // Enhanced cleanup function
   const cleanupCall = useCallback(() => {
     try {
-      console.log('Starting call cleanup...');
-      
       // Stop all tracked streams
       streamCleanupRef.current.forEach(stream => {
         stream.getTracks().forEach(track => {
           if (track.readyState !== 'ended') {
             track.stop();
-            console.log(`Stopped ${track.kind} track`);
           }
         });
       });

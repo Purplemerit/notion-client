@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { getChatSocket, setAuthErrorCallback, resetChatSocket, type ChatMessage } from "@/lib/socket";
+import type { Socket } from "socket.io-client";
 import { useToast } from "@/hooks/use-toast";
 import { usersAPI, chatAPI } from "@/lib/api";
 import { deduplicateMessages, mergeMessages, setLastConnectionTime } from "@/lib/chatUtils";
@@ -40,6 +41,7 @@ interface ChatContextType {
   unreadCounts: { [chatName: string]: number };
   markChatAsRead: (chatName: string) => void;
   getTotalUnreadCount: () => number;
+  clearAllChatData: () => void;
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -59,8 +61,11 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [unreadCounts, setUnreadCounts] = useState<{ [chatName: string]: number }>({});
   const { toast } = useToast();
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   // Cache for user avatars to avoid repeated API calls
   const [userAvatarCache, setUserAvatarCache] = useState<{ [email: string]: string }>({});
+  // Track previous user email to detect user changes
+  const [previousUserEmail, setPreviousUserEmail] = useState<string | null>(null);
 
   // Helper function to get user avatar from cache or fetch from API
   const getUserAvatar = useCallback(async (email: string): Promise<string> => {
@@ -88,49 +93,53 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     return '';
   }, [userAvatarCache]);
 
-  // Load from localStorage on mount
+  // Initialize user on mount
   useEffect(() => {
-    const savedChitChats = localStorage.getItem('chitChatChats');
-    const savedTeamChats = localStorage.getItem('teamChats');
-    const savedMessages = localStorage.getItem('chatMessages');
-    const savedUnreadCounts = localStorage.getItem('unreadCounts');
+    // Function to initialize user email
+    const initializeUser = async () => {
+      const accessToken = localStorage.getItem('accessToken');
+      if (!accessToken) {
+        return false;
+      }
 
-    if (savedChitChats) {
-      setChitChatChats(JSON.parse(savedChitChats));
-    }
-    if (savedTeamChats) {
-      setTeamChats(JSON.parse(savedTeamChats));
-    }
-    if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
-    }
-    if (savedUnreadCounts) {
-      setUnreadCounts(JSON.parse(savedUnreadCounts));
-    }
+      try {
+        const user = await usersAPI.getMe();
+        setCurrentUserEmail(user.email);
+        setIsInitialized(true);
+        return true;
+      } catch (err) {
+        console.error("Failed to get current user", err);
+        return false;
+      }
+    };
 
-    usersAPI.getMe().then((user: any) => {
-      setCurrentUserEmail(user.email);
-    }).catch(err => {
-      console.error("Failed to get current user", err);
-    })
-  }, []);
+    // Try to initialize immediately
+    initializeUser();
 
-  // Save to localStorage whenever data changes
-  useEffect(() => {
-    localStorage.setItem('chitChatChats', JSON.stringify(chitChatChats));
-  }, [chitChatChats]);
+    // Also listen for when tokens are added to localStorage
+    // This handles the case when ChatProvider mounts before tokens are set
+    const checkForTokens = setInterval(async () => {
+      if (!isInitialized) {
+        const success = await initializeUser();
+        if (success) {
+          clearInterval(checkForTokens);
+        }
+      }
+    }, 200); // Check every 200ms
 
-  useEffect(() => {
-    localStorage.setItem('teamChats', JSON.stringify(teamChats));
-  }, [teamChats]);
+    // Clean up interval after 10 seconds
+    const timeout = setTimeout(() => {
+      clearInterval(checkForTokens);
+    }, 10000);
 
-  useEffect(() => {
-    localStorage.setItem('chatMessages', JSON.stringify(messages));
-  }, [messages]);
+    return () => {
+      clearInterval(checkForTokens);
+      clearTimeout(timeout);
+    };
+  }, [isInitialized]);
 
-  useEffect(() => {
-    localStorage.setItem('unreadCounts', JSON.stringify(unreadCounts));
-  }, [unreadCounts]);
+  // Note: We don't persist chat data to localStorage
+  // Chat data should be fetched from the database when user visits /chat page
 
   const addChitChat = useCallback((chat: Chat) => {
     setChitChatChats(prev => {
@@ -155,8 +164,33 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     });
   }, []);
 
+  // Clear chat data when user changes or logs out
   useEffect(() => {
-    if (!currentUserEmail) return;
+    if (!currentUserEmail) {
+      // User logged out - clear all chat data
+      setChitChatChats([]);
+      setTeamChats([]);
+      setMessages({});
+      setUnreadCounts({});
+      setUserAvatarCache({});
+      resetChatSocket();
+      setPreviousUserEmail(null);
+      return;
+    }
+
+    // Check if user has changed (different user logging in)
+    if (previousUserEmail && previousUserEmail !== currentUserEmail) {
+      // Different user - clear previous user's chat data
+      setChitChatChats([]);
+      setTeamChats([]);
+      setMessages({});
+      setUnreadCounts({});
+      setUserAvatarCache({});
+      resetChatSocket();
+    }
+
+    // Update previous user email
+    setPreviousUserEmail(currentUserEmail);
 
     const fetchConversations = async () => {
       try {
@@ -220,8 +254,10 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
     fetchConversations();
 
+    // Reset any existing socket connection (important: this clears the cached socket)
     resetChatSocket();
 
+    // Set up auth error handler
     setAuthErrorCallback((error) => {
       console.error('Authentication error:', error);
       toast({
@@ -235,6 +271,14 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         window.location.href = '/';
       }, 2000);
     });
+
+    // Verify token is available before creating socket
+    const token = localStorage.getItem('accessToken');
+
+    if (!token) {
+      console.error('ChatContext: No token found when initializing socket!');
+      return;
+    }
 
     const socket = getChatSocket();
 
@@ -262,16 +306,12 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
     // Helper function to ensure chat exists in the list
     const ensureChatExists = async (chatName: string, data: ChatMessage) => {
-      console.log(`ensureChatExists called - chatName: ${chatName}, sender: ${data.sender}, currentUser: ${currentUserEmail}, mode: ${data.mode}`);
-      
       // Only create chat for incoming messages (not from current user)
       if (data.mode === 'private' && data.sender !== currentUserEmail) {
         const avatar = await getUserAvatar(chatName);
         setChitChatChats(prev => {
           const chatExists = prev.some(chat => chat.name === chatName);
-          console.log(`Chat exists check: ${chatExists} for ${chatName}`);
           if (!chatExists) {
-            console.log(`✅ Creating new chat card for: ${chatName}`);
             return [...prev, {
               name: chatName,
               role: 'New Chat',
@@ -282,8 +322,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
           }
           return prev;
         });
-      } else {
-        console.log(`❌ Not creating chat - mode: ${data.mode}, isFromCurrentUser: ${data.sender === currentUserEmail}`);
       }
     };
 
@@ -373,7 +411,6 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
     // Handle message confirmation from server
     socket.on('message:sent', (data: ChatMessage & { _id?: string; delivered?: boolean }) => {
-      console.log('Message sent confirmation:', data);
       // Message was saved successfully on server
       // Update the local message with server ID and createdAt if needed
       const chatName = data.receiver || '';
@@ -406,12 +443,10 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     });
 
     socket.on('groupMessage:sent', (data: ChatMessage) => {
-      console.log('Group message sent confirmation:', data);
       // Similar handling for group messages
     });
 
     socket.on('mediaMessage:sent', (data: ChatMessage & { _id?: string; delivered?: boolean }) => {
-      console.log('Media message sent confirmation:', data);
       // Handle media message confirmation
     });
 
@@ -476,6 +511,21 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     return Object.values(unreadCounts).reduce((sum, count) => sum + count, 0);
   };
 
+  const clearAllChatData = useCallback(() => {
+    // Clear all state
+    setChitChatChats([]);
+    setTeamChats([]);
+    setMessages({});
+    setUnreadCounts({});
+    setCurrentUserEmail(null);
+    setIsInitialized(false);
+    setUserAvatarCache({});
+    setPreviousUserEmail(null);
+
+    // Reset socket connection
+    resetChatSocket();
+  }, []);
+
   return (
     <ChatContext.Provider
       value={{
@@ -489,6 +539,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         unreadCounts,
         markChatAsRead,
         getTotalUnreadCount,
+        clearAllChatData,
       }}
     >
       {children}

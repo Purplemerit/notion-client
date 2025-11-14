@@ -14,19 +14,23 @@ export const setAuthErrorCallback = (callback: (error: { message: string; code: 
 
 export const getChatSocket = (): Socket => {
   if (!chatSocket) {
+    // Get token from localStorage for cross-origin WebSocket auth
+    const token = localStorage.getItem('accessToken');
+
     chatSocket = io(`${WS_URL}/chat`, {
       withCredentials: true, // Send cookies with WebSocket connection
       transports: ['websocket'],
       reconnection: false, // Disable auto-reconnection for auth errors
       autoConnect: true,
+      query: token ? { token } : {}, // Pass token via query for cross-origin
     });
 
     chatSocket.on('connect', () => {
-      console.log('✅ Connected to chat socket');
+      // Connected to chat socket
     });
 
     chatSocket.on('disconnect', (reason) => {
-      console.log('❌ Disconnected from chat socket:', reason);
+      // Disconnected from chat socket
     });
 
     chatSocket.on('connect_error', (error) => {
@@ -51,7 +55,8 @@ export const getChatSocket = (): Socket => {
           // Fallback if callback not set yet
           console.error('Auth error but no callback set:', error);
           setTimeout(() => {
-            localStorage.removeItem('token');
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
             window.location.href = '/login';
           }, 1000);
         }

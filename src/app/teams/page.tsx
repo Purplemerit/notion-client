@@ -24,7 +24,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const timeSlots = Array.from({ length: 18 }, (_, i) => i + 6); // 6 AM to 11 PM
+const timeSlots = Array.from({ length: 18 }, (_, i) => i + 6);
 
 const EVENT_COLORS = [
   'border-orange-400 bg-orange-50 text-orange-700',

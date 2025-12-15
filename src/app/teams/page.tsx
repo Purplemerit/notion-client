@@ -910,7 +910,7 @@ export default function Page() {
                         </div>
                         
                         <div style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: 8 }}>
-                            <span style={{ fontWeight: 500, fontSize: 15, color: actualTheme === 'dark' ? '#F3F4F6' : '#222', marginRight: 8 }}>Invite Member's</span>
+                            <span style={{ fontWeight: 500, fontSize: 15, color: actualTheme === 'dark' ? '#F3F4F6' : '#222', marginRight: 8 }}>Invite Members</span>
                             <button
                               onClick={() => setShowMemberSelection(true)}
                               style={{

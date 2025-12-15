@@ -11,9 +11,13 @@ import { useToast } from '@/hooks/use-toast';
 import { usersAPI } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
 import '@excalidraw/excalidraw/index.css';
+// @ts-ignore
 import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
+// @ts-ignore  
 import type { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/types';
+// @ts-ignore
 import type { AppState } from '@excalidraw/excalidraw/types/types';
+
 import io, { Socket } from 'socket.io-client';
 
 // Dynamically import Excalidraw to avoid SSR issues

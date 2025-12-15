@@ -92,7 +92,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSave }: ChangePasswordM
       <div
         style={{
           borderRadius: 24,
-          background: '#FFF',
+          background: 'hsl(var(--card))',
           boxShadow: '0 4px 16px 0 rgba(0, 0, 0, 0.20), 35px 45px 73px 0 rgba(32, 32, 35, 0.07)',
           width: 500,
           padding: '32px',
@@ -105,7 +105,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSave }: ChangePasswordM
       >
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontWeight: 600, fontSize: 20, color: '#222' }}>Change Password</div>
+          <div style={{ fontWeight: 600, fontSize: 20, color: 'hsl(var(--foreground))' }}>Change Password</div>
           <button
             onClick={handleClose}
             style={{
@@ -123,7 +123,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSave }: ChangePasswordM
           </button>
         </div>
 
-        <div style={{ fontSize: 14, color: '#7B8794' }}>
+        <div style={{ fontSize: 14, color: 'hsl(var(--muted-foreground))' }}>
           Enter your current password and choose a new password to update your account security.
         </div>
 
@@ -151,14 +151,14 @@ export function ChangePasswordModal({ isOpen, onClose, onSave }: ChangePasswordM
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: '#7B8794',
+                  color: 'hsl(var(--muted-foreground))',
                 }}
               >
                 {showPasswords.current ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.currentPassword && (
-              <p style={{ fontSize: 13, color: '#DC2626', marginTop: 4 }}>{errors.currentPassword}</p>
+              <p style={{ fontSize: 13, color: 'hsl(var(--destructive))', marginTop: 4 }}>{errors.currentPassword}</p>
             )}
           </div>
 
@@ -184,14 +184,14 @@ export function ChangePasswordModal({ isOpen, onClose, onSave }: ChangePasswordM
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: '#7B8794',
+                  color: 'hsl(var(--muted-foreground))',
                 }}
               >
                 {showPasswords.new ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.newPassword && (
-              <p style={{ fontSize: 13, color: '#DC2626', marginTop: 4 }}>{errors.newPassword}</p>
+              <p style={{ fontSize: 13, color: 'hsl(var(--destructive))', marginTop: 4 }}>{errors.newPassword}</p>
             )}
           </div>
 
@@ -217,14 +217,14 @@ export function ChangePasswordModal({ isOpen, onClose, onSave }: ChangePasswordM
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: '#7B8794',
+                  color: 'hsl(var(--muted-foreground))',
                 }}
               >
                 {showPasswords.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.confirmPassword && (
-              <p style={{ fontSize: 13, color: '#DC2626', marginTop: 4 }}>{errors.confirmPassword}</p>
+              <p style={{ fontSize: 13, color: 'hsl(var(--destructive))', marginTop: 4 }}>{errors.confirmPassword}</p>
             )}
           </div>
 
@@ -233,12 +233,12 @@ export function ChangePasswordModal({ isOpen, onClose, onSave }: ChangePasswordM
             <div
               style={{
                 padding: '12px 16px',
-                background: '#FEF2F2',
+                background: 'hsl(var(--destructive) / 0.12)',
                 borderRadius: 12,
-                border: '1px solid #FCA5A5',
+                border: '1px solid hsl(var(--destructive) / 0.5)',
               }}
             >
-              <p style={{ fontSize: 13, color: '#DC2626', fontWeight: 500 }}>{errors.submit}</p>
+              <p style={{ fontSize: 13, color: 'hsl(var(--destructive))', fontWeight: 500 }}>{errors.submit}</p>
             </div>
           )}
         </div>
@@ -250,7 +250,7 @@ export function ChangePasswordModal({ isOpen, onClose, onSave }: ChangePasswordM
           </Button>
           <Button
             onClick={handleSave}
-            style={{ flex: 1, background: '#846BD2', color: '#FFF' }}
+            className="flex-1 bg-purple-600 dark:bg-purple-700 text-white hover:bg-purple-700 dark:hover:bg-purple-600"
             disabled={loading}
           >
             {loading ? 'Changing...' : 'Change Password'}

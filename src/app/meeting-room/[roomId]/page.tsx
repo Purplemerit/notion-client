@@ -380,13 +380,13 @@ export default function MeetingRoomPage() {
   };
 
   return (
-    <div className="flex h-screen w-full bg-gray-50">
+    <div className="flex h-screen w-full bg-gray-50 dark:bg-gray-900">
       {/* Main Content - Video Area */}
       <div className="flex flex-1 flex-col">
         {/* Header */}
-        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-white px-3 sm:px-6 py-3 sm:py-4 border-b">
+        <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 bg-white dark:bg-gray-800 px-3 sm:px-6 py-3 sm:py-4 border-b dark:border-gray-700">
           <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
-            <h1 className="text-base sm:text-lg font-semibold text-gray-800 line-clamp-1 flex-1">
+            <h1 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 line-clamp-1 flex-1">
               {meetingInfo?.title || 'Meeting Room'}
             </h1>
           </div>
@@ -420,7 +420,7 @@ export default function MeetingRoomPage() {
         {/* Video Area */}
         <div className="flex-1 flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 overflow-hidden">
           {/* Main Video - Large */}
-          <div className="flex-1 bg-gray-900 rounded-2xl sm:rounded-3xl overflow-hidden relative border-2 sm:border-4 border-blue-500">
+          <div className="flex-1 bg-gray-900 dark:bg-gray-950 rounded-2xl sm:rounded-3xl overflow-hidden relative border-2 sm:border-4 border-blue-500 dark:border-blue-600">
             <video
               ref={localVideoRef}
               autoPlay
@@ -429,7 +429,7 @@ export default function MeetingRoomPage() {
               className="w-full h-full object-cover"
             />
             {isVideoOff && (
-              <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gray-800 dark:bg-gray-950 flex items-center justify-center">
                 <Avatar className="w-20 h-20 sm:w-32 sm:h-32">
                   <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=main" />
                   <AvatarFallback>You</AvatarFallback>
@@ -450,7 +450,7 @@ export default function MeetingRoomPage() {
             {[...Array(Math.min(participants.length, 3))].map((_, idx) => (
               <div
                 key={idx}
-                className="w-32 h-24 sm:w-48 md:w-64 sm:h-36 md:h-48 bg-gray-900 rounded-xl sm:rounded-2xl overflow-hidden relative flex-shrink-0"
+                className="w-32 h-24 sm:w-48 md:w-64 sm:h-36 md:h-48 bg-gray-900 dark:bg-gray-950 rounded-xl sm:rounded-2xl overflow-hidden relative flex-shrink-0"
               >
                 <video
                   ref={(el) => {
@@ -467,7 +467,7 @@ export default function MeetingRoomPage() {
                   className="w-full h-full object-cover"
                 />
                 {!participants[idx]?.stream && (
-                  <div className="absolute inset-0 bg-gray-800 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gray-800 dark:bg-gray-950 flex items-center justify-center">
                     <Avatar className="w-10 h-10 sm:w-16 sm:h-16">
                       <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${idx + 10}`} />
                       <AvatarFallback>P{idx + 1}</AvatarFallback>
@@ -491,47 +491,47 @@ export default function MeetingRoomPage() {
             <Button
               variant="outline"
               size="icon"
-              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white hover:bg-gray-100"
+              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
               onClick={toggleMute}
             >
-              {isMuted ? <MicOff className="h-4 w-4 sm:h-5 md:h-6 sm:w-5 md:w-6 text-gray-700" /> : <Mic className="h-4 w-4 sm:h-5 md:h-6 sm:w-5 md:w-6 text-gray-700" />}
+              {isMuted ? <MicOff className="h-4 w-4 sm:h-5 md:h-6 sm:w-5 md:w-6 text-gray-700 dark:text-gray-300" /> : <Mic className="h-4 w-4 sm:h-5 md:h-6 sm:w-5 md:w-6 text-gray-700 dark:text-gray-300" />}
             </Button>
             <Button
               variant="outline"
               size="icon"
-              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white hover:bg-gray-100"
+              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
               onClick={toggleVideo}
             >
-              {isVideoOff ? <VideoOff className="h-4 w-4 sm:h-5 md:h-6 sm:w-5 md:w-6 text-gray-700" /> : <Video className="h-4 w-4 sm:h-5 md:h-6 sm:w-5 md:w-6 text-gray-700" />}
+              {isVideoOff ? <VideoOff className="h-4 w-4 sm:h-5 md:h-6 sm:w-5 md:w-6 text-gray-700 dark:text-gray-300" /> : <Video className="h-4 w-4 sm:h-5 md:h-6 sm:w-5 md:w-6 text-gray-700 dark:text-gray-300" />}
             </Button>
             <Button
               variant="outline"
               size="icon"
-              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white hover:bg-gray-100 hidden sm:flex"
+              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 hidden sm:flex"
             >
-              <MessageSquare className="h-5 md:h-6 w-5 md:w-6 text-gray-700" />
+              <MessageSquare className="h-5 md:h-6 w-5 md:w-6 text-gray-700 dark:text-gray-300" />
             </Button>
             <Button
               variant="outline"
               size="icon"
-              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white hover:bg-gray-100"
+              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
               onClick={toggleScreenShare}
             >
-              <ScreenShare className="h-4 w-4 sm:h-5 md:h-6 sm:w-5 md:w-6 text-gray-700" />
+              <ScreenShare className="h-4 w-4 sm:h-5 md:h-6 sm:w-5 md:w-6 text-gray-700 dark:text-gray-300" />
             </Button>
             <Button
               variant="outline"
               size="icon"
-              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white hover:bg-gray-100 hidden md:flex"
+              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 hidden md:flex"
             >
-              <Upload className="h-6 w-6 text-gray-700" />
+              <Upload className="h-6 w-6 text-gray-700 dark:text-gray-300" />
             </Button>
             <Button
               variant="outline"
               size="icon"
-              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white hover:bg-gray-100 hidden md:flex"
+              className="h-10 w-10 sm:h-12 md:h-14 sm:w-12 md:w-14 rounded-full bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 hidden md:flex"
             >
-              <Ellipsis className="h-6 w-6 text-gray-700" />
+              <Ellipsis className="h-6 w-6 text-gray-700 dark:text-gray-300" />
             </Button>
             <Button
               onClick={endCall}
@@ -544,9 +544,9 @@ export default function MeetingRoomPage() {
       </div>
 
       {/* Right Sidebar */}
-      <aside className={`${isSidebarOpen ? 'flex' : 'hidden'} lg:flex w-full lg:w-[400px] flex-shrink-0 bg-white border-l flex-col absolute lg:relative inset-0 lg:inset-auto z-20 lg:z-auto`}>
+      <aside className={`${isSidebarOpen ? 'flex' : 'hidden'} lg:flex w-full lg:w-[400px] flex-shrink-0 bg-white dark:bg-gray-800 border-l dark:border-gray-700 flex-col absolute lg:relative inset-0 lg:inset-auto z-20 lg:z-auto`}>
         {/* Close button for mobile/tablet */}
-        <div className="lg:hidden flex justify-end p-2 border-b">
+        <div className="lg:hidden flex justify-end p-2 border-b dark:border-gray-700">
           <Button
             variant="ghost"
             size="icon"
@@ -557,8 +557,8 @@ export default function MeetingRoomPage() {
         </div>
 
         {/* Things to Discuss */}
-        <div className="p-4 sm:p-6 border-b">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">Things to Discuss</h2>
+        <div className="p-4 sm:p-6 border-b dark:border-gray-700">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">Things to Discuss</h2>
           <div className="space-y-2 sm:space-y-3">
             {discussionItems.map((item) => (
               <div key={item.id} className="flex items-center justify-between group">
@@ -573,7 +573,7 @@ export default function MeetingRoomPage() {
                       <Circle className="h-5 w-5 sm:h-6 sm:w-6 text-gray-300" />
                     )}
                   </button>
-                  <span className={`text-xs sm:text-sm ${item.completed ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
+                  <span className={`text-xs sm:text-sm ${item.completed ? 'text-gray-500 dark:text-gray-400 line-through' : 'text-gray-900 dark:text-gray-100'}`}>
                     {item.text}
                   </span>
                 </div>
@@ -611,14 +611,14 @@ export default function MeetingRoomPage() {
 
         {/* Comments Section */}
         <div className="flex-1 flex flex-col overflow-hidden min-h-0">
-          <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-2 border-b">
+          <div className="px-4 sm:px-6 pt-3 sm:pt-4 pb-2 border-b dark:border-gray-700">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">Comments</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Comments</h2>
               <div className="flex gap-1">
                 <Button
                   variant={activeTab === 'common' ? 'default' : 'ghost'}
                   size="sm"
-                  className={`rounded-full text-xs sm:text-sm px-2 sm:px-3 ${activeTab === 'common' ? 'bg-purple-500 hover:bg-purple-600 text-white' : 'text-gray-600'}`}
+                  className={`rounded-full text-xs sm:text-sm px-2 sm:px-3 ${activeTab === 'common' ? 'bg-purple-500 hover:bg-purple-600 text-white' : 'text-gray-600 dark:text-gray-400'}`}
                   onClick={() => setActiveTab('common')}
                 >
                   Common
@@ -626,7 +626,7 @@ export default function MeetingRoomPage() {
                 <Button
                   variant={activeTab === 'internal' ? 'default' : 'ghost'}
                   size="sm"
-                  className={`rounded-full text-xs sm:text-sm px-2 sm:px-3 ${activeTab === 'internal' ? 'bg-purple-500 hover:bg-purple-600 text-white' : 'text-gray-600'}`}
+                  className={`rounded-full text-xs sm:text-sm px-2 sm:px-3 ${activeTab === 'internal' ? 'bg-purple-500 hover:bg-purple-600 text-white' : 'text-gray-600 dark:text-gray-400'}`}
                   onClick={() => setActiveTab('internal')}
                 >
                   Internal
@@ -638,7 +638,7 @@ export default function MeetingRoomPage() {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-3 sm:py-4 space-y-3 sm:space-y-4">
             {messages.length === 0 ? (
-              <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+              <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500 text-sm">
                 No messages yet. Start the conversation!
               </div>
             ) : (
@@ -648,9 +648,9 @@ export default function MeetingRoomPage() {
                     <AvatarFallback>{msg.user?.charAt(0) || 'U'}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs sm:text-sm font-semibold text-gray-900 mb-1">{msg.user}</p>
-                    <div className="bg-gray-100 rounded-2xl rounded-tl-none p-2 sm:p-3">
-                      <p className="text-xs sm:text-sm text-gray-700 break-words">{msg.text}</p>
+                    <p className="text-xs sm:text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">{msg.user}</p>
+                    <div className="bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-tl-none p-2 sm:p-3">
+                      <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 break-words">{msg.text}</p>
                     </div>
                   </div>
                 </div>
@@ -659,14 +659,14 @@ export default function MeetingRoomPage() {
           </div>
 
           {/* Message Input */}
-          <div className="p-3 sm:p-4 border-t">
+          <div className="p-3 sm:p-4 border-t dark:border-gray-700">
             <div className="flex items-center gap-2">
               <Button size="icon" variant="outline" className="h-9 w-9 sm:h-10 sm:w-10 rounded-full flex-shrink-0 hidden sm:flex">
                 <Upload className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
               </Button>
               <Input
                 placeholder="Message"
-                className="flex-1 rounded-full border-gray-300 text-xs sm:text-sm"
+                className="flex-1 rounded-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 text-xs sm:text-sm"
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyPress={(e) => {

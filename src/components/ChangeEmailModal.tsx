@@ -84,7 +84,7 @@ export function ChangeEmailModal({ isOpen, onClose, onSave, currentEmail }: Chan
       <div
         style={{
           borderRadius: 24,
-          background: '#FFF',
+          background: 'hsl(var(--card))',
           boxShadow: '0 4px 16px 0 rgba(0, 0, 0, 0.20), 35px 45px 73px 0 rgba(32, 32, 35, 0.07)',
           width: 500,
           padding: '32px',
@@ -97,7 +97,7 @@ export function ChangeEmailModal({ isOpen, onClose, onSave, currentEmail }: Chan
       >
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontWeight: 600, fontSize: 20, color: '#222' }}>Change Email</div>
+          <div style={{ fontWeight: 600, fontSize: 20, color: 'hsl(var(--foreground))' }}>Change Email</div>
           <button
             onClick={handleClose}
             style={{
@@ -115,7 +115,7 @@ export function ChangeEmailModal({ isOpen, onClose, onSave, currentEmail }: Chan
           </button>
         </div>
 
-        <div style={{ fontSize: 14, color: '#7B8794' }}>
+        <div style={{ fontSize: 14, color: 'hsl(var(--muted-foreground))' }}>
           Enter your new email address and verify with your password. You&apos;ll need to log in with your new email after this change.
         </div>
 
@@ -124,13 +124,13 @@ export function ChangeEmailModal({ isOpen, onClose, onSave, currentEmail }: Chan
           <div
             style={{
               padding: '12px 16px',
-              background: '#F9FAFB',
+              background: 'hsl(var(--surface))',
               borderRadius: 12,
-              border: '1px solid #E5E7EB',
+              border: '1px solid hsl(var(--border))',
             }}
           >
-            <div style={{ fontSize: 12, color: '#7B8794', marginBottom: 4 }}>Current Email</div>
-            <div style={{ fontSize: 14, color: '#222', fontWeight: 500 }}>{currentEmail}</div>
+            <div style={{ fontSize: 12, color: 'hsl(var(--muted-foreground))', marginBottom: 4 }}>Current Email</div>
+            <div style={{ fontSize: 14, color: 'hsl(var(--foreground))', fontWeight: 500 }}>{currentEmail}</div>
           </div>
         )}
 
@@ -147,7 +147,7 @@ export function ChangeEmailModal({ isOpen, onClose, onSave, currentEmail }: Chan
               placeholder="Enter new email address"
             />
             {errors.newEmail && (
-              <p style={{ fontSize: 13, color: '#DC2626', marginTop: 4 }}>{errors.newEmail}</p>
+              <p style={{ fontSize: 13, color: 'hsl(var(--destructive))', marginTop: 4 }}>{errors.newEmail}</p>
             )}
           </div>
 
@@ -173,14 +173,14 @@ export function ChangeEmailModal({ isOpen, onClose, onSave, currentEmail }: Chan
                   background: 'none',
                   border: 'none',
                   cursor: 'pointer',
-                  color: '#7B8794',
+                  color: 'hsl(var(--muted-foreground))',
                 }}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {errors.password && (
-              <p style={{ fontSize: 13, color: '#DC2626', marginTop: 4 }}>{errors.password}</p>
+              <p style={{ fontSize: 13, color: 'hsl(var(--destructive))', marginTop: 4 }}>{errors.password}</p>
             )}
           </div>
 
@@ -189,12 +189,12 @@ export function ChangeEmailModal({ isOpen, onClose, onSave, currentEmail }: Chan
             <div
               style={{
                 padding: '12px 16px',
-                background: '#FEF2F2',
+                background: 'hsl(var(--destructive) / 0.12)',
                 borderRadius: 12,
-                border: '1px solid #FCA5A5',
+                border: '1px solid hsl(var(--destructive) / 0.5)',
               }}
             >
-              <p style={{ fontSize: 13, color: '#DC2626', fontWeight: 500 }}>{errors.submit}</p>
+              <p style={{ fontSize: 13, color: 'hsl(var(--destructive))', fontWeight: 500 }}>{errors.submit}</p>
             </div>
           )}
         </div>
@@ -206,7 +206,7 @@ export function ChangeEmailModal({ isOpen, onClose, onSave, currentEmail }: Chan
           </Button>
           <Button
             onClick={handleSave}
-            style={{ flex: 1, background: '#846BD2', color: '#FFF' }}
+            className="flex-1 bg-purple-600 dark:bg-purple-700 text-white hover:bg-purple-700 dark:hover:bg-purple-600"
             disabled={loading}
           >
             {loading ? 'Changing...' : 'Change Email'}

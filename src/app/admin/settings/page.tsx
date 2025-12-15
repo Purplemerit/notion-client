@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usersAPI, userAPI } from "@/lib/api";
+import { useTheme } from "@/contexts/ThemeContext";
 import AdminSidebar from "@/components/adminSidebar";
 import AdminHeader from "@/components/AdminHeader";
 import { Button } from "@/components/ui/button";
@@ -49,6 +50,7 @@ const SvgSwitch = ({ checked, onCheckedChange }: { checked?: boolean; onCheckedC
 };
 
 export default function AdminSettingsPage() {
+  const { theme, setTheme } = useTheme();
   const [activeSection, setActiveSection] = useState("profile");
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -96,6 +98,17 @@ export default function AdminSettingsPage() {
 
   const handleUpdatePreference = async (key: string, value: any) => {
     try {
+      // Handle theme preference separately using ThemeContext
+      if (key === 'theme') {
+        await setTheme(value);
+        toast({
+          title: "Theme Updated",
+          description: "Your theme preference has been saved",
+        });
+        return;
+      }
+
+      // Handle other preferences normally
       const updates = { [key]: value };
       const updatedPreferences = await userAPI.updatePreferences(updates);
       setPreferences(updatedPreferences);
@@ -117,7 +130,7 @@ export default function AdminSettingsPage() {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#FAFAFA" }}>
+    <div className="dark:bg-gray-900" style={{ display: "flex", minHeight: "100vh", background: "#FAFAFA" }}>
       <div style={{ flexShrink: 0, height: "100vh" }}>
         <AdminSidebar />
       </div>
@@ -130,17 +143,18 @@ export default function AdminSettingsPage() {
         />
 
         {/* Main Content */}
-        <main style={{ flex: 1, overflow: "auto", padding: "32px 40px" }}>
+        <main className="dark:bg-gray-800" style={{ flex: 1, overflow: "auto", padding: "32px 40px" }}>
           <div style={{ maxWidth: 1200, margin: "0 auto" }}>
-            <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8, color: "#1A1A1A" }}>Settings</h1>
-            <p style={{ fontSize: 14, color: "#666", marginBottom: 32 }}>Manage your admin account settings and preferences</p>
+            <h1 className="dark:text-gray-100" style={{ fontSize: 32, fontWeight: 700, marginBottom: 8, color: "#1A1A1A" }}>Settings</h1>
+            <p className="dark:text-gray-400" style={{ fontSize: 14, color: "#666", marginBottom: 32 }}>Manage your admin account settings and preferences</p>
 
             {/* Tab Navigation */}
-            <div style={{ display: "flex", gap: 24, borderBottom: "2px solid #E5E5E5", marginBottom: 32 }}>
+            <div className="dark:border-gray-600" style={{ display: "flex", gap: 24, borderBottom: "2px solid #E5E5E5", marginBottom: 32 }}>
               {["profile", "security", "accessibility", "notifications", "ai"].map((section) => (
                 <button
                   key={section}
                   onClick={() => setActiveSection(section)}
+                  className="dark:text-gray-300"
                   style={{
                     padding: "12px 0",
                     fontSize: 14,
@@ -161,11 +175,11 @@ export default function AdminSettingsPage() {
 
             {/* Profile Section */}
             {activeSection === "profile" && (
-              <div style={{ background: "#FFF", borderRadius: 16, padding: 24, border: "1px solid #E1DEF6" }}>
+              <div className="dark:bg-gray-700 dark:border-gray-600" style={{ background: "#FFF", borderRadius: 16, padding: 24, border: "1px solid #E1DEF6" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
                   <div>
-                    <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>Profile Information</h2>
-                    <p style={{ fontSize: 14, color: "#666" }}>Update your admin account profile</p>
+                    <h2 className="dark:text-gray-100" style={{ fontSize: 20, fontWeight: 600, marginBottom: 4 }}>Profile Information</h2>
+                    <p className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>Update your admin account profile</p>
                   </div>
                   <Button onClick={() => setShowEditProfile(true)} variant="outline" style={{ borderColor: "#8B7BE8", color: "#8B7BE8" }}>
                     Edit Profile
@@ -180,28 +194,28 @@ export default function AdminSettingsPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h3 style={{ fontSize: 18, fontWeight: 600 }}>{user?.name || "Admin User"}</h3>
-                    <p style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>{user?.email}</p>
+                    <h3 className="dark:text-gray-100" style={{ fontSize: 18, fontWeight: 600 }}>{user?.name || "Admin User"}</h3>
+                    <p className="dark:text-gray-300" style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>{user?.email}</p>
                     <Badge style={{ background: "#E8E4FF", color: "#8B7BE8" }}>{user?.role === 'admin' ? 'Administrator' : 'User'}</Badge>
                   </div>
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                   <div>
-                    <Label style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>First Name</Label>
-                    <Input value={user?.firstName || ""} disabled style={{ background: "#F5F5FF" }} />
+                    <Label className="dark:text-gray-300" style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>First Name</Label>
+                    <Input className="dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500" value={user?.firstName || ""} disabled style={{ background: "#F5F5FF" }} />
                   </div>
                   <div>
-                    <Label style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>Last Name</Label>
-                    <Input value={user?.lastName || ""} disabled style={{ background: "#F5F5FF" }} />
+                    <Label className="dark:text-gray-300" style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>Last Name</Label>
+                    <Input className="dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500" value={user?.lastName || ""} disabled style={{ background: "#F5F5FF" }} />
                   </div>
                   <div>
-                    <Label style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>Phone</Label>
-                    <Input value={user?.phone || ""} disabled style={{ background: "#F5F5FF" }} />
+                    <Label className="dark:text-gray-300" style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>Phone</Label>
+                    <Input className="dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500" value={user?.phone || ""} disabled style={{ background: "#F5F5FF" }} />
                   </div>
                   <div>
-                    <Label style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>Bio</Label>
-                    <Input value={user?.bio || ""} disabled style={{ background: "#F5F5FF" }} />
+                    <Label className="dark:text-gray-300" style={{ fontSize: 14, color: "#666", marginBottom: 4 }}>Bio</Label>
+                    <Input className="dark:bg-gray-600 dark:text-gray-100 dark:border-gray-500" value={user?.bio || ""} disabled style={{ background: "#F5F5FF" }} />
                   </div>
                 </div>
               </div>
@@ -209,30 +223,30 @@ export default function AdminSettingsPage() {
 
             {/* Security Section */}
             {activeSection === "security" && (
-              <div style={{ background: "#FFF", borderRadius: 16, padding: 24, border: "1px solid #E1DEF6" }}>
-                <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>Security Settings</h2>
+              <div className="dark:bg-gray-700 dark:border-gray-600" style={{ background: "#FFF", borderRadius: 16, padding: 24, border: "1px solid #E1DEF6" }}>
+                <h2 className="dark:text-gray-100" style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>Security Settings</h2>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 16, background: "#F5F5FF", borderRadius: 8 }}>
+                  <div className="dark:bg-gray-600" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 16, background: "#F5F5FF", borderRadius: 8 }}>
                     <div>
-                      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Email Address</h3>
-                      <p style={{ fontSize: 14, color: "#666" }}>{user?.email}</p>
+                      <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Email Address</h3>
+                      <p className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>{user?.email}</p>
                     </div>
                     <Button onClick={() => setShowChangeEmail(true)} variant="outline" size="sm">Change Email</Button>
                   </div>
 
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 16, background: "#F5F5FF", borderRadius: 8 }}>
+                  <div className="dark:bg-gray-600" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 16, background: "#F5F5FF", borderRadius: 8 }}>
                     <div>
-                      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Password</h3>
-                      <p style={{ fontSize: 14, color: "#666" }}>••••••••</p>
+                      <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Password</h3>
+                      <p className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>••••••••</p>
                     </div>
                     <Button onClick={() => setShowChangePassword(true)} variant="outline" size="sm">Change Password</Button>
                   </div>
 
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 16, background: "#F5F5FF", borderRadius: 8 }}>
+                  <div className="dark:bg-gray-600" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 16, background: "#F5F5FF", borderRadius: 8 }}>
                     <div>
-                      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Two-Factor Authentication</h3>
-                      <p style={{ fontSize: 14, color: "#666" }}>
+                      <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Two-Factor Authentication</h3>
+                      <p className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>
                         {user?.twoFactorEnabled ? "Enabled" : "Disabled"}
                       </p>
                     </div>
@@ -246,14 +260,14 @@ export default function AdminSettingsPage() {
 
             {/* Accessibility Section */}
             {activeSection === "accessibility" && (
-              <div style={{ background: "#FFF", borderRadius: 16, padding: 24, border: "1px solid #E1DEF6" }}>
-                <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>Accessibility</h2>
+              <div className="dark:bg-gray-700 dark:border-gray-600" style={{ background: "#FFF", borderRadius: 16, padding: 24, border: "1px solid #E1DEF6" }}>
+                <h2 className="dark:text-gray-100" style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>Accessibility</h2>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Language</h3>
-                      <p style={{ fontSize: 14, color: "#666" }}>Choose your preferred language</p>
+                      <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Language</h3>
+                      <p className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>Choose your preferred language</p>
                     </div>
                     <Select
                       value={preferences?.language || "en"}
@@ -272,8 +286,8 @@ export default function AdminSettingsPage() {
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Font Size</h3>
-                      <p style={{ fontSize: 14, color: "#666" }}>Adjust text size for better readability</p>
+                      <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Font Size</h3>
+                      <p className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>Adjust text size for better readability</p>
                     </div>
                     <Select
                       value={preferences?.fontSize || "medium"}
@@ -292,11 +306,11 @@ export default function AdminSettingsPage() {
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Theme</h3>
-                      <p style={{ fontSize: 14, color: "#666" }}>Choose your preferred theme</p>
+                      <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Theme</h3>
+                      <p className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>Choose your preferred theme</p>
                     </div>
                     <Select
-                      value={preferences?.theme || "light"}
+                      value={theme}
                       onValueChange={(value) => handleUpdatePreference("theme", value)}
                     >
                       <SelectTrigger style={{ width: 200 }}>
@@ -312,8 +326,8 @@ export default function AdminSettingsPage() {
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>
-                      <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Enable Captions</h3>
-                      <p style={{ fontSize: 14, color: "#666" }}>Show captions in meetings</p>
+                      <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>Enable Captions</h3>
+                      <p className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>Show captions in meetings</p>
                     </div>
                     <SvgSwitch
                       checked={preferences?.enableCaptions || false}
@@ -326,15 +340,15 @@ export default function AdminSettingsPage() {
 
             {/* Notifications Section */}
             {activeSection === "notifications" && (
-              <div style={{ background: "#FFF", borderRadius: 16, padding: 24, border: "1px solid #E1DEF6" }}>
-                <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>Notification Preferences</h2>
+              <div className="dark:bg-gray-700 dark:border-gray-600" style={{ background: "#FFF", borderRadius: 16, padding: 24, border: "1px solid #E1DEF6" }}>
+                <h2 className="dark:text-gray-100" style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>Notification Preferences</h2>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>Notification Types</h3>
+                    <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>Notification Types</h3>
                     {["chatNotifications", "meetingInvites", "taskUpdates", "calendarChanges"].map((type) => (
                       <div key={type} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 12 }}>
-                        <span style={{ fontSize: 14, textTransform: "capitalize" }}>
+                        <span className="dark:text-gray-300" style={{ fontSize: 14, textTransform: "capitalize" }}>
                           {type.replace(/([A-Z])/g, ' $1').trim()}
                         </span>
                         <SvgSwitch
@@ -351,10 +365,10 @@ export default function AdminSettingsPage() {
                   </div>
 
                   <div>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>Notification Channels</h3>
+                    <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, marginBottom: 16 }}>Notification Channels</h3>
                     {["email", "inApp", "push"].map((channel) => (
                       <div key={channel} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: 12 }}>
-                        <span style={{ fontSize: 14, textTransform: "capitalize" }}>
+                        <span className="dark:text-gray-300" style={{ fontSize: 14, textTransform: "capitalize" }}>
                           {channel.replace(/([A-Z])/g, ' $1').trim()}
                         </span>
                         <SvgSwitch
@@ -375,8 +389,8 @@ export default function AdminSettingsPage() {
 
             {/* AI Settings Section */}
             {activeSection === "ai" && (
-              <div style={{ background: "#FFF", borderRadius: 16, padding: 24, border: "1px solid #E1DEF6" }}>
-                <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>AI Features</h2>
+              <div className="dark:bg-gray-700 dark:border-gray-600" style={{ background: "#FFF", borderRadius: 16, padding: 24, border: "1px solid #E1DEF6" }}>
+                <h2 className="dark:text-gray-100" style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>AI Features</h2>
 
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                   {[
@@ -388,8 +402,8 @@ export default function AdminSettingsPage() {
                   ].map((setting) => (
                     <div key={setting.key} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                       <div>
-                        <h3 style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{setting.label}</h3>
-                        <p style={{ fontSize: 14, color: "#666" }}>{setting.desc}</p>
+                        <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{setting.label}</h3>
+                        <p className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>{setting.desc}</p>
                       </div>
                       <SvgSwitch
                         checked={preferences?.[setting.key] || false}

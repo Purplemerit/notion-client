@@ -13,9 +13,11 @@ import { useChatContext } from "@/contexts/ChatContext";
 import { useRouter } from "next/navigation";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function CommunityPage() {
     const router = useRouter();
+    const { actualTheme } = useTheme();
     const { chitChatChats, messages: contextMessages } = useChatContext();
     const [activeTab, setActiveTab] = useState("references");
     const [currentView, setCurrentView] = useState("community");
@@ -56,7 +58,6 @@ export default function CommunityPage() {
     ];
 
     useEffect(() => {
-        // Fetch current user profile
         const fetchUserProfile = async () => {
             try {
                 const profile = await userAPI.getProfile();
@@ -74,13 +75,11 @@ export default function CommunityPage() {
             setLoadingPosts(true);
             const data = await blogAPI.getAll('published');
             setPosts(data.map((blog: any) => {
-                // Use current user's name if this is their post, otherwise use author name from backend
                 let authorName = blog.author?.name || "Anonymous";
                 if (currentUser && blog.author?._id === currentUser.id) {
                     authorName = currentUser.name;
                 }
 
-                // Check if current user has liked this post
                 const isLiked = currentUser && blog.likes?.some((likeId: string) => likeId === currentUser.id);
 
                 return {
@@ -98,10 +97,10 @@ export default function CommunityPage() {
                     title: blog.title,
                     content: blog.content,
                     image: blog.coverImage && typeof blog.coverImage === 'string' && blog.coverImage.trim() !== ''
-    ? (blog.coverImage.startsWith('http://') || blog.coverImage.startsWith('https://')
-        ? blog.coverImage
-        : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/${blog.coverImage.replace(/^\/+/, '')}`)
-    : null,
+                        ? (blog.coverImage.startsWith('http://') || blog.coverImage.startsWith('https://')
+                            ? blog.coverImage
+                            : `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/${blog.coverImage.replace(/^\/+/, '')}`)
+                        : null,
                     likes: blog.likes?.length || 0,
                     isLiked: isLiked,
                     comments: blog.comments?.length || 0,
@@ -183,7 +182,7 @@ export default function CommunityPage() {
         }
 
         if (isCreatingPost) {
-            return; // Prevent double submission
+            return;
         }
 
         try {
@@ -196,7 +195,6 @@ export default function CommunityPage() {
                 tags: ['community'],
             };
 
-            // If there's an image, upload it to S3 first
             if (selectedImage) {
                 const uploadData = await blogAPI.uploadImage(selectedImage);
                 console.log('Image upload URL:', uploadData.url);
@@ -254,7 +252,6 @@ export default function CommunityPage() {
         try {
             const commentsData = await blogAPI.getComments(postId);
             setComments(commentsData);
-            // Update comment count in posts to reflect actual count
             setPosts(posts.map(post =>
                 post.id === postId
                     ? { ...post, comments: commentsData.length }
@@ -272,10 +269,8 @@ export default function CommunityPage() {
         try {
             await blogAPI.addComment(postId, newComment);
             setNewComment("");
-            // Reload comments
             const commentsData = await blogAPI.getComments(postId);
             setComments(commentsData);
-            // Update comment count in posts
             setPosts(posts.map(post =>
                 post.id === postId
                     ? { ...post, comments: commentsData.length }
@@ -340,12 +335,10 @@ export default function CommunityPage() {
                 content: editPostContent,
             };
 
-            // If there's a new image, upload it first
             if (editPostImage) {
                 const uploadData = await blogAPI.uploadImage(editPostImage);
                 updateData.coverImage = uploadData.url;
             } else if (!editImagePreview) {
-                // If image was removed and no new image, set coverImage to empty
                 updateData.coverImage = "";
             }
 
@@ -353,7 +346,6 @@ export default function CommunityPage() {
 
             alert("Post updated successfully!");
 
-            // Reset edit state
             setEditingPost(null);
             setEditPostContent("");
             setEditPostImage(null);
@@ -362,7 +354,6 @@ export default function CommunityPage() {
                 editFileInputRef.current.value = "";
             }
 
-            // Reload posts
             loadPosts();
         } catch (error: any) {
             console.error("Failed to update post:", error);
@@ -382,27 +373,35 @@ export default function CommunityPage() {
         }
     };
 
-    const tabTriggerClasses = "rounded-full px-6 py-2 text-sm font-medium border bg-white text-gray-700 shadow-none data-[state=active]:bg-gray-800 data-[state=active]:text-white";
+    const tabTriggerClasses = `rounded-full px-6 py-2 text-sm font-medium border shadow-none ${
+        actualTheme === 'dark' 
+            ? 'bg-gray-800 text-gray-300 data-[state=active]:bg-gray-700 data-[state=active]:text-white' 
+            : 'bg-white text-gray-700 data-[state=active]:bg-gray-800 data-[state=active]:text-white'
+    }`;
 
     return (
-        <div className="min-h-screen bg-white flex">
+        <div className={`min-h-screen flex ${actualTheme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
             <Sidebar currentView={currentView} onViewChange={handleViewChange} />
 
             <div className="flex-1 flex flex-row">
-                <main className="flex-1 p-4 sm:p-6 flex gap-4 sm:gap-6 bg-gray-50">
+                <main className={`flex-1 p-4 sm:p-6 flex gap-4 sm:gap-6 ${actualTheme === 'dark' ? 'bg-gray-800' : 'bg-gray-50'}`}>
                     <div className="flex-1">
                         <div className="max-w-5xl">
                             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-8 lg:gap-16 mb-6 sm:mb-8">
-                                <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Community</h1>
+                                <h1 className={`text-2xl sm:text-3xl font-bold ${actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                                    Community
+                                </h1>
                                 <div className="relative flex-1 w-full max-w-md">
-                                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
                                     <Input
                                         placeholder="Search"
-                                        className="pl-11 bg-white h-10 w-full"
+                                        className={`pl-11 h-10 w-full ${
+                                            actualTheme === 'dark' 
+                                                ? 'bg-gray-700 text-gray-100 border-gray-600 placeholder:text-gray-400' 
+                                                : 'bg-white text-gray-900 border-gray-200'
+                                        }`}
                                         style={{
                                           borderRadius: '24px',
-                                          border: '1px solid #E6E6E6',
-                                          background: '#FFF',
                                           boxShadow: '0 4px 4px 0 rgba(221, 221, 221, 0.25)',
                                         }}
                                     />
@@ -424,15 +423,25 @@ export default function CommunityPage() {
                                     </TabsList>
 
                                     {activeTab !== 'posts' && (
-                                        <Button className="bg-gray-100 text-gray-700 hover:bg-gray-200">Post Reference</Button>
+                                        <Button className={`${
+                                            actualTheme === 'dark' 
+                                                ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        }`}>
+                                            Post Reference
+                                        </Button>
                                     )}
                                 </div>
 
                                 <TabsContent value="references" className="space-y-6">
                                     {loadingReferences ? (
-                                        <div className="text-center py-8 text-muted-foreground">Loading references...</div>
+                                        <div className={`text-center py-8 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Loading references...
+                                        </div>
                                     ) : references.length === 0 ? (
-                                        <div className="text-center py-8 text-muted-foreground">No references available yet.</div>
+                                        <div className={`text-center py-8 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            No references available yet.
+                                        </div>
                                     ) : (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                                             {references.map((project) => (
@@ -450,7 +459,6 @@ export default function CommunityPage() {
                                                             backgroundColor: 'lightgray'
                                                         }}
                                                     >
-                                                        {/* Hover overlay */}
                                                         <div
                                                             className="w-full h-full rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center p-6"
                                                             style={{
@@ -471,13 +479,14 @@ export default function CommunityPage() {
 
                                 <TabsContent value="posts" className="space-y-6 flex flex-col items-center">
                                     <div
-                                        className="w-full lg:w-[720px]"
+                                        className={`w-full lg:w-[720px] ${
+                                            actualTheme === 'dark' ? 'bg-gray-700' : 'bg-white'
+                                        }`}
                                         style={{
                                             minHeight: '73px',
                                             flexShrink: 0,
                                             borderRadius: '16px',
                                             border: '0.5px solid #D9D9D9',
-                                            background: '#FFF',
                                             padding: '12px 16px'
                                         }}
                                     >
@@ -502,10 +511,13 @@ export default function CommunityPage() {
                                                     height: '40px',
                                                     flexShrink: 0,
                                                     borderRadius: '8px',
-                                                    border: '0.5px solid #E0E0E0',
-                                                    background: '#FAF9F6'
+                                                    border: '0.5px solid #E0E0E0'
                                                 }}
-                                                className="border-none shadow-none text-base focus-visible:ring-0"
+                                                className={`border-none shadow-none text-base focus-visible:ring-0 ${
+                                                    actualTheme === 'dark' 
+                                                        ? 'bg-gray-600 text-gray-100 placeholder:text-gray-400' 
+                                                        : 'bg-[#FAF9F6] text-gray-900'
+                                                }`}
                                             />
                                             <input
                                                 ref={fileInputRef}
@@ -521,7 +533,7 @@ export default function CommunityPage() {
                                                 disabled={isCreatingPost}
                                                 className="h-10 w-10"
                                             >
-                                                <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                                                <ImageIcon className={`w-5 h-5 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`} />
                                             </Button>
                                             <Button
                                                 onClick={handleCreatePost}
@@ -561,9 +573,11 @@ export default function CommunityPage() {
                                     </div>
 
                                     {loadingPosts ? (
-                                        <div className="text-center py-8 text-muted-foreground">Loading posts...</div>
+                                        <div className={`text-center py-8 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Loading posts...
+                                        </div>
                                     ) : posts.length === 0 ? (
-                                        <div className="text-center py-8 text-muted-foreground">
+                                        <div className={`text-center py-8 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                                             No posts yet. Be the first to share something!
                                         </div>
                                     ) : (
@@ -571,7 +585,11 @@ export default function CommunityPage() {
                                             {posts.map((post) => (
                                                 <div
                                                     key={post.id}
-                                                    className="cursor-pointer hover:shadow-lg transition-shadow w-full lg:w-[720px] rounded-2xl border border-gray-200 bg-white p-4 flex flex-col gap-3"
+                                                    className={`cursor-pointer hover:shadow-lg transition-shadow w-full lg:w-[720px] rounded-2xl p-4 flex flex-col gap-3 ${
+                                                        actualTheme === 'dark' 
+                                                            ? 'border-gray-600 bg-gray-700' 
+                                                            : 'border-gray-200 bg-white'
+                                                    } border`}
                                                 >
                                                     <div className="flex items-center justify-between">
                                                         <div className="flex items-center gap-3">
@@ -580,8 +598,12 @@ export default function CommunityPage() {
                                                                 <AvatarFallback>{post.author.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
                                                             </Avatar>
                                                             <div>
-                                                                <h3 className="font-medium text-sm">{post.author}</h3>
-                                                                <p className="text-xs text-muted-foreground">{post.time}</p>
+                                                                <h3 className={`font-medium text-sm ${actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                                                                    {post.author}
+                                                                </h3>
+                                                                <p className={`text-xs ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                                    {post.time}
+                                                                </p>
                                                             </div>
                                                         </div>
                                                         {currentUser && post.authorId === currentUser.id && (
@@ -605,15 +627,16 @@ export default function CommunityPage() {
 
                                                     <div className="flex-1 overflow-hidden">
                                                         {post.title && post.title !== post.content && (
-                                                            <h2 className="text-lg font-semibold mb-2">{post.title}</h2>
+                                                            <h2 className={`text-lg font-semibold mb-2 ${actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                                                                {post.title}
+                                                            </h2>
                                                         )}
-                                                        <p className="text-sm mb-3 whitespace-pre-line">{post.content}</p>
-                                                        {post.image && (
-                                                            (() => { console.log('Post image URL:', post.image); return null; })()
-                                                        )}
+                                                        <p className={`text-sm mb-3 whitespace-pre-line ${actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                            {post.content}
+                                                        </p>
                                                         {post.image && (
                                                             <div
-                                                                className="w-full h-48 sm:h-64 rounded-2xl bg-gray-200"
+                                                                className={`w-full h-48 sm:h-64 rounded-2xl ${actualTheme === 'dark' ? 'bg-gray-600' : 'bg-gray-200'}`}
                                                                 style={{
                                                                     backgroundImage: `url(${post.image})`,
                                                                     backgroundSize: 'cover',
@@ -684,9 +707,13 @@ export default function CommunityPage() {
 
                                 <TabsContent value="learnings" className="space-y-6">
                                     {loadingLearnings ? (
-                                        <div className="text-center py-8 text-muted-foreground">Loading learnings...</div>
+                                        <div className={`text-center py-8 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            Loading learnings...
+                                        </div>
                                     ) : learnings.length === 0 ? (
-                                        <div className="text-center py-8 text-muted-foreground">No learnings available yet.</div>
+                                        <div className={`text-center py-8 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                            No learnings available yet.
+                                        </div>
                                     ) : (
                                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                                             {learnings.map((course) => (
@@ -719,10 +746,13 @@ export default function CommunityPage() {
                                                             <p className="text-xs text-white/90 drop-shadow-md">{course.subtitle}</p>
                                                         </div>
                                                     </div>
-                                                    <div className="p-4 bg-white" style={{ width: '318px', height: '80px', flexShrink: 0, borderRadius: '0 0 16px 16px', border: '1px solid #D9D9D9', borderTop: 'none' }}>
+                                                    <div 
+                                                        className={`p-4 ${actualTheme === 'dark' ? 'bg-gray-700' : 'bg-white'}`}
+                                                        style={{ width: '318px', height: '80px', flexShrink: 0, borderRadius: '0 0 16px 16px', border: '1px solid #D9D9D9', borderTop: 'none' }}
+                                                    >
                                                         <div className="flex items-center justify-between">
                                                             <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full font-medium">{course.category}</span>
-                                                            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                                                            <div className={`flex items-center gap-1 text-xs ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                                                                 <Clock className="w-3 h-3" />
                                                                 {course.duration}
                                                             </div>
@@ -746,29 +776,32 @@ export default function CommunityPage() {
 
                 {activeTab === 'posts' && (
                     <div
-                        className="hidden lg:block"
+                        className={`hidden lg:block ${actualTheme === 'dark' ? 'bg-gray-800' : 'bg-[#FAFAFA]'}`}
                         style={{
                             width: '296px',
                             minHeight: '100vh',
                             height: '100%',
                             flexShrink: 0,
                             padding: '16px',
-                            background: '#FAFAFA',
                             boxSizing: 'border-box',
                         }}
                     >
                         <div className="mb-6">
-                            <h2 className="text-lg font-semibold mb-4">Messages</h2>
+                            <h2 className={`text-lg font-semibold mb-4 ${actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                                Messages
+                            </h2>
                             <div className="relative">
-                                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Search className={`absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 ${actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}`} />
                                 <Input
                                     placeholder="Search"
-                                    className="pl-11 bg-white h-8 w-full"
+                                    className={`pl-11 h-8 w-full ${
+                                        actualTheme === 'dark' 
+                                            ? 'bg-gray-700 text-gray-100 border-gray-600 placeholder:text-gray-400' 
+                                            : 'bg-white text-gray-900 border-gray-200'
+                                    }`}
                                     style={{
                                         width: '264px',
                                         borderRadius: '24px',
-                                        border: '1px solid #E6E6E6',
-                                        background: '#FFF',
                                         boxShadow: '0 4px 4px 0 rgba(221, 221, 221, 0.25)',
                                     }}
                                 />
@@ -795,7 +828,6 @@ export default function CommunityPage() {
                             <div className="space-y-2">
                                 {chitChatChats.length > 0 ? (
                                     chitChatChats.map((chat, index) => {
-                                        // Get the last message for this chat
                                         const chatMessages = contextMessages[chat.name] || [];
                                         const lastMessage = chatMessages[chatMessages.length - 1];
                                         const preview = lastMessage?.content || chat.status;
@@ -803,7 +835,11 @@ export default function CommunityPage() {
                                         return (
                                             <div
                                                 key={index}
-                                                className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted cursor-pointer transition-colors"
+                                                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
+                                                    actualTheme === 'dark' 
+                                                        ? 'hover:bg-gray-700' 
+                                                        : 'hover:bg-gray-200'
+                                                }`}
                                                 onClick={() => router.push('/chat')}
                                             >
                                                 <Avatar className="w-8 h-8">
@@ -812,16 +848,20 @@ export default function CommunityPage() {
                                                 </Avatar>
                                                 <div className="flex-1 min-w-0 max-w-[150px]">
                                                     <div className="flex items-center gap-2">
-                                                        <h4 className="font-medium text-sm truncate">{chat.name}</h4>
+                                                        <h4 className={`font-medium text-sm truncate ${actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                                                            {chat.name}
+                                                        </h4>
                                                         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${statusColors[index % statusColors.length]}`}></div>
                                                     </div>
-                                                    <p className="text-xs text-muted-foreground truncate">{preview}</p>
+                                                    <p className={`text-xs truncate ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                                        {preview}
+                                                    </p>
                                                 </div>
                                             </div>
                                         );
                                     })
                                 ) : (
-                                    <div className="text-center py-4 text-sm text-muted-foreground">
+                                    <div className={`text-center py-4 text-sm ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                                         No chats yet. Visit the chat page to start a conversation.
                                     </div>
                                 )}
@@ -833,16 +873,21 @@ export default function CommunityPage() {
 
             {/* Comments Dialog */}
             <Dialog open={selectedPostForComments !== null} onOpenChange={(open) => !open && handleCloseComments()}>
-                <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto bg-white text-gray-900">
+                <DialogContent className={`max-w-2xl max-h-[80vh] overflow-y-auto ${
+                    actualTheme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900'
+                }`}>
                     <DialogHeader>
-                        <DialogTitle className="text-xl font-bold text-gray-900">Comments</DialogTitle>
+                        <DialogTitle className={`text-xl font-bold ${actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                            Comments
+                        </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
                         {loadingComments ? (
-                            <div className="text-center py-4 text-gray-600">Loading comments...</div>
+                            <div className={`text-center py-4 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                                Loading comments...
+                            </div>
                         ) : (
                             <>
-                                {/* Comment input */}
                                 <div className="flex gap-2">
                                     <Avatar className="w-8 h-8">
                                         <AvatarImage src={currentUser?.avatar || "/placeholder.svg"} />
@@ -859,7 +904,11 @@ export default function CommunityPage() {
                                                     handleAddComment(selectedPostForComments);
                                                 }
                                             }}
-                                            className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400"
+                                            className={`${
+                                                actualTheme === 'dark' 
+                                                    ? 'bg-gray-600 border-gray-500 text-gray-100 placeholder:text-gray-400' 
+                                                    : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'
+                                            }`}
                                         />
                                         <Button
                                             size="icon"
@@ -872,10 +921,9 @@ export default function CommunityPage() {
                                     </div>
                                 </div>
 
-                                {/* Comments list */}
                                 <div className="space-y-4">
                                     {comments.length === 0 ? (
-                                        <div className="text-center py-8 text-gray-500">
+                                        <div className={`text-center py-8 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                             No comments yet. Be the first to comment!
                                         </div>
                                     ) : (
@@ -886,11 +934,17 @@ export default function CommunityPage() {
                                                     <AvatarFallback className="bg-gray-600 text-white">{comment.author?.name?.charAt(0).toUpperCase() || "U"}</AvatarFallback>
                                                 </Avatar>
                                                 <div className="flex-1">
-                                                    <div className="bg-gray-100 rounded-lg px-3 py-2">
-                                                        <div className="font-semibold text-sm text-gray-900">{comment.author?.name || "Anonymous"}</div>
-                                                        <p className="text-sm text-gray-700">{comment.content}</p>
+                                                    <div className={`rounded-lg px-3 py-2 ${
+                                                        actualTheme === 'dark' ? 'bg-gray-600' : 'bg-gray-100'
+                                                    }`}>
+                                                        <div className={`font-semibold text-sm ${actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                                                            {comment.author?.name || "Anonymous"}
+                                                        </div>
+                                                        <p className={`text-sm ${actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
+                                                            {comment.content}
+                                                        </p>
                                                     </div>
-                                                    <div className="text-xs text-gray-500 mt-1 px-3">
+                                                    <div className={`text-xs mt-1 px-3 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
                                                         {new Date(comment.createdAt).toLocaleString()}
                                                     </div>
                                                 </div>
@@ -906,26 +960,36 @@ export default function CommunityPage() {
 
             {/* Edit Post Dialog */}
             <Dialog open={editingPost !== null} onOpenChange={(open) => !open && handleCloseEditPost()}>
-                <DialogContent className="max-w-2xl bg-white text-gray-900">
+                <DialogContent className={`max-w-2xl ${
+                    actualTheme === 'dark' ? 'bg-gray-700 text-gray-100' : 'bg-white text-gray-900'
+                }`}>
                     <DialogHeader>
-                        <DialogTitle className="text-xl font-bold text-gray-900">Edit Post</DialogTitle>
+                        <DialogTitle className={`text-xl font-bold ${actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                            Edit Post
+                        </DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4">
                         <div>
-                            <label className="text-sm font-medium mb-2 block text-gray-900">Content</label>
+                            <label className={`text-sm font-medium mb-2 block ${actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}`}>
+                                Content
+                            </label>
                             <textarea
                                 placeholder="What's on your mind?"
                                 value={editPostContent}
                                 onChange={(e) => setEditPostContent(e.target.value)}
                                 disabled={isUpdatingPost}
-                                className="w-full min-h-[120px] p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 bg-white text-gray-900 placeholder:text-gray-400"
+                                className={`w-full min-h-[120px] p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600 ${
+                                    actualTheme === 'dark' 
+                                        ? 'bg-gray-600 border-gray-500 text-gray-100 placeholder:text-gray-400' 
+                                        : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-400'
+                                }`}
                             />
                         </div>
 
-                        {imagePreview && (
+                        {editImagePreview && (
                             <div className="relative inline-block">
                                 <Image
-                                    src={imagePreview}
+                                    src={editImagePreview}
                                     alt="Preview"
                                     width={400}
                                     height={256}
@@ -934,8 +998,8 @@ export default function CommunityPage() {
                                 <Button
                                     variant="destructive"
                                     size="icon"
-                                    onClick={handleRemoveImage}
-                                    disabled={isCreatingPost}
+                                    onClick={handleRemoveEditImage}
+                                    disabled={isUpdatingPost}
                                     className="absolute top-2 right-2 h-8 w-8"
                                 >
                                     <X className="w-4 h-4" />
@@ -955,7 +1019,11 @@ export default function CommunityPage() {
                                 variant="outline"
                                 onClick={() => editFileInputRef.current?.click()}
                                 disabled={isUpdatingPost}
-                                className="flex items-center gap-2 border-gray-300 text-gray-900 hover:bg-gray-100"
+                                className={`flex items-center gap-2 ${
+                                    actualTheme === 'dark' 
+                                        ? 'border-gray-500 text-gray-100 hover:bg-gray-600' 
+                                        : 'border-gray-300 text-gray-900 hover:bg-gray-100'
+                                }`}
                             >
                                 <ImageIcon className="w-4 h-4" />
                                 {editImagePreview ? 'Change Image' : 'Add Image'}
@@ -965,7 +1033,11 @@ export default function CommunityPage() {
                                 variant="outline"
                                 onClick={handleCloseEditPost}
                                 disabled={isUpdatingPost}
-                                className="border-gray-300 text-gray-900 hover:bg-gray-100"
+                                className={`${
+                                    actualTheme === 'dark' 
+                                        ? 'border-gray-500 text-gray-100 hover:bg-gray-600' 
+                                        : 'border-gray-300 text-gray-900 hover:bg-gray-100'
+                                }`}
                             >
                                 Cancel
                             </Button>

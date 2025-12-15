@@ -9,10 +9,10 @@ const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fri
 
 // Label to color mapping
 const LABEL_BG_COLORS: Record<string, string> = {
-  'High': '#FFCDD2',
-  'Medium': '#FFE0B2',
-  'Low': '#FFF9C4',
-  'Stand-by': '#B2EBF2',
+  'High': 'hsl(var(--destructive) / 0.12)',
+  'Medium': 'hsl(var(--warning) / 0.12)',
+  'Low': 'hsl(48 100% 92%)',
+  'Stand-by': 'hsl(var(--info) / 0.12)',
 };
 
 export interface Task {
@@ -59,7 +59,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
   const convertEventToTask = (event: any): Task => {
     // Handle local tasks created from modal
     if (event.day) {
-      const bgColor = event.label ? LABEL_BG_COLORS[event.label] || '#D8D5F0' : '#D8D5F0';
+      const bgColor = event.label ? LABEL_BG_COLORS[event.label] || 'hsl(var(--primary) / 0.12)' : 'hsl(var(--primary) / 0.12)';
       return {
         _id: event._id,
         title: event.title,
@@ -91,7 +91,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
       startTime: startHour,
       duration: duration,
       members: event.members || [],
-      backgroundColor: '#D8D5F0',
+      backgroundColor: 'hsl(var(--primary) / 0.12)',
       startDate: event.startDate,
       endDate: event.endDate,
       assignee: event.assignee || `https://i.pravatar.cc/150?u=${event._id}`,
@@ -123,7 +123,7 @@ export function TaskProvider({ children }: { children: ReactNode }) {
     try {
       // Backend auto-creates team when task is created
       const createdTask = await tasksAPI.create(taskData);
-      const bgColor = createdTask.label ? LABEL_BG_COLORS[createdTask.label] || '#D8D5F0' : '#D8D5F0';
+      const bgColor = createdTask.label ? LABEL_BG_COLORS[createdTask.label] || 'hsl(var(--primary) / 0.12)' : 'hsl(var(--primary) / 0.12)';
       
       const taskWithBg: Task = {
         ...createdTask,

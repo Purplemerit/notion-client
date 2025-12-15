@@ -365,17 +365,17 @@ export default function EmailPage() {
 
   if (!gmailConnected) {
     return (
-      <div style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
+      <div className="dark:bg-gray-900" style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
         <div style={{ flexShrink: 0, height: "100vh" }}>
           <AdminSidebar />
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", flex: 1, alignItems: "center", justifyContent: "center", padding: "40px" }}>
           <Mail size={64} color="#8B7BE8" style={{ marginBottom: 24 }} />
-          <h1 style={{ fontSize: 32, fontWeight: 600, marginBottom: 16, color: "#252525" }}>
+          <h1 className="dark:text-gray-100" style={{ fontSize: 32, fontWeight: 600, marginBottom: 16, color: "#252525" }}>
             Connect Your Gmail Account
           </h1>
-          <p style={{ fontSize: 16, color: "#999", marginBottom: 32, textAlign: "center", maxWidth: 500 }}>
+          <p className="dark:text-gray-400" style={{ fontSize: 16, color: "#999", marginBottom: 32, textAlign: "center", maxWidth: 500 }}>
             To use the email functionality, you need to connect your Gmail account. This will allow you to view, send, and manage your emails directly from this interface.
           </p>
           <Button
@@ -397,7 +397,7 @@ export default function EmailPage() {
             <Mail size={20} />
             Connect Gmail Account
           </Button>
-          <p style={{ fontSize: 12, color: "#BBB", marginTop: 16 }}>
+          <p className="dark:text-gray-500" style={{ fontSize: 12, color: "#BBB", marginTop: 16 }}>
             You&apos;ll be redirected to Google to authorize access
           </p>
         </div>
@@ -406,7 +406,7 @@ export default function EmailPage() {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
+    <div className="dark:bg-gray-900" style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
       {/* Sidebar */}
       <div style={{ flexShrink: 0, height: "100vh" }}>
         <AdminSidebar />
@@ -423,9 +423,10 @@ export default function EmailPage() {
         />
 
         {/* Main Email Content */}
-        <main style={{ display: "flex", flex: 1, overflow: "hidden", background: "#F7F5FD" }}>
+        <main className="dark:bg-gray-800" style={{ display: "flex", flex: 1, overflow: "hidden", background: "#F7F5FD" }}>
           {/* Left Email Sidebar */}
           <aside
+            className="dark:bg-gray-700 dark:border-gray-600"
             style={{
               width: 280,
               background: "#FFF",
@@ -557,6 +558,7 @@ export default function EmailPage() {
 
           {/* Email List */}
           <section
+            className="dark:bg-gray-700 dark:border-gray-600"
             style={{
               width: 400,
               background: "#FFF",
@@ -668,6 +670,7 @@ export default function EmailPage() {
 
           {/* Email Preview */}
           <section
+            className="dark:bg-gray-700"
             style={{
               flex: 1,
               background: "#FFF",
@@ -964,6 +967,7 @@ export default function EmailPage() {
           onClick={() => setComposeOpen(false)}
         >
           <div
+            className="dark:bg-gray-800"
             style={{
               background: "#FFF",
               borderRadius: 16,
@@ -976,6 +980,7 @@ export default function EmailPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div
+              className="dark:border-gray-600"
               style={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -984,7 +989,7 @@ export default function EmailPage() {
                 borderBottom: "1px solid #E5E5E5",
               }}
             >
-              <h2 style={{ fontSize: 20, fontWeight: 600, color: "#252525" }}>New Message</h2>
+              <h2 className="dark:text-gray-100" style={{ fontSize: 20, fontWeight: 600, color: "#252525" }}>New Message</h2>
               <Button
                 onClick={() => setComposeOpen(false)}
                 style={{ background: "transparent", padding: 0, border: "none" }}

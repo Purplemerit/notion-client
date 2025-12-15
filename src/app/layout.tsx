@@ -4,6 +4,8 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ChatProvider } from "@/contexts/ChatContext";
 import { TaskProvider } from "@/contexts/TaskContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeClientWrapper } from "@/components/ThemeClientWrappper"; // New wrapper
 import { Toaster } from "@/components/ui/toaster";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -24,23 +26,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ErrorBoundary>
-          <AuthProvider>
-            <TaskProvider>
-              <ChatProvider>
-                {children}
-              </ChatProvider>
-            </TaskProvider>
-          </AuthProvider>
-          <Toaster />
+          <ThemeProvider>
+            <ThemeClientWrapper>
+              <AuthProvider>
+                <TaskProvider>
+                  <ChatProvider>{children}</ChatProvider>
+                </TaskProvider>
+              </AuthProvider>
+              <Toaster />
+            </ThemeClientWrapper>
+          </ThemeProvider>
         </ErrorBoundary>
       </body>
     </html>

@@ -630,7 +630,7 @@ export default function KanbanPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
+    <div className="dark:bg-gray-900" style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
       {/* Sidebar */}
       <div style={{ flexShrink: 0, height: "100vh" }}>
         <AdminSidebar />
@@ -648,6 +648,7 @@ export default function KanbanPage() {
 
         {/* Main Content Area */}
         <main
+          className="dark:bg-gray-800"
           style={{
             flex: 1,
             overflow: "auto",
@@ -655,7 +656,7 @@ export default function KanbanPage() {
           }}
         >
           {/* Page Title */}
-          <h1 style={{ fontSize: 32, fontWeight: 600, color: "#000", marginBottom: 24 }}>Kanban Board</h1>
+          <h1 className="dark:text-gray-100" style={{ fontSize: 32, fontWeight: 600, color: "#000", marginBottom: 24 }}>Kanban Board</h1>
 
           {loading ? (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "400px" }}>
@@ -665,6 +666,7 @@ export default function KanbanPage() {
             <>
               {/* Project Board Header */}
               <div
+                className="dark:bg-gray-700 dark:border-gray-600"
                 style={{
                   background: "#FFF",
                   borderRadius: 16,
@@ -677,11 +679,12 @@ export default function KanbanPage() {
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-                  <span style={{ fontSize: 18, fontWeight: 600, color: "#000" }}>
+                  <span className="dark:text-gray-100" style={{ fontSize: 18, fontWeight: 600, color: "#000" }}>
                     {project ? project.name : "All Tasks"} Board
                   </span>
               <button
                 onClick={handleEmailProject}
+                className="dark:bg-gray-600"
                 style={{
                   background: "#F5F5F5",
                   border: "none",
@@ -698,6 +701,7 @@ export default function KanbanPage() {
               </button>
               <button
                 onClick={handleCallProject}
+                className="dark:bg-gray-600"
                 style={{
                   background: "#F5F5F5",
                   border: "none",
@@ -714,6 +718,7 @@ export default function KanbanPage() {
               </button>
               <button
                 onClick={handleCompleteAllTasks}
+                className="dark:bg-gray-600"
                 style={{
                   background: "#F5F5F5",
                   border: "none",
@@ -923,6 +928,7 @@ export default function KanbanPage() {
                   return (
               <div
                 key={columnIndex}
+                className="dark:bg-gray-700"
                 style={{
                   background: draggedOverColumn === column.status[0] ? "#D4CCFA" : column.color,
                   borderRadius: 16,
@@ -945,7 +951,7 @@ export default function KanbanPage() {
                 {/* Column Header */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <h3 style={{ fontSize: 16, fontWeight: 600, color: "#000", margin: 0 }}>{column.title}</h3>
+                    <h3 className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, color: "#000", margin: 0 }}>{column.title}</h3>
                     <span
                       style={{
                         background: "#FFF",
@@ -1091,6 +1097,7 @@ export default function KanbanPage() {
                     draggable
                     onDragStart={() => handleDragStart(task)}
                     onDragEnd={handleDragEnd}
+                    className="dark:bg-gray-800"
                     style={{
                       background: "#FFF",
                       borderRadius: 12,
@@ -1150,7 +1157,7 @@ export default function KanbanPage() {
                             background: getPriorityColor(task.priority),
                           }}
                         />
-                        <span style={{ fontSize: 15, fontWeight: 600, color: "#000", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <span className="dark:text-gray-100" style={{ fontSize: 15, fontWeight: 600, color: "#000", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {task.title}
                         </span>
                       </div>
@@ -1159,6 +1166,7 @@ export default function KanbanPage() {
                     {/* Card Description */}
                     {task.description && (
                       <p
+                        className="dark:text-gray-400"
                         style={{
                           fontSize: 12,
                           color: "#999",

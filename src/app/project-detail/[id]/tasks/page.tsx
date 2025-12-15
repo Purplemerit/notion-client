@@ -16,7 +16,7 @@ const priorityOptions = [
     label: 'High',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M13.28 10.0334L8.93338 5.68676C8.42005 5.17342 7.58005 5.17342 7.06671 5.68676L2.72005 10.0334" stroke="#E42020" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M13.28 10.0334L8.93338 5.68676C8.42005 5.17342 7.58005 5.17342 7.06671 5.68676L2.72005 10.0334" stroke="hsl(var(--destructive))" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
   },
@@ -25,8 +25,8 @@ const priorityOptions = [
     label: 'Medium',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M2.33333 9.99341H13.6667" stroke="#2B61D5" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M13.6667 6.00659H2.33333" stroke="#2B61D5" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M2.33333 9.99341H13.6667" stroke="hsl(var(--info))" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M13.6667 6.00659H2.33333" stroke="hsl(var(--info))" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
   },
@@ -35,7 +35,7 @@ const priorityOptions = [
     label: 'Low',
     icon: (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M13.28 5.9668L8.93338 10.3135C8.42005 10.8268 7.58005 10.8268 7.06671 10.3135L2.72005 5.9668" stroke="#E2B10E" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M13.28 5.9668L8.93338 10.3135C8.42005 10.8268 7.58005 10.8268 7.06671 10.3135L2.72005 5.9668" stroke="hsl(var(--warning))" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     ),
   },
@@ -47,24 +47,24 @@ const timeTrackerOptions = [
     value: 'start',
     label: 'Start',
     style: {
-      background: '#319239',
-      color: '#FFF',
+      background: 'hsl(var(--success))',
+      color: 'hsl(var(--success-foreground) / 1)',
     },
   },
   {
     value: 'break',
     label: 'Break',
     style: {
-      background: '#E2B10E',
-      color: '#FFF',
+      background: 'hsl(var(--warning))',
+      color: 'hsl(var(--warning-foreground) / 1)',
     },
   },
   {
     value: 'end',
     label: 'End',
     style: {
-      background: '#E42020',
-      color: '#FFF',
+      background: 'hsl(var(--destructive))',
+      color: 'hsl(var(--destructive-foreground) / 1)',
     },
   },
 ];
@@ -75,24 +75,24 @@ const statusOptions = [
     value: 'completed',
     label: 'Completed',
     style: {
-      background: 'rgba(27, 177, 81, 0.10)',
-      color: '#139A44',
+      background: 'hsl(var(--success) / 0.12)',
+      color: 'hsl(var(--success) / 1)',
     },
   },
   {
     value: 'in-progress',
     label: 'In Progress',
     style: {
-      background: 'rgba(43, 97, 213, 0.10)',
-      color: '#2B61D5',
+      background: 'hsl(var(--info) / 0.12)',
+      color: 'hsl(var(--info) / 1)',
     },
   },
   {
     value: 'to-be-done',
     label: 'To Be Done',
     style: {
-      background: 'rgba(34, 34, 34, 0.10)',
-      color: '#2D2D2D',
+      background: 'hsl(var(--muted-foreground) / 0.12)',
+      color: 'hsl(var(--muted-foreground) / 1)',
     },
   },
 ];
@@ -217,14 +217,14 @@ export default function ProjectTasksPage() {
 
   return (
     <AppLayout>
-      <div className="flex-1 flex flex-col" style={{ background: '#FFF' }}>
+      <div className="flex-1 flex flex-col bg-white dark:bg-gray-900">
         {/* Header */}
-        <div className="border-b px-8 py-6" style={{ background: '#FFF' }}>
+        <div className="border-b border-gray-200 dark:border-gray-600 px-8 py-6 bg-white dark:bg-gray-900">
           <div className="flex items-center justify-between">
             <div className="relative">
               <button
                 onClick={() => setShowProjectDropdown(!showProjectDropdown)}
-                className="flex items-center gap-2 text-3xl font-bold hover:text-gray-700 transition-colors"
+                className="flex items-center gap-2 text-3xl font-bold text-gray-900 dark:text-gray-100 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
               >
                 {currentProject?.name || 'Loading...'}
                 <ChevronDown className="h-6 w-6" />
@@ -232,19 +232,19 @@ export default function ProjectTasksPage() {
 
               {/* Project Dropdown */}
               {showProjectDropdown && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                <div className="absolute top-full left-0 mt-2 w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
                   {allProjects.map((project) => (
                     <div
                       key={project._id}
-                      className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0"
+                      className="p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-200 dark:border-gray-600 last:border-b-0"
                       onClick={() => handleSelectProject(project)}
                     >
-                      <div className="font-semibold text-gray-900">{project.name}</div>
-                      <div className="text-sm text-gray-500">Project ID: {project._id.slice(0, 8)}...</div>
+                      <div className="font-semibold text-gray-900 dark:text-gray-100">{project.name}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">Project ID: {project._id.slice(0, 8)}...</div>
                     </div>
                   ))}
                   {allProjects.length === 0 && (
-                    <div className="p-4 text-center text-gray-500">No projects found</div>
+                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">No projects found</div>
                   )}
                 </div>
               )}
@@ -259,13 +259,13 @@ export default function ProjectTasksPage() {
                   style={
                     viewMode === 'board'
                       ? {
-                          background: '#000',
-                          color: '#FFF',
+                          background: 'hsl(var(--foreground))',
+                          color: 'hsl(var(--background))',
                         }
                       : {
-                          border: '1px solid #000',
-                          background: '#FFF',
-                          color: '#000',
+                          border: '1px solid hsl(var(--border))',
+                          background: 'hsl(var(--background))',
+                          color: 'hsl(var(--foreground))',
                         }
                   }
                 >
@@ -278,13 +278,13 @@ export default function ProjectTasksPage() {
                   style={
                     viewMode === 'list'
                       ? {
-                          background: '#000',
-                          color: '#FFF',
+                          background: 'hsl(var(--foreground))',
+                          color: 'hsl(var(--background))',
                         }
                       : {
-                          border: '1px solid #000',
-                          background: '#FFF',
-                          color: '#000',
+                          border: '1px solid hsl(var(--border))',
+                          background: 'hsl(var(--background))',
+                          color: 'hsl(var(--foreground))',
                         }
                   }
                 >
@@ -298,10 +298,10 @@ export default function ProjectTasksPage() {
               </div>
               <Button
                 variant="outline"
-                className="rounded-full px-6"
+                className="rounded-full px-6 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
                 style={{
-                  border: '1px solid #000',
-                  background: '#FFF',
+                  border: viewMode ? '1px solid #000' : '1px solid #000',
+                  background: viewMode ? '#FFF' : '#FFF',
                 }}
               >
                 share
@@ -312,16 +312,16 @@ export default function ProjectTasksPage() {
 
         {/* Table */}
         <div className="flex-1 overflow-auto px-8 py-6">
-          <div className="border rounded-lg overflow-visible">
+          <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-visible">
             {/* Table Header */}
-            <div className="grid grid-cols-[80px_1fr_200px_180px_180px_180px_180px] bg-gray-50 border-b">
-              <div className="px-4 py-3 text-sm font-medium text-gray-700 border-r">No.</div>
-              <div className="px-4 py-3 text-sm font-medium text-gray-700 border-r">Tasks</div>
-              <div className="px-4 py-3 text-sm font-medium text-gray-700 border-r">Assigned by</div>
-              <div className="px-4 py-3 text-sm font-medium text-gray-700 border-r">Created on</div>
-              <div className="px-4 py-3 text-sm font-medium text-gray-700 border-r">Priority</div>
-              <div className="px-4 py-3 text-sm font-medium text-gray-700 border-r">Time Tracker</div>
-              <div className="px-4 py-3 text-sm font-medium text-gray-700">Status</div>
+            <div className="grid grid-cols-[80px_1fr_200px_180px_180px_180px_180px] bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600">
+              <div className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-600">No.</div>
+              <div className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-600">Tasks</div>
+              <div className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-600">Assigned by</div>
+              <div className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-600">Created on</div>
+              <div className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-600">Priority</div>
+              <div className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-r border-gray-200 dark:border-gray-600">Time Tracker</div>
+              <div className="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300">Status</div>
             </div>
 
             {/* Table Rows */}
@@ -329,17 +329,17 @@ export default function ProjectTasksPage() {
               <>
                 {/* Project Name Row */}
                 <div
-                  className="grid grid-cols-[80px_1fr_200px_180px_180px_180px_180px] border-b bg-purple-50 cursor-pointer hover:bg-purple-100"
+                  className="grid grid-cols-[80px_1fr_200px_180px_180px_180px_180px] border-b border-gray-200 dark:border-gray-600 bg-purple-50 dark:bg-purple-900 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-800"
                   onClick={() => setExpandedProject(expandedProject === projectId ? null : projectId)}
                 >
-                  <div className="px-4 py-3 flex items-center border-r text-sm font-semibold">
+                  <div className="px-4 py-3 flex items-center border-r border-gray-200 dark:border-gray-600 text-sm font-semibold">
                     <ChevronDown
                       className={`h-4 w-4 transition-transform ${
                         expandedProject === projectId ? 'rotate-180' : ''
                       }`}
                     />
                   </div>
-                  <div className="px-4 py-3 flex items-center border-r font-semibold text-purple-700 col-span-6">
+                  <div className="px-4 py-3 flex items-center border-r border-gray-200 dark:border-gray-600 font-semibold text-purple-700 dark:text-purple-300 col-span-6">
                     {currentProject.name}
                   </div>
                 </div>
@@ -349,16 +349,16 @@ export default function ProjectTasksPage() {
                   tasks.map((task, index) => (
                     <div
                       key={task.id}
-                      className="grid grid-cols-[80px_1fr_200px_180px_180px_180px_180px] border-b last:border-b-0 hover:bg-gray-50 transition-colors relative"
+                      className="grid grid-cols-[80px_1fr_200px_180px_180px_180px_180px] border-b border-gray-200 dark:border-gray-600 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors relative"
                       style={{ zIndex: tasks.length - index }}
                     >
                       {/* No. */}
-                      <div className="px-4 py-3 flex items-center border-r text-sm">
+                      <div className="px-4 py-3 flex items-center border-r border-gray-200 dark:border-gray-600 text-sm dark:text-gray-300">
                         {index + 1}
                       </div>
 
                       {/* Tasks */}
-                      <div className="px-4 py-3 flex items-center border-r">
+                      <div className="px-4 py-3 flex items-center border-r border-gray-200 dark:border-gray-600">
                         <div className="flex items-center gap-2 w-full">
                           <Input
                             value={task.title}
@@ -367,30 +367,30 @@ export default function ProjectTasksPage() {
                               newTasks[index].title = e.target.value;
                               setTasks(newTasks);
                             }}
-                            className="border-none shadow-none p-0 h-auto focus-visible:ring-0"
+                            className="border-none shadow-none p-0 h-auto focus-visible:ring-0 dark:bg-gray-800 dark:text-gray-100"
                           />
-                          <ChevronDown size={16} className="flex-shrink-0 text-gray-400" />
+                          <ChevronDown size={16} className="flex-shrink-0 text-gray-400 dark:text-gray-500" />
                         </div>
                       </div>
 
                       {/* Assigned by */}
-                      <div className="px-4 py-3 flex items-center gap-2 border-r">
+                      <div className="px-4 py-3 flex items-center gap-2 border-r border-gray-200 dark:border-gray-600">
                         <Avatar className="w-8 h-8">
                           <AvatarImage src={task.assignedBy.avatar} />
-                          <AvatarFallback className="text-xs bg-gray-200">
+                          <AvatarFallback className="text-xs bg-gray-200 dark:bg-gray-600 dark:text-gray-300">
                             {task.assignedBy.name.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-sm">{task.assignedBy.name}</span>
+                        <span className="text-sm dark:text-gray-300">{task.assignedBy.name}</span>
                       </div>
 
                       {/* Created on */}
-                      <div className="px-4 py-3 flex items-center border-r text-sm">
+                      <div className="px-4 py-3 flex items-center border-r border-gray-200 dark:border-gray-600 text-sm dark:text-gray-300">
                         {task.createdOn}
                       </div>
 
                       {/* Priority */}
-                      <div className="px-4 py-3 flex items-center border-r relative">
+                      <div className="px-4 py-3 flex items-center border-r border-gray-200 dark:border-gray-600 relative">
                         <div
                           className="flex items-center gap-2 cursor-pointer w-full"
                           style={{
@@ -409,19 +409,19 @@ export default function ProjectTasksPage() {
                           }}
                         >
                           {priorityOptions.find((p) => p.value === task.priority)?.icon}
-                          <span className="text-sm flex-1">
+                          <span className="text-sm flex-1 dark:text-gray-300">
                             {priorityOptions.find((p) => p.value === task.priority)?.label}
                           </span>
-                          <ChevronDown size={16} className="text-gray-400" />
+                          <ChevronDown size={16} className="text-gray-400 dark:text-gray-500" />
                         </div>
-                        
+
                         {/* Priority Dropdown */}
                         {openDropdown?.taskId === task.id && openDropdown?.type === 'priority' && (
-                          <div className="absolute top-full left-4 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px]" style={{ zIndex: 9999 }}>
+                          <div className="absolute top-full left-4 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg py-1 min-w-[140px]" style={{ zIndex: 9999 }}>
                             {priorityOptions.map((option) => (
                               <div
                                 key={option.value}
-                                className="px-3 py-2 hover:bg-gray-50 cursor-pointer flex items-center gap-2"
+                                className="px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer flex items-center gap-2"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleUpdateTask(task.id, { priority: option.label });
@@ -429,7 +429,7 @@ export default function ProjectTasksPage() {
                                 }}
                               >
                                 {option.icon}
-                                <span className="text-sm">{option.label}</span>
+                                <span className="text-sm dark:text-gray-300">{option.label}</span>
                               </div>
                             ))}
                           </div>
@@ -437,7 +437,7 @@ export default function ProjectTasksPage() {
                       </div>
 
                       {/* Time Tracker */}
-                      <div className="px-4 py-3 flex items-center border-r relative">
+                      <div className="px-4 py-3 flex items-center border-r border-gray-200 dark:border-gray-600 relative">
                         <div
                           className="flex items-center justify-center cursor-pointer w-full"
                           style={{
@@ -459,14 +459,14 @@ export default function ProjectTasksPage() {
                         >
                           {timeTrackerOptions.find((t) => t.value === task.timeTracker)?.label}
                         </div>
-                        
+
                         {/* Time Tracker Dropdown */}
                         {openDropdown?.taskId === task.id && openDropdown?.type === 'timeTracker' && (
-                          <div className="absolute top-full left-4 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[120px]" style={{ zIndex: 9999 }}>
+                          <div className="absolute top-full left-4 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg py-1 min-w-[120px]" style={{ zIndex: 9999 }}>
                             {timeTrackerOptions.map((option) => (
                               <div
                                 key={option.value}
-                                className="px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                                className="px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleUpdateTask(task.id, { timeTracker: option.label });
@@ -512,14 +512,14 @@ export default function ProjectTasksPage() {
                         >
                           {statusOptions.find((s) => s.value === task.status)?.label}
                         </div>
-                        
+
                         {/* Status Dropdown */}
                         {openDropdown?.taskId === task.id && openDropdown?.type === 'status' && (
-                          <div className="absolute top-full left-4 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px]" style={{ zIndex: 9999 }}>
+                          <div className="absolute top-full left-4 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg py-1 min-w-[140px]" style={{ zIndex: 9999 }}>
                             {statusOptions.map((option) => (
                               <div
                                 key={option.value}
-                                className="px-3 py-2 hover:bg-gray-50 cursor-pointer"
+                                className="px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleUpdateTask(task.id, { taskStatus: option.label });

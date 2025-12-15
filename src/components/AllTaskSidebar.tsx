@@ -6,6 +6,7 @@ import { MemberSelectionModal } from "@/components/MemberSelectionModal";
 import { useTasks } from "@/contexts/TaskContext";
 import { usersAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface AllTaskSidebarProps {
   open: boolean;
@@ -17,6 +18,7 @@ interface AllTaskSidebarProps {
 export default function AllTaskSidebar({ open, onClose, task, onUpdate }: AllTaskSidebarProps) {
   const { updateTask, deleteTask } = useTasks();
   const { toast } = useToast();
+  const { actualTheme } = useTheme();
   const [checklist, setChecklist] = useState<any[]>([]);
   const [newItem, setNewItem] = useState("");
   const [showMemberModal, setShowMemberModal] = useState(false);
@@ -149,102 +151,99 @@ export default function AllTaskSidebar({ open, onClose, task, onUpdate }: AllTas
 
   return (
     <aside
+      className={`bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-l border-gray-200 dark:border-gray-700 shadow-lg flex flex-col transition-all duration-300`}
       style={{
         width: 400,
-        background: "#F7F7FB",
         height: "100%",
         position: "relative",
-        boxShadow: "-2px 0 16px 0 rgba(0,0,0,0.04)",
         display: open ? "flex" : "none",
-        flexDirection: "column",
-        borderLeft: "1px solid #E0E0E0",
-        transition: 'width 0.3s cubic-bezier(0.4,0,0.2,1)',
+        borderLeft: "1px solid var(--border)",
       }}
     >
-      <div style={{ padding: "32px 32px 0 32px", borderBottom: "1px solid #E0E0E0" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span style={{ fontWeight: 700, fontSize: 22, color: "#222" }}>{task.title}</span>
-          <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 28, color: "#222", cursor: "pointer" }}>&times;</button>
+      <div className="p-8 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between mb-6">
+          <span className="font-bold text-xl text-gray-900 dark:text-white">{task.title}</span>
+          <button onClick={onClose} className="bg-none border-none text-2xl text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-900 dark:hover:text-gray-100">&times;</button>
         </div>
         {taskAdmin && (
-          <div style={{ marginTop: 24, marginBottom: 16 }}>
-            <div style={{ fontWeight: 500, fontSize: 15, color: "#888", marginBottom: 8 }}>Assign to -</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div className="mb-6">
+            <div className="font-medium text-sm text-gray-500 dark:text-gray-400 mb-2">Assign to -</div>
+            <div className="flex items-center gap-3">
               <Avatar className="w-10 h-10">
                 <AvatarImage src={taskAdmin.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${taskAdmin.name || taskAdmin.email}`} />
               </Avatar>
               <div>
-                <span style={{ fontWeight: 600, color: "#222" }}>{taskAdmin.name || taskAdmin.email}</span>
+                <span className="font-semibold text-gray-900 dark:text-gray-100">{taskAdmin.name || taskAdmin.email}</span>
                 {taskAdmin.role && (
-                  <span style={{ fontSize: 13, color: "#888", marginLeft: 6 }}>({taskAdmin.role})</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">({taskAdmin.role})</span>
                 )}
               </div>
             </div>
           </div>
         )}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <span style={{ fontWeight: 500, fontSize: 15, color: "#888" }}>
+        <div className="flex items-center justify-between mb-4">
+          <span className="font-medium text-sm text-gray-500 dark:text-gray-400">
             Invite Members - {taskMembers.length > 0 && `(${taskMembers.length})`}
           </span>
           <Button
             onClick={() => setShowMemberModal(true)}
             variant="ghost"
             size="icon"
-            style={{ color: "#888", borderRadius: 999, width: 32, height: 32, fontSize: 22 }}
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100"
           >+</Button>
         </div>
         {taskMembers.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
+          <div className="flex flex-wrap gap-2 mb-4">
             {taskMembers.map((member) => (
-              <div key={member._id} style={{ display: "flex", alignItems: "center", gap: 6, background: "#F0F0F0", padding: "4px 10px", borderRadius: 16 }}>
+              <div key={member._id} className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-full">
                 <Avatar className="w-6 h-6">
                   <AvatarImage src={member.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${member.name || member.email}`} />
                 </Avatar>
-                <span style={{ fontSize: 13, fontWeight: 500, color: "#222" }}>{member.name || member.email}</span>
+                <span className="text-xs font-medium text-gray-800 dark:text-gray-200">{member.name || member.email}</span>
               </div>
             ))}
           </div>
         )}
       </div>
-      <div style={{ flex: 1, padding: "32px" }}>
-        <div style={{ fontWeight: 600, fontSize: 16, color: "#222", marginBottom: 12 }}>Checklist</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div className="flex-1 p-8">
+        <div className="font-semibold text-base text-gray-900 dark:text-white mb-3">Checklist</div>
+        <div className="flex flex-col gap-2.5">
           {checklist.map((item, idx) => (
-            <label key={item.label} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 15, color: "#222" }}>
+            <label key={item.label} className="flex items-center gap-2.5 text-sm text-gray-900 dark:text-gray-100 cursor-pointer">
               <Checkbox checked={item.checked} onCheckedChange={() => handleCheck(idx)} />
               {item.label}
             </label>
           ))}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+          <div className="flex items-center gap-2 mt-2">
             <input
               value={newItem}
               onChange={e => setNewItem(e.target.value)}
               placeholder="Add More."
-              style={{ flex: 1, border: "1px solid #E0E0E0", borderRadius: 8, padding: "6px 10px", fontSize: 14 }}
+              className="flex-1 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg p-1.5 text-sm placeholder-gray-400 dark:placeholder-gray-500"
               onKeyDown={e => { if (e.key === "Enter") handleAdd(); }}
             />
-            <Button variant="ghost" size="icon" style={{ color: "#888", borderRadius: 999, width: 32, height: 32, fontSize: 22 }} onClick={handleAdd}>+</Button>
+            <Button variant="ghost" size="icon" className="text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100" onClick={handleAdd}>+</Button>
           </div>
         </div>
       </div>
-      <div style={{ borderTop: "1px solid #E0E0E0", padding: "18px 32px", background: "#F7F7FB", display: "flex", gap: 12, flexWrap: "wrap" }}>
+      <div className="border-t border-gray-200 dark:border-gray-700 p-4 bg-gray-50 dark:bg-gray-900 flex gap-3 flex-wrap">
         <Button
           onClick={handleMarkAsDone}
           variant="outline"
-          style={{ flex: 1, fontWeight: 600, color: "#222", borderRadius: 10, border: "1.5px solid #B39DDB" }}
+          className="flex-1 font-semibold text-gray-900 dark:text-gray-100 rounded-lg border-2 border-purple-400 dark:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20"
         >
           Mark as done
         </Button>
         <Button
           variant="outline"
-          style={{ flex: 1, fontWeight: 600, color: "#222", borderRadius: 10, border: "1.5px solid #B39DDB" }}
+          className="flex-1 font-semibold text-gray-900 dark:text-gray-100 rounded-lg border-2 border-purple-400 dark:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20"
           title="Coming soon"
         >
           Remind me
         </Button>
         <Button
           variant="outline"
-          style={{ flex: 1, fontWeight: 600, color: "#222", borderRadius: 10, border: "1.5px solid #B39DDB" }}
+          className="flex-1 font-semibold text-gray-900 dark:text-gray-100 rounded-lg border-2 border-purple-400 dark:border-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20"
           title={`${checklist.filter(item => item.checked).length}/${checklist.length} completed`}
         >
           Checklist
@@ -252,7 +251,7 @@ export default function AllTaskSidebar({ open, onClose, task, onUpdate }: AllTas
         <Button
           onClick={handleDelete}
           variant="outline"
-          style={{ flex: 1, fontWeight: 600, color: "#F44336", borderRadius: 10, border: "1.5px solid #F44336" }}
+          className="flex-1 font-semibold text-red-600 dark:text-red-400 rounded-lg border-2 border-red-500 dark:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
         >
           Delete
         </Button>

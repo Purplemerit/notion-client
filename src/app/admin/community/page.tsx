@@ -247,7 +247,7 @@ export default function AdminCommunityPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
+    <div className="dark:bg-gray-900" style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
       {/* Sidebar */}
       <div style={{ flexShrink: 0, height: "100vh" }}>
         <AdminSidebar />
@@ -263,6 +263,7 @@ export default function AdminCommunityPage() {
 
         {/* Main Scrollable Content */}
         <main
+          className="dark:bg-gray-800"
           style={{
             display: "flex",
             flex: 1,
@@ -275,7 +276,7 @@ export default function AdminCommunityPage() {
           }}
         >
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h1 style={{ fontSize: 32, fontWeight: 600, color: "#252525" }}>Community Management</h1>
+            <h1 className="dark:text-gray-100" style={{ fontSize: 32, fontWeight: 600, color: "#252525" }}>Community Management</h1>
             <Button
               onClick={() => {
                 if (activeTab === "learnings") {
@@ -337,6 +338,7 @@ export default function AdminCommunityPage() {
               {learnings.map((learning) => (
                 <Card
                   key={learning._id}
+                  className="dark:bg-gray-700 dark:border-gray-600"
                   style={{
                     padding: 0,
                     background: "#FFF",
@@ -506,6 +508,7 @@ export default function AdminCommunityPage() {
           }}
         >
           <div
+            className="dark:bg-gray-800"
             style={{
               background: "#FFF",
               borderRadius: 16,
@@ -518,7 +521,7 @@ export default function AdminCommunityPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-              <h2 style={{ fontSize: 24, fontWeight: 600, color: "#252525" }}>
+              <h2 className="dark:text-gray-100" style={{ fontSize: 24, fontWeight: 600, color: "#252525" }}>
                 {editingLearning ? "Edit Learning" : "Add New Learning"}
               </h2>
               <Button
@@ -534,8 +537,9 @@ export default function AdminCommunityPage() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <label style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, display: "block", color: "#252525" }}>Title</label>
+                <label className="dark:text-gray-200" style={{ fontSize: 14, fontWeight: 600, marginBottom: 8, display: "block", color: "#252525" }}>Title</label>
                 <Input
+                  className="dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                   value={learningForm.title}
                   onChange={(e) => setLearningForm({ ...learningForm, title: e.target.value })}
                   placeholder="e.g., Advanced React Patterns"

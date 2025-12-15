@@ -235,7 +235,7 @@ export default function AdminHomePage() {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#FAFAFA" }}>
+    <div className="dark:bg-gray-900" style={{ display: "flex", minHeight: "100vh", background: "#FAFAFA" }}>
       {/* Sidebar */}
       <div style={{ flexShrink: 0, height: "100vh" }}>
         <AdminSidebar />
@@ -251,6 +251,7 @@ export default function AdminHomePage() {
 
         {/* Main Scrollable Content */}
         <main
+          className="dark:bg-gray-800"
           style={{
             display: "flex",
             flex: 1,
@@ -270,17 +271,17 @@ export default function AdminHomePage() {
               gap: 24,
             }}
           >
-            <h1 style={{ fontSize: 48, fontWeight: 700, color: "#000", marginBottom: 0, letterSpacing: "-0.02em" }}>Dashboard</h1>
+            <h1 className="dark:text-gray-100" style={{ fontSize: 48, fontWeight: 700, color: "#000", marginBottom: 0, letterSpacing: "-0.02em" }}>Dashboard</h1>
 
             {/* Dashboard Content Grid - Left Stats + Right Chart */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 600px", gap: 24 }}>
               {/* Left Side - Stats Cards (2x2 Grid) */}
               <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 20, alignContent: "start" }}>
                 {statsData.map((stat, idx) => (
-                  <Card key={idx} style={{ 
-                    padding: "28px 32px", 
-                    background: "#FFF", 
-                    borderRadius: 20, 
+                  <Card key={idx} className="dark:bg-gray-700 dark:border-gray-600" style={{
+                    padding: "28px 32px",
+                    background: "#FFF",
+                    borderRadius: 20,
                     border: "1px solid #E8E8E8",
                     boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
                     minHeight: "120px",
@@ -310,10 +311,10 @@ export default function AdminHomePage() {
               </div>
 
               {/* Right Side - Monthly Active Users Chart */}
-              <Card style={{ 
-                padding: "32px 36px", 
-                background: "#FFF", 
-                borderRadius: 20, 
+              <Card className="dark:bg-gray-700 dark:border-gray-600" style={{
+                padding: "32px 36px",
+                background: "#FFF",
+                borderRadius: 20,
                 border: "1px solid #E8E8E8",
                 boxShadow: "0 1px 2px rgba(0,0,0,0.04)",
                 display: "flex",
@@ -404,10 +405,10 @@ export default function AdminHomePage() {
             </div>
 
             {/* Account Stats and Bar Chart - Full Width Below */}
-            <Card style={{ 
-              padding: "32px", 
-              background: "#FFF", 
-              borderRadius: 20, 
+            <Card className="dark:bg-gray-700 dark:border-gray-600" style={{
+              padding: "32px",
+              background: "#FFF",
+              borderRadius: 20,
               border: "1px solid #E8E8E8",
               boxShadow: "0 1px 2px rgba(0,0,0,0.04)"
             }}>
@@ -483,8 +484,8 @@ export default function AdminHomePage() {
             {/* Bottom Section */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
               {/* User Profile */}
-              <Card style={{ padding: 24, background: "#FFF", borderRadius: 16, border: "1px solid #E1DEF6" }}>
-                <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 24 }}>User Profile</div>
+              <Card className="dark:bg-gray-700 dark:border-gray-600" style={{ padding: 24, background: "#FFF", borderRadius: 16, border: "1px solid #E1DEF6" }}>
+                <div className="dark:text-gray-100" style={{ fontSize: 18, fontWeight: 600, marginBottom: 24 }}>User Profile</div>
                 <div style={{ display: "flex", justifyContent: "center" }}>
                   <svg width="200" height="200" viewBox="0 0 200 200">
                     <circle cx="100" cy="100" r="80" fill="#E8E4FF" />
@@ -496,8 +497,8 @@ export default function AdminHomePage() {
               </Card>
 
               {/* Statistics */}
-              <Card style={{ padding: 24, background: "#FFF", borderRadius: 16, border: "1px solid #E1DEF6" }}>
-                <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 24 }}>Statistic</div>
+              <Card className="dark:bg-gray-700 dark:border-gray-600" style={{ padding: 24, background: "#FFF", borderRadius: 16, border: "1px solid #E1DEF6" }}>
+                <div className="dark:text-gray-100" style={{ fontSize: 18, fontWeight: 600, marginBottom: 24 }}>Statistic</div>
                 <svg width="100%" height="200" viewBox="0 0 400 200">
                   <path d="M 0 150 L 50 120 L 100 140 L 150 100 L 200 110 L 250 80 L 300 90 L 350 60 L 400 50" stroke="#4ECDC4" strokeWidth="2" fill="none" />
                   <path d="M 0 160 L 50 140 L 100 150 L 150 130 L 200 140 L 250 110 L 300 120 L 350 100 L 400 90" stroke="#FFB547" strokeWidth="2" fill="none" />
@@ -520,9 +521,9 @@ export default function AdminHomePage() {
             }}
           >
             {/* Contacts */}
-            <Card style={{ padding: 24, background: "#FFF", borderRadius: 16, border: "1px solid #E1DEF6" }}>
+            <Card className="dark:bg-gray-700 dark:border-gray-600" style={{ padding: 24, background: "#FFF", borderRadius: 16, border: "1px solid #E1DEF6" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-                <div style={{ fontSize: 18, fontWeight: 600 }}>Contacts</div>
+                <div className="dark:text-gray-100" style={{ fontSize: 18, fontWeight: 600 }}>Contacts</div>
                 <Button variant="link" style={{ color: "#8B7BE8", padding: 0 }} onClick={() => router.push('/admin/contact')}>View All</Button>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 16 }}>
@@ -548,9 +549,9 @@ export default function AdminHomePage() {
             </Card>
 
             {/* Messages */}
-            <Card style={{ padding: 24, background: "#FFF", borderRadius: 16, border: "1px solid #E1DEF6" }}>
+            <Card className="dark:bg-gray-700 dark:border-gray-600" style={{ padding: 24, background: "#FFF", borderRadius: 16, border: "1px solid #E1DEF6" }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-                <div style={{ fontSize: 18, fontWeight: 600 }}>Messages</div>
+                <div className="dark:text-gray-100" style={{ fontSize: 18, fontWeight: 600 }}>Messages</div>
                 <Button variant="link" style={{ color: "#8B7BE8", padding: 0 }} onClick={() => router.push('/chat')}>View All</Button>
               </div>
               {teamMembers.slice(0, 3).map((member: any, idx: number) => (
@@ -567,8 +568,8 @@ export default function AdminHomePage() {
             </Card>
 
             {/* Recent Activity */}
-            <Card style={{ padding: 24, background: "#FFF", borderRadius: 16, border: "1px solid #E1DEF6" }}>
-              <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 20 }}>Recent Activity</div>
+            <Card className="dark:bg-gray-700 dark:border-gray-600" style={{ padding: 24, background: "#FFF", borderRadius: 16, border: "1px solid #E1DEF6" }}>
+              <div className="dark:text-gray-100" style={{ fontSize: 18, fontWeight: 600, marginBottom: 20 }}>Recent Activity</div>
               <div style={{ display: "flex", gap: 8, marginBottom: 20, background: "#F5F5FF", borderRadius: 12, padding: 4 }}>
                 <Button
                   onClick={() => setActiveTab("Activity")}

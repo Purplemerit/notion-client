@@ -22,6 +22,7 @@ import { CallModal } from "@/components/CallModal";
 import { useChatContext, type Chat, type Message } from "@/contexts/ChatContext";
 import { usersAPI, chatAPI } from "@/lib/api";
 import { OfflineMessageQueue, isOnline } from "@/lib/chatUtils";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface User {
   _id: string;
@@ -31,18 +32,16 @@ interface User {
 }
 
 // Constants
-const CHAT_BACKGROUND = 'url("/img.png")';
 const DEFAULT_GROUP = "Roboto UX Project";
 
 // Components
-const ChatListItem = ({ chat, onClick }: { chat: Chat; onClick: () => void }) => (
+const ChatListItem = ({ chat, onClick, actualTheme }: { chat: Chat; onClick: () => void; actualTheme: string }) => (
   <div
-    className="flex items-start space-x-3 p-2 hover:bg-muted cursor-pointer"
-    style={{
-      borderRadius: '8px',
-      border: '1px solid rgba(204, 204, 204, 0.80)',
-      background: '#FFF',
-    }}
+    className={`flex items-start space-x-3 p-2 cursor-pointer rounded-lg border ${
+      actualTheme === 'dark' 
+        ? 'hover:bg-gray-700 border-gray-700 bg-gray-800' 
+        : 'hover:bg-muted border-gray-300 bg-white'
+    }`}
     onClick={onClick}
   >
     <div className="relative flex-shrink-0">
@@ -51,23 +50,35 @@ const ChatListItem = ({ chat, onClick }: { chat: Chat; onClick: () => void }) =>
         <AvatarFallback>{chat.name.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
       </Avatar>
       {chat.type && (
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-muted rounded-md flex items-center justify-center text-xs font-bold text-foreground border-2 border-background">
+        <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-md flex items-center justify-center text-xs font-bold border-2 ${
+          actualTheme === 'dark'
+            ? 'bg-gray-700 text-gray-100 border-gray-800'
+            : 'bg-muted text-foreground border-background'
+        }`}>
           {chat.type}
         </div>
       )}
     </div>
     <div className="flex-1 min-w-0">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-foreground truncate">{chat.name}</p>
-        <span className="text-xs text-muted-foreground flex-shrink-0 ml-2">{chat.time}</span>
+        <p className={`text-sm font-medium truncate ${actualTheme === 'dark' ? 'text-gray-100' : 'text-foreground'}`}>
+          {chat.name}
+        </p>
+        <span className={`text-xs flex-shrink-0 ml-2 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+          {chat.time}
+        </span>
       </div>
-      <p className="text-xs text-muted-foreground">{chat.role}</p>
-      <p className="text-xs text-muted-foreground truncate">{chat.status}</p>
+      <p className={`text-xs ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+        {chat.role}
+      </p>
+      <p className={`text-xs truncate ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+        {chat.status}
+      </p>
     </div>
   </div>
 );
 
-const MessageBubble = ({ message }: { message: Message }) => {
+const MessageBubble = ({ message, actualTheme }: { message: Message; actualTheme: string }) => {
   const getInitials = (name: string) => {
     if (!name) return '??';
     return name
@@ -80,47 +91,63 @@ const MessageBubble = ({ message }: { message: Message }) => {
   };
 
   return (
-  <div className={`flex items-end gap-3 ${message.isOwn ? 'justify-end' : 'justify-start'}`}>
-    {!message.isOwn && (
-      <Avatar className="w-8 h-8 flex-shrink-0">
-        <AvatarImage src={message.avatar} />
-        <AvatarFallback>{getInitials(message.sender)}</AvatarFallback>
-      </Avatar>
-    )}
-    <div className={`max-w-[70%] p-3 rounded-xl shadow-sm ${message.isOwn ? 'bg-purple-100' : 'bg-white'}`}>
-      <span className={`text-sm font-semibold mb-1 block ${message.isOwn ? 'text-purple-700' : 'text-foreground'}`}>
-        {message.sender}
-      </span>
-      {message.isMedia && message.mediaUrl ? (
-        <div className="space-y-2">
-          {message.mimetype?.startsWith('image/') ? (
-            <img src={message.mediaUrl} alt={message.filename} className="rounded max-w-full" />
-          ) : message.mimetype?.startsWith('video/') ? (
-            <video src={message.mediaUrl} controls className="rounded max-w-full" />
-          ) : message.mimetype?.startsWith('audio/') ? (
-            <audio src={message.mediaUrl} controls className="w-full" />
-          ) : (
-            <a href={message.mediaUrl} download={message.filename} className="text-primary hover:underline">
-              📎 {message.filename}
-            </a>
-          )}
-          {message.content && <p className="text-sm text-muted-foreground">{message.content}</p>}
-        </div>
-      ) : (
-        <p className="text-sm text-muted-foreground whitespace-pre-line">{message.content}</p>
+    <div className={`flex items-end gap-3 ${message.isOwn ? 'justify-end' : 'justify-start'}`}>
+      {!message.isOwn && (
+        <Avatar className="w-8 h-8 flex-shrink-0">
+          <AvatarImage src={message.avatar} />
+          <AvatarFallback>{getInitials(message.sender)}</AvatarFallback>
+        </Avatar>
       )}
-      <div className="flex justify-end items-center mt-1">
-        <span className="text-xs text-muted-foreground/80">{message.time}</span>
-        {message.isOwn && <span className="text-xs text-green-500 ml-2">✓✓</span>}
+      <div className={`max-w-[70%] p-3 rounded-xl shadow-sm ${
+        message.isOwn 
+          ? actualTheme === 'dark' ? 'bg-purple-900' : 'bg-purple-100'
+          : actualTheme === 'dark' ? 'bg-gray-800' : 'bg-white'
+      }`}>
+        <span className={`text-sm font-semibold mb-1 block ${
+          message.isOwn 
+            ? actualTheme === 'dark' ? 'text-purple-200' : 'text-purple-700'
+            : actualTheme === 'dark' ? 'text-gray-100' : 'text-foreground'
+        }`}>
+          {message.sender}
+        </span>
+        {message.isMedia && message.mediaUrl ? (
+          <div className="space-y-2">
+            {message.mimetype?.startsWith('image/') ? (
+              <img src={message.mediaUrl} alt={message.filename} className="rounded max-w-full" />
+            ) : message.mimetype?.startsWith('video/') ? (
+              <video src={message.mediaUrl} controls className="rounded max-w-full" />
+            ) : message.mimetype?.startsWith('audio/') ? (
+              <audio src={message.mediaUrl} controls className="w-full" />
+            ) : (
+              <a href={message.mediaUrl} download={message.filename} className="text-primary hover:underline">
+                📎 {message.filename}
+              </a>
+            )}
+            {message.content && (
+              <p className={`text-sm ${actualTheme === 'dark' ? 'text-gray-300' : 'text-muted-foreground'}`}>
+                {message.content}
+              </p>
+            )}
+          </div>
+        ) : (
+          <p className={`text-sm whitespace-pre-line ${actualTheme === 'dark' ? 'text-gray-300' : 'text-muted-foreground'}`}>
+            {message.content}
+          </p>
+        )}
+        <div className="flex justify-end items-center mt-1">
+          <span className={`text-xs ${actualTheme === 'dark' ? 'text-gray-500' : 'text-muted-foreground/80'}`}>
+            {message.time}
+          </span>
+          {message.isOwn && <span className="text-xs text-green-500 ml-2">✓✓</span>}
+        </div>
       </div>
+      {message.isOwn && (
+        <Avatar className="w-8 h-8 flex-shrink-0">
+          <AvatarImage src={message.avatar} />
+          <AvatarFallback>{getInitials(message.sender)}</AvatarFallback>
+        </Avatar>
+      )}
     </div>
-    {message.isOwn && (
-      <Avatar className="w-8 h-8 flex-shrink-0">
-        <AvatarImage src={message.avatar} />
-        <AvatarFallback>{getInitials(message.sender)}</AvatarFallback>
-      </Avatar>
-    )}
-  </div>
   );
 };
 
@@ -147,6 +174,7 @@ const ChatSidebar = ({
   setChitchatSearchQuery,
   isOpen,
   onClose,
+  actualTheme,
 }: {
   chats: { team: Chat[]; chitchat: Chat[] };
   onSelectChat: (chat: Chat) => void;
@@ -170,6 +198,7 @@ const ChatSidebar = ({
   setChitchatSearchQuery: (query: string) => void;
   isOpen: boolean;
   onClose: () => void;
+  actualTheme: string;
 }) => {
   const getInitials = (name: string) => {
     if (!name) return '??';
@@ -182,7 +211,6 @@ const ChatSidebar = ({
       .slice(0, 2);
   };
 
-  // Filter chats based on search query
   const filteredTeamChats = chats.team.filter(chat =>
     chat.name.toLowerCase().includes(teamSearchQuery.toLowerCase()) ||
     chat.role.toLowerCase().includes(teamSearchQuery.toLowerCase())
@@ -194,177 +222,220 @@ const ChatSidebar = ({
   );
 
   return (
-  <div
-    className={`fixed lg:relative inset-y-0 right-0 z-50 border-l bg-white flex lg:flex-shrink-0 h-full overflow-y-auto w-full sm:w-96 xl:w-[400px] flex-col gap-6 p-4 sm:p-6 transform transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}`}
-  >
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px', alignSelf: 'stretch', flex: 1, minHeight: 0 }}>
-      <h3 className="text-lg font-semibold text-foreground flex-shrink-0">Messages</h3>
-      <Tabs defaultValue="chitchat" className="w-full flex flex-col flex-1" style={{ minHeight: 0 }}>
-        <style jsx>{`
-          :global(button[data-state="active"]) {
-            background-color: #846BD2 !important;
-            color: white !important;
-          }
-        `}</style>
-        <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
-          <TabsTrigger value="team">Team</TabsTrigger>
-          <TabsTrigger value="chitchat">ChitChat</TabsTrigger>
-        </TabsList>
+    <div
+      className={`fixed lg:relative inset-y-0 right-0 z-50 border-l flex lg:flex-shrink-0 h-full overflow-y-auto w-full sm:w-96 xl:w-[400px] flex-col gap-6 p-4 sm:p-6 transform transition-transform duration-300 ${
+        actualTheme === 'dark'
+          ? 'border-gray-700 bg-gray-900'
+          : 'border-gray-200 bg-white'
+      } ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}`}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px', alignSelf: 'stretch', flex: 1, minHeight: 0 }}>
+        <h3 className={`text-lg font-semibold flex-shrink-0 ${actualTheme === 'dark' ? 'text-gray-100' : 'text-foreground'}`}>
+          Messages
+        </h3>
+        <Tabs defaultValue="chitchat" className="w-full flex flex-col flex-1" style={{ minHeight: 0 }}>
+          <style jsx>{`
+            :global(button[data-state="active"]) {
+              background-color: #846BD2 !important;
+              color: white !important;
+            }
+          `}</style>
+          <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
+            <TabsTrigger value="team">Team</TabsTrigger>
+            <TabsTrigger value="chitchat">ChitChat</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="team" className="mt-4" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px', flexShrink: 0, alignSelf: 'stretch', flex: 1, minHeight: 0 }}>
-          <div className="relative w-full flex-shrink-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input 
-              placeholder="Search inbox" 
-              className="pl-9" 
-              value={teamSearchQuery}
-              onChange={(e) => setTeamSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <div className="w-full flex-1 overflow-y-auto">
-            <div className="flex items-center justify-between px-2 mb-2">
-              <span className="text-sm font-medium text-foreground">Teams</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 hover:bg-primary/10"
-                onClick={() => setShowAddTeamForm(!showAddTeamForm)}
-              >
-                <Plus size={16} className={showAddTeamForm ? "text-primary" : "text-muted-foreground"} />
-              </Button>
+          <TabsContent value="team" className="mt-4" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px', flexShrink: 0, alignSelf: 'stretch', flex: 1, minHeight: 0 }}>
+            <div className="relative w-full flex-shrink-0">
+              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`} size={16} />
+              <Input
+                placeholder="Search inbox"
+                className="pl-9"
+                value={teamSearchQuery}
+                onChange={(e) => setTeamSearchQuery(e.target.value)}
+              />
             </div>
 
-            {showAddTeamForm && (
-              <div className="mx-2 mb-3 p-3 bg-white border border-gray-300 rounded-lg shadow-sm">
-                <div className="flex items-center gap-2">
-                  <Input
-                    placeholder="Enter team name..."
-                    value={newTeamName}
-                    onChange={(e) => setNewTeamName(e.target.value)}
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter') {
-                        handleAddTeamChat();
-                      }
-                    }}
-                    className="flex-1 h-9 text-sm bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
-                  />
-                  <Button
-                    size="sm"
-                    onClick={handleAddTeamChat}
-                    className="h-9 px-4 text-sm bg-primary text-white hover:bg-primary/90"
-                  >
-                    Add
-                  </Button>
-                </div>
+            <div className="w-full flex-1 overflow-y-auto">
+              <div className="flex items-center justify-between px-2 mb-2">
+                <span className={`text-sm font-medium ${actualTheme === 'dark' ? 'text-gray-100' : 'text-foreground'}`}>
+                  Teams
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hover:bg-primary/10"
+                  onClick={() => setShowAddTeamForm(!showAddTeamForm)}
+                >
+                  <Plus size={16} className={showAddTeamForm ? "text-primary" : actualTheme === 'dark' ? 'text-gray-400' : "text-muted-foreground"} />
+                </Button>
               </div>
-            )}
 
-            <div className="space-y-1">
-              {filteredTeamChats.length > 0 ? (
-                filteredTeamChats.map((chat, index) => (
-                  <ChatListItem key={index} chat={chat} onClick={() => {
-                    onSelectChat(chat);
-                    onClose();
-                  }} />
-                ))
-              ) : teamSearchQuery ? (
-                <p className="text-xs text-muted-foreground text-center py-4">No teams found matching &quot;{teamSearchQuery}&quot;</p>
-              ) : (
-                <p className="text-xs text-muted-foreground text-center py-4">No team chats yet. Click + to add one.</p>
-              )}
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="chitchat" className="mt-4" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px', flexShrink: 0, alignSelf: 'stretch', flex: 1, minHeight: 0 }}>
-          <div className="relative w-full flex-shrink-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-            <Input 
-              placeholder="Search inbox" 
-              className="pl-9"
-              value={chitchatSearchQuery}
-              onChange={(e) => setChitchatSearchQuery(e.target.value)}
-            />
-          </div>
-
-          <div className="w-full flex-1 overflow-y-auto">
-            <div className="flex items-center justify-between px-2 mb-2">
-              <span className="text-sm font-medium text-foreground">Chit Chat</span>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 hover:bg-primary/10"
-                onClick={() => setShowAddChatForm(!showAddChatForm)}
-              >
-                <Plus size={16} className={showAddChatForm ? "text-primary" : "text-muted-foreground"} />
-              </Button>
-            </div>
-
-            {showAddChatForm && (
-              <div className="mx-2 mb-3 p-3 bg-white border border-gray-300 rounded-lg shadow-sm">
-                <div className="mb-2">
-                  <Input
-                    placeholder="Search users by name or email..."
-                    value={newChatEmail}
-                    onChange={(e) => handleUserSearch(e.target.value)}
-                    className="flex-1 h-9 text-sm bg-white border-gray-300 text-gray-900 placeholder:text-gray-500"
-                  />
+              {showAddTeamForm && (
+                <div className={`mx-2 mb-3 p-3 border rounded-lg shadow-sm ${
+                  actualTheme === 'dark'
+                    ? 'bg-gray-800 border-gray-700'
+                    : 'bg-white border-gray-300'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      placeholder="Enter team name..."
+                      value={newTeamName}
+                      onChange={(e) => setNewTeamName(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleAddTeamChat();
+                        }
+                      }}
+                      className={`flex-1 h-9 text-sm ${
+                        actualTheme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder:text-gray-400'
+                          : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-500'
+                      }`}
+                    />
+                    <Button
+                      size="sm"
+                      onClick={handleAddTeamChat}
+                      className="h-9 px-4 text-sm bg-primary text-white hover:bg-primary/90"
+                    >
+                      Add
+                    </Button>
+                  </div>
                 </div>
+              )}
 
-                {/* Search Results */}
-                {isSearchingUsers ? (
-                  <div className="text-center py-3">
-                    <Loader2 className="h-4 w-4 animate-spin mx-auto text-gray-500" />
-                  </div>
-                ) : userSearchResults.length > 0 ? (
-                  <div className="space-y-1 max-h-48 overflow-y-auto">
-                    {userSearchResults.map((user) => (
-                      <div
-                        key={user._id}
-                        className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded cursor-pointer"
-                        onClick={() => handleSelectUserFromSearch(user)}
-                      >
-                        <Avatar className="h-6 w-6">
-                          <AvatarImage src={user.avatar} alt={user.name} />
-                          <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                        </Avatar>
-                        <div className="text-sm flex-1 min-w-0">
-                          <div className="font-medium truncate">{user.name}</div>
-                          <div className="text-xs text-gray-500 truncate">{user.email}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : newChatEmail ? (
-                  <div className="text-center py-3 text-xs text-gray-500">No users found</div>
+              <div className="space-y-1">
+                {filteredTeamChats.length > 0 ? (
+                  filteredTeamChats.map((chat, index) => (
+                    <ChatListItem key={index} chat={chat} onClick={() => {
+                      onSelectChat(chat);
+                      onClose();
+                    }} actualTheme={actualTheme} />
+                  ))
+                ) : teamSearchQuery ? (
+                  <p className={`text-xs text-center py-4 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                    No teams found matching &quot;{teamSearchQuery}&quot;
+                  </p>
                 ) : (
-                  <div className="text-center py-3 text-xs text-gray-500">
-                    Start typing to search users
-                  </div>
+                  <p className={`text-xs text-center py-4 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                    No team chats yet. Click + to add one.
+                  </p>
                 )}
               </div>
-            )}
-
-            <div className="space-y-1">
-              {filteredChitchats.length > 0 ? (
-                filteredChitchats.map((chat, index) => (
-                  <ChatListItem key={index} chat={chat} onClick={() => {
-                    onSelectChat(chat);
-                    onClose();
-                  }} />
-                ))
-              ) : chitchatSearchQuery ? (
-                <p className="text-xs text-muted-foreground text-center py-4">No chats found matching &quot;{chitchatSearchQuery}&quot;</p>
-              ) : (
-                <p className="text-xs text-muted-foreground text-center py-4">No chats yet. Click + to add one.</p>
-              )}
             </div>
-          </div>
-        </TabsContent>
-      </Tabs>
+          </TabsContent>
+
+          <TabsContent value="chitchat" className="mt-4" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px', flexShrink: 0, alignSelf: 'stretch', flex: 1, minHeight: 0 }}>
+            <div className="relative w-full flex-shrink-0">
+              <Search className={`absolute left-3 top-1/2 -translate-y-1/2 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`} size={16} />
+              <Input
+                placeholder="Search inbox"
+                className="pl-9"
+                value={chitchatSearchQuery}
+                onChange={(e) => setChitchatSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <div className="w-full flex-1 overflow-y-auto">
+              <div className="flex items-center justify-between px-2 mb-2">
+                <span className={`text-sm font-medium ${actualTheme === 'dark' ? 'text-gray-100' : 'text-foreground'}`}>
+                  Chit Chat
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 hover:bg-primary/10"
+                  onClick={() => setShowAddChatForm(!showAddChatForm)}
+                >
+                  <Plus size={16} className={showAddChatForm ? "text-primary" : actualTheme === 'dark' ? 'text-gray-400' : "text-muted-foreground"} />
+                </Button>
+              </div>
+
+              {showAddChatForm && (
+                <div className={`mx-2 mb-3 p-3 border rounded-lg shadow-sm ${
+                  actualTheme === 'dark'
+                    ? 'bg-gray-800 border-gray-700'
+                    : 'bg-white border-gray-300'
+                }`}>
+                  <div className="mb-2">
+                    <Input
+                      placeholder="Search users by name or email..."
+                      value={newChatEmail}
+                      onChange={(e) => handleUserSearch(e.target.value)}
+                      className={`flex-1 h-9 text-sm ${
+                        actualTheme === 'dark'
+                          ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder:text-gray-400'
+                          : 'bg-white border-gray-300 text-gray-900 placeholder:text-gray-500'
+                      }`}
+                    />
+                  </div>
+
+                  {isSearchingUsers ? (
+                    <div className="text-center py-3">
+                      <Loader2 className={`h-4 w-4 animate-spin mx-auto ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`} />
+                    </div>
+                  ) : userSearchResults.length > 0 ? (
+                    <div className="space-y-1 max-h-48 overflow-y-auto">
+                      {userSearchResults.map((user) => (
+                        <div
+                          key={user._id}
+                          className={`flex items-center gap-2 p-2 rounded cursor-pointer ${
+                            actualTheme === 'dark'
+                              ? 'hover:bg-gray-700'
+                              : 'hover:bg-gray-100'
+                          }`}
+                          onClick={() => handleSelectUserFromSearch(user)}
+                        >
+                          <Avatar className="h-6 w-6">
+                            <AvatarImage src={user.avatar} alt={user.name} />
+                            <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+                          </Avatar>
+                          <div className="text-sm flex-1 min-w-0">
+                            <div className={`font-medium truncate ${actualTheme === 'dark' ? 'text-gray-100' : ''}`}>
+                              {user.name}
+                            </div>
+                            <div className={`text-xs truncate ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                              {user.email}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : newChatEmail ? (
+                    <div className={`text-center py-3 text-xs ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      No users found
+                    </div>
+                  ) : (
+                    <div className={`text-center py-3 text-xs ${actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                      Start typing to search users
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="space-y-1">
+                {filteredChitchats.length > 0 ? (
+                  filteredChitchats.map((chat, index) => (
+                    <ChatListItem key={index} chat={chat} onClick={() => {
+                      onSelectChat(chat);
+                      onClose();
+                    }} actualTheme={actualTheme} />
+                  ))
+                ) : chitchatSearchQuery ? (
+                  <p className={`text-xs text-center py-4 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                    No chats found matching &quot;{chitchatSearchQuery}&quot;
+                  </p>
+                ) : (
+                  <p className={`text-xs text-center py-4 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                    No chats yet. Click + to add one.
+                  </p>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
-  </div>
   );
 };
 
@@ -372,10 +443,10 @@ const ChatSidebar = ({
 export default function Chat() {
   const router = useRouter();
   const { toast } = useToast();
+  const { actualTheme } = useTheme();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Use ChatContext
   const { chitChatChats, teamChats, addChitChat, addTeamChat, messages: contextMessages, addMessage: addMessageToContext, setMessagesForChat, markChatAsRead } = useChatContext();
 
   const [currentView, setCurrentView] = useState("chat");
@@ -394,7 +465,6 @@ export default function Chat() {
   const [chitchatSearchQuery, setChitchatSearchQuery] = useState("");
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
-  // Call state
   const [isCallModalOpen, setIsCallModalOpen] = useState(false);
   const [callState, setCallState] = useState<'incoming' | 'outgoing' | 'connected'>('outgoing');
   const [callType, setCallType] = useState<'audio' | 'video'>('audio');
@@ -408,10 +478,9 @@ export default function Chat() {
   const [pendingIceCandidates, setPendingIceCandidates] = useState<RTCIceCandidate[]>([]);
   const [callTimeout, setCallTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  // ICE candidate cleanup ref to prevent memory leaks
   const iceCandidateCleanupRef = useRef<NodeJS.Timeout | null>(null);
+  const streamCleanupRef = useRef<Set<MediaStream>>(new Set());
 
-  // Helpers
   const createMessage = (data: ChatMessage, isOwn: boolean = false): Message => ({
     id: `${Date.now()}-${Math.random()}`,
     sender: data.sender,
@@ -428,8 +497,8 @@ export default function Chat() {
   const processPendingIceCandidates = async (pc: RTCPeerConnection) => {
     if (pendingIceCandidates.length > 0 && pc.remoteDescription) {
       console.log(`Processing ${pendingIceCandidates.length} pending ICE candidates`);
-      const candidatesToProcess = [...pendingIceCandidates]; // Create copy to avoid race conditions
-      setPendingIceCandidates([]); // Clear immediately to prevent accumulation
+      const candidatesToProcess = [...pendingIceCandidates];
+      setPendingIceCandidates([]);
 
       for (const candidate of candidatesToProcess) {
         try {
@@ -445,7 +514,6 @@ export default function Chat() {
     }
   };
 
-  // Cleanup old ICE candidates to prevent memory leaks
   const cleanupOldIceCandidates = useCallback(() => {
     if (iceCandidateCleanupRef.current) {
       clearTimeout(iceCandidateCleanupRef.current);
@@ -453,290 +521,32 @@ export default function Chat() {
     
     iceCandidateCleanupRef.current = setTimeout(() => {
       setPendingIceCandidates(prev => {
-        if (prev.length > 50) { // Limit to 50 candidates max
+        if (prev.length > 50) {
           console.warn(`Cleaning up ${prev.length - 50} old ICE candidates to prevent memory leak`);
-          return prev.slice(-50); // Keep only the latest 50
+          return prev.slice(-50);
         }
         return prev;
       });
-    }, 10000); // Clean up every 10 seconds
+    }, 10000);
   }, []);
 
   const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
 
   const addMessage = (msg: Message) => {
-    // Don't add to local state - let context handle it and the useEffect will update local state
-    // This prevents duplicate messages
     if (selectedChat) {
       const chatKey = selectedChat.name;
       addMessageToContext(chatKey, msg);
     }
   };
 
-  // Process offline queue
-  useEffect(() => {
-    const processOfflineQueue = async () => {
-      if (!isOnline() || !currentUser) return;
-
-      const pendingMessages = OfflineMessageQueue.getPendingMessages();
-      if (pendingMessages.length === 0) return;
-
-      console.log(`Processing ${pendingMessages.length} offline messages`);
-
-      for (const queuedMsg of pendingMessages) {
-        try {
-          OfflineMessageQueue.markAsSending(queuedMsg.id);
-
-          if (queuedMsg.type === 'group') {
-            await sendGroupMessage(
-              queuedMsg.message.sender,
-              queuedMsg.message.groupName!,
-              queuedMsg.message.text,
-            );
-          } else {
-            await sendPrivateMessage(
-              queuedMsg.message.sender,
-              queuedMsg.message.receiver!,
-              queuedMsg.message.text,
-            );
-          }
-
-          // Remove from queue on success
-          OfflineMessageQueue.dequeue(queuedMsg.id);
-        } catch (error) {
-          console.error('Failed to send offline message:', error);
-          OfflineMessageQueue.markAsFailed(queuedMsg.id);
-        }
-      }
-    };
-
-    // Process queue on mount and when coming online
-    processOfflineQueue();
-
-    // Listen for online events
-    window.addEventListener('online', processOfflineQueue);
-    return () => window.removeEventListener('online', processOfflineQueue);
-  }, [currentUser]);
-
-  // Socket Effects
-  useEffect(() => {
-    // Fetch the actual user email
-    import('@/lib/api').then(({ usersAPI }) => {
-      usersAPI.getMe().then((user: any) => {
-        setCurrentUser(user.email);
-      }).catch((error) => {
-        console.error('Failed to get user:', error);
-      });
-    });
-  }, []);
-
-  // Separate effect for socket setup with better cleanup to prevent memory leaks
-  useEffect(() => {
-    if (!currentUser) return;
-
-    const socket = getChatSocket();
-    
-    // Create scoped handlers to ensure proper cleanup
-    const handleConnect = () => {
-      console.log('Chat socket connected successfully');
-    };
-
-    const handleDisconnect = () => {
-      console.log('Chat socket disconnected');
-    };
-
-    const handleConnectError = (error: any) => {
-      console.error('Chat socket connection error:', error);
-    };
-
-    const handleCallIncoming = async (data: { caller: string; offer: any; callType: 'audio' | 'video' }) => {
-      try {
-        console.log(`Incoming ${data.callType} call from ${data.caller}`);
-        setCaller(data.caller);
-        setCallee(currentUser);
-        setCallType(data.callType);
-        setCallState('incoming');
-        setIsCallModalOpen(true);
-
-        // Create peer connection for incoming call
-        const pc = new RTCPeerConnection({
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-          ],
-        });
-
-        pc.onicecandidate = (event) => {
-          if (event.candidate && pc.signalingState !== 'closed') {
-            sendCallICECandidate(currentUser, data.caller, event.candidate);
-          }
-        };
-
-        pc.ontrack = (event) => {
-          const remoteStream = event.streams[0];
-          setRemoteStream(remoteStream);
-          trackMediaStream(remoteStream); // Track for cleanup
-        };
-
-        pc.onconnectionstatechange = () => {
-          console.log('Peer connection state changed:', pc.connectionState);
-          if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
-            cleanupCall();
-          }
-        };
-
-        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-        setPeerConnection(pc);
-        // Process any pending ICE candidates
-        await processPendingIceCandidates(pc);
-      } catch (error) {
-        console.error('Error handling incoming call:', error);
-        toast({
-          title: "Call Error",
-          description: "Failed to setup incoming call",
-          variant: "destructive",
-        });
-        cleanupCall();
-      }
-    };
-
-    const handleCallAnswered = async (data: { callee: string; answer: any }) => {
-      try {
-        if (peerConnection && peerConnection.signalingState !== 'closed') {
-          await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-          setCallState('connected');
-          // Process any pending ICE candidates
-          await processPendingIceCandidates(peerConnection);
-        }
-      } catch (error) {
-        console.error('Error handling call answer:', error);
-        toast({
-          title: "Call Error",
-          description: "Failed to establish connection",
-          variant: "destructive",
-        });
-        cleanupCall();
-      }
-    };
-
-    const handleIceCandidate = async (data: { sender: string; candidate: any }) => {
-      if (data.candidate) {
-        const candidate = new RTCIceCandidate(data.candidate);
-        
-        if (peerConnection && 
-            peerConnection.signalingState !== 'closed' && 
-            peerConnection.connectionState !== 'closed' &&
-            peerConnection.connectionState !== 'failed' &&
-            peerConnection.remoteDescription) {
-          try {
-            await peerConnection.addIceCandidate(candidate);
-          } catch (error) {
-            console.error('Error adding ICE candidate:', error);
-          }
-        } else {
-          // Queue the candidate but limit queue size and trigger cleanup
-          setPendingIceCandidates(prev => {
-            const newCandidates = [...prev, candidate];
-            if (newCandidates.length > 20) { // Immediate limit to prevent runaway growth
-              console.warn('ICE candidate queue getting large, keeping only latest 20');
-              return newCandidates.slice(-20);
-            }
-            return newCandidates;
-          });
-          cleanupOldIceCandidates(); // Trigger cleanup timer
-        }
-      }
-    };
-
-    const handleCallRejected = (data: { callee: string; reason: string }) => {
-      toast({
-        title: "Call Rejected",
-        description: data.reason,
-        variant: "destructive",
-      });
-      cleanupCall();
-    };
-
-    const handleCallEnded = () => {
-      toast({
-        title: "Call Ended",
-        description: "The call has been ended.",
-      });
-      cleanupCall();
-    };
-
-    const handleCallError = (data: { message: string }) => {
-      toast({
-        title: "Call Error",
-        description: data.message,
-        variant: "destructive",
-      });
-      cleanupCall();
-    };
-
-    // Add connection debugging
-    socket.on('connect', handleConnect);
-    socket.on('disconnect', handleDisconnect);
-    socket.on('connect_error', handleConnectError);
-
-    // Call event listeners with scoped handlers
-    socket.on('call:incoming', handleCallIncoming);
-    socket.on('call:answered', handleCallAnswered);
-    socket.on('call:iceCandidate', handleIceCandidate);
-    socket.on('call:rejected', handleCallRejected);
-    socket.on('call:ended', handleCallEnded);
-    socket.on('call:error', handleCallError);
-
-    // Cleanup ALL listeners on unmount or currentUser change to prevent duplicates
-    return () => {
-      socket.off('connect', handleConnect);
-      socket.off('disconnect', handleDisconnect);
-      socket.off('connect_error', handleConnectError);
-      socket.off('call:incoming', handleCallIncoming);
-      socket.off('call:answered', handleCallAnswered);
-      socket.off('call:iceCandidate', handleIceCandidate);
-      socket.off('call:rejected', handleCallRejected);
-      socket.off('call:ended', handleCallEnded);
-      socket.off('call:error', handleCallError);
-    };
-  }, [currentUser, toast, peerConnection, cleanupOldIceCandidates, processPendingIceCandidates]);
-
-  // Update local messages when context messages change for selected chat
-  useEffect(() => {
-    if (selectedChat) {
-      const chatKey = selectedChat.name;
-      const contextMsgs = contextMessages[chatKey] || [];
-      setMessages(contextMsgs);
-      scrollToBottom();
-    }
-  }, [contextMessages, selectedChat]);
-
-  // Cleanup on unmount and proper stream management
-  useEffect(() => {
-    return () => {
-      cleanupCall();
-      // Clean up ICE candidate cleanup timer
-      if (iceCandidateCleanupRef.current) {
-        clearTimeout(iceCandidateCleanupRef.current);
-        iceCandidateCleanupRef.current = null;
-      }
-    };
-  }, []);
-
-  // Stream cleanup ref to prevent hanging tracks
-  const streamCleanupRef = useRef<Set<MediaStream>>(new Set());
-
-  // Track all streams for proper cleanup
   const trackMediaStream = useCallback((stream: MediaStream | null) => {
     if (stream) {
       streamCleanupRef.current.add(stream);
     }
   }, []);
 
-  // Enhanced cleanup function with better stream management
   const cleanupCall = useCallback(() => {
     try {
-      // Stop and clean up all tracked streams
       streamCleanupRef.current.forEach(stream => {
         stream.getTracks().forEach(track => {
           if (track.readyState !== 'ended') {
@@ -746,7 +556,6 @@ export default function Chat() {
       });
       streamCleanupRef.current.clear();
 
-      // Clean up current local stream
       if (localStream) {
         localStream.getTracks().forEach(track => {
           if (track.readyState !== 'ended') {
@@ -756,11 +565,8 @@ export default function Chat() {
         });
       }
 
-      // Clean up peer connection
       if (peerConnection) {
-        // Check if connection is not already closed
         if (peerConnection.signalingState !== 'closed') {
-          // Remove event listeners to prevent memory leaks
           peerConnection.onicecandidate = null;
           peerConnection.ontrack = null;
           peerConnection.onconnectionstatechange = null;
@@ -769,12 +575,10 @@ export default function Chat() {
         }
       }
 
-      // Clear call timeout
       if (callTimeout) {
         clearTimeout(callTimeout);
       }
 
-      // Clear ICE candidate cleanup timer
       if (iceCandidateCleanupRef.current) {
         clearTimeout(iceCandidateCleanupRef.current);
         iceCandidateCleanupRef.current = null;
@@ -782,7 +586,6 @@ export default function Chat() {
     } catch (error) {
       console.error('Error during call cleanup:', error);
     } finally {
-      // Reset all call-related state
       setIsCallModalOpen(false);
       setLocalStream(null);
       setRemoteStream(null);
@@ -795,30 +598,28 @@ export default function Chat() {
     }
   }, [localStream, peerConnection, callTimeout]);
 
-  // Handlers
+  // Effects and handlers continue from original file...
+  // (All the useEffect hooks and handler functions remain the same)
+
   const handleSendMessage = () => {
     if (!message.trim() || !selectedChat) return;
 
     const chatKey = selectedChat.name;
     const isGroup = selectedChat.type === 'TEAM' || teamChats.some(t => t.name === selectedChat.name);
 
-    // Create message for immediate display (optimistic UI)
     const newMsg = createMessage(
       { sender: currentUser, text: message, receiver: chatKey } as ChatMessage,
       true,
     );
     addMessage(newMsg);
 
-    // Check if online
     if (isOnline()) {
-      // Send immediately
       if (isGroup) {
         sendGroupMessage(currentUser, chatKey, message);
       } else {
         sendPrivateMessage(currentUser, chatKey, message);
       }
     } else {
-      // Queue for later when online
       const messageData = {
         sender: currentUser,
         text: message,
@@ -875,25 +676,9 @@ export default function Chat() {
     await startCall('video');
   };
 
-  const handleVideoCallRoom = () => {
-    if (!selectedChat) return;
-    const roomName = `room-${currentUser}-${selectedChat.name}`.replace(/[^a-zA-Z0-9-]/g, '');
-    router.push(`/video/${roomName}`);
-  };
-
   const handleAudioCall = async () => {
     if (!selectedChat) return;
     await startCall('audio');
-  };
-
-  // Debug function to test socket connection
-  const testSocketConnection = () => {
-    const socket = getChatSocket();
-    console.log('Testing socket connection...');
-    console.log('Socket connected:', socket.connected);
-    console.log('Socket ID:', socket.id);
-    console.log('Current user:', currentUser);
-    console.log('Selected chat:', selectedChat?.name);
   };
 
   const startCall = async (type: 'audio' | 'video') => {
@@ -905,7 +690,6 @@ export default function Chat() {
       setCallee(selectedChat!.name);
       setIsCallModalOpen(true);
 
-      // Set timeout for call
       const timeout = setTimeout(() => {
         toast({
           title: "Call Timeout",
@@ -913,18 +697,16 @@ export default function Chat() {
           variant: "destructive",
         });
         cleanupCall();
-      }, 30000); // 30 second timeout
+      }, 30000);
       setCallTimeout(timeout);
 
-      // Get user media
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: type === 'video', // Enable video for video calls
+        video: type === 'video',
       });
       setLocalStream(stream);
-      trackMediaStream(stream); // Track for cleanup
+      trackMediaStream(stream);
 
-      // Create peer connection
       const pc = new RTCPeerConnection({
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
@@ -932,28 +714,23 @@ export default function Chat() {
         ],
       });
 
-      // Add local stream tracks to peer connection
       stream.getTracks().forEach(track => {
         pc.addTrack(track, stream);
       });
 
-      // Handle ICE candidates
       pc.onicecandidate = (event) => {
         if (event.candidate && pc.signalingState !== 'closed') {
           sendCallICECandidate(currentUser, selectedChat!.name, event.candidate);
         }
       };
 
-      // Handle remote stream
       pc.ontrack = (event) => {
         setRemoteStream(event.streams[0]);
       };
 
-      // Handle connection state changes
       pc.onconnectionstatechange = () => {
         console.log('Peer connection state changed:', pc.connectionState);
         if (pc.connectionState === 'connected') {
-          // Clear timeout when connected
           if (callTimeout) {
             clearTimeout(callTimeout);
             setCallTimeout(null);
@@ -972,7 +749,6 @@ export default function Chat() {
 
       setPeerConnection(pc);
 
-      // Create and send offer
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
       console.log(`Sending ${type} call offer to ${selectedChat!.name}`);
@@ -990,15 +766,13 @@ export default function Chat() {
 
   const handleAcceptCall = async () => {
     try {
-      // Get user media
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: callType === 'video',
       });
       setLocalStream(stream);
-      trackMediaStream(stream); // Track for cleanup
+      trackMediaStream(stream);
 
-      // Peer connection should already exist from incoming call setup
       if (peerConnection && peerConnection.signalingState !== 'closed') {
         stream.getTracks().forEach(track => {
           peerConnection.addTrack(track, stream);
@@ -1055,32 +829,20 @@ export default function Chat() {
   const handleSelectChat = async (chat: Chat) => {
     setSelectedChat(chat);
     setIsLoadingHistory(true);
-
-    // Use the chat name as the key (which is the email for direct chats)
     const chatKey = chat.name;
-
-    // Mark chat as read
     markChatAsRead(chatKey);
 
-    // Load messages from context first (for immediate display)
-    // Don't replace - this will be updated by the useEffect that watches contextMessages
-    // Just let the context messages flow through
-
-    // Then fetch message history from backend
     try {
-      // Check if it's a team/group chat
       const isGroup = chat.type === 'TEAM' || teamChats.some(t => t.name === chat.name);
-
       let response;
+      
       if (isGroup) {
         response = await chatAPI.getGroupConversation(chat.name, 100);
       } else {
-        // For direct chats, chat.name is the other user's email
         response = await chatAPI.getPrivateConversation(chat.name, 100);
       }
 
       if (response.success && response.messages) {
-        // Convert backend messages to frontend format
         const loadedMessages: Message[] = response.messages.map((msg: any) => ({
           id: msg._id || `${Date.now()}-${Math.random()}`,
           sender: msg.sender,
@@ -1094,20 +856,15 @@ export default function Chat() {
           isMedia: msg.isMedia || !!msg.mediaUrl,
         }));
 
-        // Update context with loaded messages (this uses merge now!)
         setMessagesForChat(chatKey, loadedMessages);
-        // The useEffect below will update local messages from context
-        // No need to call setMessages directly - prevents race condition
       }
     } catch (error) {
       console.error('Failed to load message history:', error);
-      // Don't show error toast, just continue with local messages
     } finally {
       setIsLoadingHistory(false);
     }
   };
 
-  // Search users
   const handleUserSearch = async (query: string) => {
     setNewChatEmail(query);
     if (!query.trim()) {
@@ -1131,7 +888,6 @@ export default function Chat() {
     }
   };
 
-  // Select user from search results
   const handleSelectUserFromSearch = (user: User) => {
     const newChat: Chat = {
       name: user.email,
@@ -1212,21 +968,249 @@ export default function Chat() {
     });
   };
 
+  // Process offline queue
+  useEffect(() => {
+    const processOfflineQueue = async () => {
+      if (!isOnline() || !currentUser) return;
+
+      const pendingMessages = OfflineMessageQueue.getPendingMessages();
+      if (pendingMessages.length === 0) return;
+
+      console.log(`Processing ${pendingMessages.length} offline messages`);
+
+      for (const queuedMsg of pendingMessages) {
+        try {
+          OfflineMessageQueue.markAsSending(queuedMsg.id);
+
+          if (queuedMsg.type === 'group') {
+            await sendGroupMessage(
+              queuedMsg.message.sender,
+              queuedMsg.message.groupName!,
+              queuedMsg.message.text,
+            );
+          } else {
+            await sendPrivateMessage(
+              queuedMsg.message.sender,
+              queuedMsg.message.receiver!,
+              queuedMsg.message.text,
+            );
+          }
+
+          OfflineMessageQueue.dequeue(queuedMsg.id);
+        } catch (error) {
+          console.error('Failed to send offline message:', error);
+          OfflineMessageQueue.markAsFailed(queuedMsg.id);
+        }
+      }
+    };
+
+    processOfflineQueue();
+    window.addEventListener('online', processOfflineQueue);
+    return () => window.removeEventListener('online', processOfflineQueue);
+  }, [currentUser]);
+
+  useEffect(() => {
+    if (selectedChat) {
+      const chatKey = selectedChat.name;
+      const contextMsgs = contextMessages[chatKey] || [];
+      setMessages(contextMsgs);
+      scrollToBottom();
+    }
+  }, [contextMessages, selectedChat]);
+
+  useEffect(() => {
+    usersAPI.getMe().then((user: any) => {
+      setCurrentUser(user.email);
+    }).catch((error) => {
+      console.error('Failed to get user:', error);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const socket = getChatSocket();
+    
+    const handleConnect = () => {
+      console.log('Chat socket connected successfully');
+    };
+
+    const handleDisconnect = () => {
+      console.log('Chat socket disconnected');
+    };
+
+    const handleConnectError = (error: any) => {
+      console.error('Chat socket connection error:', error);
+    };
+
+    const handleCallIncoming = async (data: { caller: string; offer: any; callType: 'audio' | 'video' }) => {
+      try {
+        console.log(`Incoming ${data.callType} call from ${data.caller}`);
+        setCaller(data.caller);
+        setCallee(currentUser);
+        setCallType(data.callType);
+        setCallState('incoming');
+        setIsCallModalOpen(true);
+
+        const pc = new RTCPeerConnection({
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+          ],
+        });
+
+        pc.onicecandidate = (event) => {
+          if (event.candidate && pc.signalingState !== 'closed') {
+            sendCallICECandidate(currentUser, data.caller, event.candidate);
+          }
+        };
+
+        pc.ontrack = (event) => {
+          const remoteStream = event.streams[0];
+          setRemoteStream(remoteStream);
+          trackMediaStream(remoteStream);
+        };
+
+        pc.onconnectionstatechange = () => {
+          console.log('Peer connection state changed:', pc.connectionState);
+          if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+            cleanupCall();
+          }
+        };
+
+        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+        setPeerConnection(pc);
+        await processPendingIceCandidates(pc);
+      } catch (error) {
+        console.error('Error handling incoming call:', error);
+        toast({
+          title: "Call Error",
+          description: "Failed to setup incoming call",
+          variant: "destructive",
+        });
+        cleanupCall();
+      }
+    };
+
+    const handleCallAnswered = async (data: { callee: string; answer: any }) => {
+      try {
+        if (peerConnection && peerConnection.signalingState !== 'closed') {
+          await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+          setCallState('connected');
+          await processPendingIceCandidates(peerConnection);
+        }
+      } catch (error) {
+        console.error('Error handling call answer:', error);
+        toast({
+          title: "Call Error",
+          description: "Failed to establish connection",
+          variant: "destructive",
+        });
+        cleanupCall();
+      }
+    };
+
+    const handleIceCandidate = async (data: { sender: string; candidate: any }) => {
+      if (data.candidate) {
+        const candidate = new RTCIceCandidate(data.candidate);
+        
+        if (peerConnection && 
+            peerConnection.signalingState !== 'closed' && 
+            peerConnection.connectionState !== 'closed' &&
+            peerConnection.connectionState !== 'failed' &&
+            peerConnection.remoteDescription) {
+          try {
+            await peerConnection.addIceCandidate(candidate);
+          } catch (error) {
+            console.error('Error adding ICE candidate:', error);
+          }
+        } else {
+          setPendingIceCandidates(prev => {
+            const newCandidates = [...prev, candidate];
+            if (newCandidates.length > 20) {
+              console.warn('ICE candidate queue getting large, keeping only latest 20');
+              return newCandidates.slice(-20);
+            }
+            return newCandidates;
+          });
+          cleanupOldIceCandidates();
+        }
+      }
+    };
+
+    const handleCallRejected = (data: { callee: string; reason: string }) => {
+      toast({
+        title: "Call Rejected",
+        description: data.reason,
+        variant: "destructive",
+      });
+      cleanupCall();
+    };
+
+    const handleCallEnded = () => {
+      toast({
+        title: "Call Ended",
+        description: "The call has been ended.",
+      });
+      cleanupCall();
+    };
+
+    const handleCallError = (data: { message: string }) => {
+      toast({
+        title: "Call Error",
+        description: data.message,
+        variant: "destructive",
+      });
+      cleanupCall();
+    };
+
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
+    socket.on('connect_error', handleConnectError);
+    socket.on('call:incoming', handleCallIncoming);
+    socket.on('call:answered', handleCallAnswered);
+    socket.on('call:iceCandidate', handleIceCandidate);
+    socket.on('call:rejected', handleCallRejected);
+    socket.on('call:ended', handleCallEnded);
+    socket.on('call:error', handleCallError);
+
+    return () => {
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
+      socket.off('connect_error', handleConnectError);
+      socket.off('call:incoming', handleCallIncoming);
+      socket.off('call:answered', handleCallAnswered);
+      socket.off('call:iceCandidate', handleIceCandidate);
+      socket.off('call:rejected', handleCallRejected);
+      socket.off('call:ended', handleCallEnded);
+      socket.off('call:error', handleCallError);
+    };
+  }, [currentUser, toast, peerConnection, cleanupOldIceCandidates, processPendingIceCandidates]);
+
+  useEffect(() => {
+    return () => {
+      cleanupCall();
+      if (iceCandidateCleanupRef.current) {
+        clearTimeout(iceCandidateCleanupRef.current);
+        iceCandidateCleanupRef.current = null;
+      }
+    };
+  }, []);
+
   return (
-    <div className="flex h-screen w-full bg-[#F9F9F9] overflow-hidden">
+    <div className={`flex h-screen w-full overflow-hidden ${actualTheme === 'dark' ? 'bg-gray-900' : 'bg-[#F9F9F9]'}`}>
       <Sidebar currentView={currentView} onViewChange={setCurrentView} />
 
-      <div className="flex-1 flex border-l h-full">
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col bg-white h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between p-3 sm:p-4 border-b bg-white z-10 flex-shrink-0">
+      <div className={`flex-1 flex border-l h-full ${actualTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+        <div className={`flex-1 flex flex-col h-full ${actualTheme === 'dark' ? 'bg-gray-900' : 'bg-white'}`}>
+          <div className={`flex items-center justify-between p-3 sm:p-4 border-b z-10 flex-shrink-0 ${
+            actualTheme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'
+          }`}>
             <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
-              {/* Mobile Sidebar Toggle */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden text-muted-foreground h-8 w-8 flex-shrink-0"
+                className={`lg:hidden h-8 w-8 flex-shrink-0 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}
                 onClick={() => setIsChatSidebarOpen(!isChatSidebarOpen)}
               >
                 <Menu size={20} />
@@ -1239,8 +1223,16 @@ export default function Chat() {
                     <AvatarFallback>{selectedChat.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">{selectedChat.name}</h3>
-                    {selectedChat.role && <p className="text-xs text-muted-foreground truncate">{selectedChat.role}</p>}
+                    <h3 className={`font-semibold text-sm sm:text-base truncate ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-foreground'
+                    }`}>
+                      {selectedChat.name}
+                    </h3>
+                    {selectedChat.role && (
+                      <p className={`text-xs truncate ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                        {selectedChat.role}
+                      </p>
+                    )}
                   </div>
                 </>
               ) : (
@@ -1248,25 +1240,21 @@ export default function Chat() {
                   <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
                     <AvatarFallback>?</AvatarFallback>
                   </Avatar>
-                  <h3 className="font-semibold text-muted-foreground text-sm sm:text-base truncate">Select a chat to start messaging</h3>
+                  <h3 className={`font-semibold text-sm sm:text-base truncate ${
+                    actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'
+                  }`}>
+                    Select a chat to start messaging
+                  </h3>
                 </>
               )}
             </div>
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              {/* Debug button - remove in production */}
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-muted-foreground rounded-lg bg-white shadow-sm h-8 w-8 sm:h-10 sm:w-10"
-                onClick={testSocketConnection}
-                title="Test Socket Connection"
-              >
-                🔧
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-muted-foreground rounded-lg bg-white shadow-sm h-8 w-8 sm:h-10 sm:w-10"
+                className={`rounded-lg shadow-sm h-8 w-8 sm:h-10 sm:w-10 ${
+                  actualTheme === 'dark' ? 'text-gray-400 bg-gray-700' : 'text-muted-foreground bg-white'
+                }`}
                 disabled={!selectedChat}
                 onClick={handleAudioCall}
               >
@@ -1275,7 +1263,9 @@ export default function Chat() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-muted-foreground rounded-lg bg-white shadow-sm h-8 w-8 sm:h-10 sm:w-10"
+                className={`rounded-lg shadow-sm h-8 w-8 sm:h-10 sm:w-10 ${
+                  actualTheme === 'dark' ? 'text-gray-400 bg-gray-700' : 'text-muted-foreground bg-white'
+                }`}
                 onClick={handleVideoCall}
                 disabled={!selectedChat}
               >
@@ -1284,11 +1274,11 @@ export default function Chat() {
             </div>
           </div>
 
-          {/* Messages */}
           <div
             className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-6"
             style={{
-              backgroundImage: CHAT_BACKGROUND,
+              backgroundImage: actualTheme === 'dark' ? 'none' : 'url("/img.png")',
+              backgroundColor: actualTheme === 'dark' ? '#111827' : 'transparent',
               backgroundRepeat: 'repeat',
               backgroundPosition: 'center',
             }}
@@ -1298,12 +1288,14 @@ export default function Chat() {
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
                     <Loader2 className="w-8 h-8 mx-auto mb-2 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">Loading messages...</p>
+                    <p className={`text-sm ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                      Loading messages...
+                    </p>
                   </div>
                 </div>
               ) : messages.length > 0 ? (
                 messages.map((msg) => (
-                  <MessageBubble key={msg.id} message={msg} />
+                  <MessageBubble key={msg.id} message={msg} actualTheme={actualTheme} />
                 ))
               ) : (
                 <div className="flex items-center justify-center h-full">
@@ -1312,45 +1304,65 @@ export default function Chat() {
                       <AvatarImage src={selectedChat.avatar} />
                       <AvatarFallback>{selectedChat.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                     </Avatar>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">{selectedChat.name}</h3>
-                    <p className="text-sm text-muted-foreground">No messages yet. Start the conversation!</p>
+                    <h3 className={`text-lg font-semibold mb-2 ${actualTheme === 'dark' ? 'text-gray-100' : 'text-foreground'}`}>
+                      {selectedChat.name}
+                    </h3>
+                    <p className={`text-sm ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                      No messages yet. Start the conversation!
+                    </p>
                   </div>
                 </div>
               )
             ) : (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
-                    <Plus size={32} className="text-muted-foreground" />
+                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
+                    actualTheme === 'dark' ? 'bg-gray-700' : 'bg-muted'
+                  }`}>
+                    <Plus size={32} className={actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'} />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">No chat selected</h3>
-                  <p className="text-sm text-muted-foreground">Select a chat from the sidebar or create a new one</p>
+                  <h3 className={`text-lg font-semibold mb-2 ${actualTheme === 'dark' ? 'text-gray-100' : 'text-foreground'}`}>
+                    No chat selected
+                  </h3>
+                  <p className={`text-sm ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+                    Select a chat from the sidebar or create a new one
+                  </p>
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input */}
-          <div className="p-3 sm:p-4 border-t bg-white flex-shrink-0 flex justify-center">
-            <div className="flex flex-col justify-center items-center gap-2 rounded-2xl border border-gray-300 bg-white p-3 sm:p-4 w-full max-w-4xl">
+          <div className={`p-3 sm:p-4 border-t flex-shrink-0 flex justify-center ${
+            actualTheme === 'dark' ? 'border-gray-700 bg-gray-900' : 'border-gray-200 bg-white'
+          }`}>
+            <div className={`flex flex-col justify-center items-center gap-2 rounded-2xl border p-3 sm:p-4 w-full max-w-4xl ${
+              actualTheme === 'dark' ? 'border-gray-700 bg-gray-800' : 'border-gray-300 bg-white'
+            }`}>
               <div className="flex items-center w-full gap-1 sm:gap-2">
-                <Button variant="ghost" size="icon" className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0" disabled={!selectedChat}>
-                  {/* Custom Smile SVG */}
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className={`h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 ${
+                    actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'
+                  }`}
+                  disabled={!selectedChat}
+                >
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" viewBox="0 0 24 25" fill="none">
-                    <path d="M8 14.5C8 14.5 9.5 16.5 12 16.5C14.5 16.5 16 14.5 16 14.5M9 9.5H9.01M15 9.5H15.01M22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5C2 6.97715 6.47715 2.5 12 2.5C17.5228 2.5 22 6.97715 22 12.5Z" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M8 14.5C8 14.5 9.5 16.5 12 16.5C14.5 16.5 16 14.5 16 14.5M9 9.5H9.01M15 9.5H15.01M22 12.5C22 18.0228 17.5228 22.5 12 22.5C6.47715 22.5 2 18.0228 2 12.5C2 6.97715 6.47715 2.5 12 2.5C17.5228 2.5 22 6.97715 22 12.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0"
+                  className={`h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 ${
+                    actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'
+                  }`}
                   onClick={() => fileInputRef.current?.click()}
                   disabled={!selectedChat}
                 >
-                  {/* Custom Paperclip SVG */}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none" style={{ width: '25px', height: '25px', aspectRatio: '1/1' }}>
-                    <path d="M7.81266 17.1868H14.1147C13.896 17.6764 13.7293 18.1973 13.6356 18.7493H7.81266C4.646 18.7493 2.0835 16.1868 2.0835 13.0202C2.0835 9.85352 4.646 7.29102 7.81266 7.29102H18.7502C21.0522 7.29102 22.9168 9.1556 22.9168 11.4577C22.9168 12.4056 22.5939 13.2702 22.0522 13.9681C21.4897 13.7493 20.8856 13.6139 20.2606 13.5723C20.7108 13.2529 21.0476 12.7986 21.2223 12.275C21.397 11.7514 21.4004 11.1858 21.2322 10.6602C21.0639 10.1345 20.7326 9.67605 20.2864 9.35123C19.8402 9.0264 19.3021 8.85208 18.7502 8.85352H7.81266C5.51058 8.85352 3.646 10.7181 3.646 13.0202C3.646 15.3223 5.51058 17.1868 7.81266 17.1868ZM9.896 14.0618C9.32308 14.0618 8.85433 13.5931 8.85433 13.0202C8.85433 12.4473 9.32308 11.9785 9.896 11.9785H17.7085V10.416H9.896C9.20533 10.416 8.54295 10.6904 8.05457 11.1788C7.5662 11.6671 7.29183 12.3295 7.29183 13.0202C7.29183 13.7108 7.5662 14.3732 8.05457 14.8616C8.54295 15.35 9.20533 15.6243 9.896 15.6243H15.146C15.7442 14.9547 16.4796 14.4217 17.3022 14.0618H9.896ZM20.8335 18.7493V15.6243H18.7502V18.7493H15.6252V20.8327H18.7502V23.9577H20.8335V20.8327H23.9585V18.7493H20.8335Z" fill="black"/>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
+                    <path d="M7.81266 17.1868H14.1147C13.896 17.6764 13.7293 18.1973 13.6356 18.7493H7.81266C4.646 18.7493 2.0835 16.1868 2.0835 13.0202C2.0835 9.85352 4.646 7.29102 7.81266 7.29102H18.7502C21.0522 7.29102 22.9168 9.1556 22.9168 11.4577C22.9168 12.4056 22.5939 13.2702 22.0522 13.9681C21.4897 13.7493 20.8856 13.6139 20.2606 13.5723C20.7108 13.2529 21.0476 12.7986 21.2223 12.275C21.397 11.7514 21.4004 11.1858 21.2322 10.6602C21.0639 10.1345 20.7326 9.67605 20.2864 9.35123C19.8402 9.0264 19.3021 8.85208 18.7502 8.85352H7.81266C5.51058 8.85352 3.646 10.7181 3.646 13.0202C3.646 15.3223 5.51058 17.1868 7.81266 17.1868ZM9.896 14.0618C9.32308 14.0618 8.85433 13.5931 8.85433 13.0202C8.85433 12.4473 9.32308 11.9785 9.896 11.9785H17.7085V10.416H9.896C9.20533 10.416 8.54295 10.6904 8.05457 11.1788C7.5662 11.6671 7.29183 12.3295 7.29183 13.0202C7.29183 13.7108 7.5662 14.3732 8.05457 14.8616C8.54295 15.35 9.20533 15.6243 9.896 15.6243H15.146C15.7442 14.9547 16.4796 14.4217 17.3022 14.0618H9.896ZM20.8335 18.7493V15.6243H18.7502V18.7493H15.6252V20.8327H18.7502V23.9577H20.8335V20.8327H23.9585V18.7493H20.8335Z" fill="currentColor"/>
                   </svg>
                 </Button>
                 <Input
@@ -1371,14 +1383,15 @@ export default function Chat() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0"
+                  className={`h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0 ${
+                    actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'
+                  }`}
                   onClick={handleSendMessage}
                   disabled={!selectedChat}
                 >
-                  {/* Custom Send SVG */}
-                  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none" style={{ width: '25px', height: '25px', aspectRatio: '1/1' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25" fill="none">
                     <g clipPath="url(#clip0_2570_9833)">
-                      <path fillRule="evenodd" clipRule="evenodd" d="M18.7087 8.68281C18.8017 9.36861 19.3832 9.89167 20.0577 9.89167C20.7438 9.89167 21.3136 9.36861 21.4066 8.67119C21.5578 7.42747 22.5463 6.43946 23.7906 6.28836C24.4767 6.19537 25 5.62581 25 4.94002C25 4.25423 24.4767 3.68468 23.779 3.59169C23.173 3.5162 22.6096 3.24088 22.1778 2.80929C21.746 2.37771 21.4705 1.81452 21.395 1.20885C21.302 0.523061 20.7322 0 20.0461 0C19.3599 0 18.7901 0.523061 18.6971 1.22048C18.6196 1.82539 18.3436 2.38751 17.9121 2.81873C17.4807 3.24996 16.9183 3.5259 16.3131 3.60331C15.627 3.6963 15.1037 4.26585 15.1037 4.95165C15.1037 5.63744 15.627 6.20699 16.3248 6.29998C17.5691 6.45109 18.5575 7.43909 18.7087 8.68281ZM20.0577 7.11363C19.6155 6.15975 18.849 5.39364 17.8947 4.95165C18.8483 4.50995 19.6158 3.74279 20.0577 2.78966C20.4996 3.74279 21.2671 4.50995 22.2207 4.95165C21.2671 5.39334 20.4996 6.1605 20.0577 7.11363ZM11.9197 25C17.0365 25 19.6181 25 21.4904 23.3959C21.7578 23.1635 22.002 22.9194 22.2346 22.652C23.8394 20.7806 23.8394 18.2118 23.8394 13.0858C23.8394 12.6093 23.444 12.2141 22.9673 12.2141C22.4905 12.2141 22.0951 12.6093 22.0951 13.0858C22.0951 17.7818 22.0951 20.1413 20.9089 21.5245C20.7461 21.7221 20.5601 21.9081 20.3624 22.0709C18.9785 23.2565 16.6178 23.2565 11.9197 23.2565C7.2216 23.2565 4.86092 23.2565 3.47707 22.0709C3.27937 21.9081 3.09331 21.7221 2.93051 21.5245C1.74435 20.1413 1.74435 17.7818 1.74435 13.0858C1.74435 8.3899 1.74435 6.03031 2.93051 4.64711C3.09331 4.44951 3.27937 4.26353 3.47707 4.1008C4.86092 2.91519 7.2216 2.91519 11.9197 2.91519C12.3965 2.91519 12.7919 2.51999 12.7919 2.04343C12.7919 1.56686 12.3965 1.17166 11.9197 1.17166C6.80296 1.17166 4.22132 1.17166 2.34906 2.77571C2.08159 3.00818 1.83738 3.25228 1.6048 3.51962C1.38628e-07 5.39102 0 7.97145 0 13.0858C0 18.2002 1.38628e-07 20.7806 1.6048 22.652C1.83738 22.9194 2.08159 23.1751 2.34906 23.3959C4.22132 25 6.79133 25 11.9197 25ZM8.14146 14.8294C8.14146 15.3059 8.53684 15.7011 9.01363 15.7011C9.49042 15.7011 9.8858 15.3059 9.8858 14.8294V11.3423C9.8858 10.8657 9.49042 10.4705 9.01363 10.4705C8.53684 10.4705 8.14146 10.8657 8.14146 11.3423V14.8294ZM12.5023 19.1882C12.0255 19.1882 11.6302 18.793 11.6302 18.3164V7.85522C11.6302 7.37865 12.0255 6.98345 12.5023 6.98345C12.9791 6.98345 13.3745 7.37865 13.3745 7.85522V18.3164C13.3745 18.793 12.9791 19.1882 12.5023 19.1882ZM15.1188 15.9917C15.1188 16.4683 15.5142 16.8635 15.991 16.8635C16.4678 16.8635 16.8632 16.4683 16.8632 15.9917V10.1799C16.8632 9.70337 16.4678 9.30816 15.991 9.30816C15.5142 9.30816 15.1188 9.70337 15.1188 10.1799V15.9917ZM5.52377 14.5388C5.04698 14.5388 4.6516 14.1436 4.6516 13.667V12.5046C4.6516 12.0281 5.04698 11.6329 5.52377 11.6329C6.00056 11.6329 6.39594 12.0281 6.39594 12.5046V13.667C6.39594 14.1436 6.00056 14.5388 5.52377 14.5388Z" fill="black"/>
+                      <path fillRule="evenodd" clipRule="evenodd" d="M18.7087 8.68281C18.8017 9.36861 19.3832 9.89167 20.0577 9.89167C20.7438 9.89167 21.3136 9.36861 21.4066 8.67119C21.5578 7.42747 22.5463 6.43946 23.7906 6.28836C24.4767 6.19537 25 5.62581 25 4.94002C25 4.25423 24.4767 3.68468 23.779 3.59169C23.173 3.5162 22.6096 3.24088 22.1778 2.80929C21.746 2.37771 21.4705 1.81452 21.395 1.20885C21.302 0.523061 20.7322 0 20.0461 0C19.3599 0 18.7901 0.523061 18.6971 1.22048C18.6196 1.82539 18.3436 2.38751 17.9121 2.81873C17.4807 3.24996 16.9183 3.5259 16.3131 3.60331C15.627 3.6963 15.1037 4.26585 15.1037 4.95165C15.1037 5.63744 15.627 6.20699 16.3248 6.29998C17.5691 6.45109 18.5575 7.43909 18.7087 8.68281ZM20.0577 7.11363C19.6155 6.15975 18.849 5.39364 17.8947 4.95165C18.8483 4.50995 19.6158 3.74279 20.0577 2.78966C20.4996 3.74279 21.2671 4.50995 22.2207 4.95165C21.2671 5.39334 20.4996 6.1605 20.0577 7.11363ZM11.9197 25C17.0365 25 19.6181 25 21.4904 23.3959C21.7578 23.1635 22.002 22.9194 22.2346 22.652C23.8394 20.7806 23.8394 18.2118 23.8394 13.0858C23.8394 12.6093 23.444 12.2141 22.9673 12.2141C22.4905 12.2141 22.0951 12.6093 22.0951 13.0858C22.0951 17.7818 22.0951 20.1413 20.9089 21.5245C20.7461 21.7221 20.5601 21.9081 20.3624 22.0709C18.9785 23.2565 16.6178 23.2565 11.9197 23.2565C7.2216 23.2565 4.86092 23.2565 3.47707 22.0709C3.27937 21.9081 3.09331 21.7221 2.93051 21.5245C1.74435 20.1413 1.74435 17.7818 1.74435 13.0858C1.74435 8.3899 1.74435 6.03031 2.93051 4.64711C3.09331 4.44951 3.27937 4.26353 3.47707 4.1008C4.86092 2.91519 7.2216 2.91519 11.9197 2.91519C12.3965 2.91519 12.7919 2.51999 12.7919 2.04343C12.7919 1.56686 12.3965 1.17166 11.9197 1.17166C6.80296 1.17166 4.22132 1.17166 2.34906 2.77571C2.08159 3.00818 1.83738 3.25228 1.6048 3.51962C1.38628e-07 5.39102 0 7.97145 0 13.0858C0 18.2002 1.38628e-07 20.7806 1.6048 22.652C1.83738 22.9194 2.08159 23.1751 2.34906 23.3959C4.22132 25 6.79133 25 11.9197 25ZM8.14146 14.8294C8.14146 15.3059 8.53684 15.7011 9.01363 15.7011C9.49042 15.7011 9.8858 15.3059 9.8858 14.8294V11.3423C9.8858 10.8657 9.49042 10.4705 9.01363 10.4705C8.53684 10.4705 8.14146 10.8657 8.14146 11.3423V14.8294ZM12.5023 19.1882C12.0255 19.1882 11.6302 18.793 11.6302 18.3164V7.85522C11.6302 7.37865 12.0255 6.98345 12.5023 6.98345C12.9791 6.98345 13.3745 7.37865 13.3745 7.85522V18.3164C13.3745 18.793 12.9791 19.1882 12.5023 19.1882ZM15.1188 15.9917C15.1188 16.4683 15.5142 16.8635 15.991 16.8635C16.4678 16.8635 16.8632 16.4683 16.8632 15.9917V10.1799C16.8632 9.70337 16.4678 9.30816 15.991 9.30816C15.5142 9.30816 15.1188 9.70337 15.1188 10.1799V15.9917ZM5.52377 14.5388C5.04698 14.5388 4.6516 14.1436 4.6516 13.667V12.5046C4.6516 12.0281 5.04698 11.6329 5.52377 11.6329C6.00056 11.6329 6.39594 12.0281 6.39594 12.5046V13.667C6.39594 14.1436 6.00056 14.5388 5.52377 14.5388Z" fill="currentColor"/>
                     </g>
                     <defs>
                       <clipPath id="clip0_2570_9833">
@@ -1392,7 +1405,6 @@ export default function Chat() {
           </div>
         </div>
 
-        {/* Sidebar */}
         <ChatSidebar
           chats={{ team: teamChats, chitchat: chitChatChats }}
           onSelectChat={handleSelectChat}
@@ -1416,10 +1428,10 @@ export default function Chat() {
           setTeamSearchQuery={setTeamSearchQuery}
           chitchatSearchQuery={chitchatSearchQuery}
           setChitchatSearchQuery={setChitchatSearchQuery}
+          actualTheme={actualTheme}
         />
       </div>
 
-      {/* Call Modal */}
       <CallModal
         isOpen={isCallModalOpen}
         callType={callType}
@@ -1439,7 +1451,6 @@ export default function Chat() {
         onToggleVideo={handleToggleVideo}
       />
 
-      {/* Toast Notifications */}
       <Toaster />
     </div>
   );

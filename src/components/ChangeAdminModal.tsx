@@ -109,7 +109,7 @@ export function ChangeAdminModal({
       <div
         style={{
           borderRadius: 24,
-          background: '#FFF',
+          background: 'hsl(var(--card))',
           boxShadow: '0 4px 16px 0 rgba(0, 0, 0, 0.20), 35px 45px 73px 0 rgba(32, 32, 35, 0.07)',
           width: 480,
           maxHeight: '80vh',
@@ -122,15 +122,15 @@ export function ChangeAdminModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontWeight: 600, fontSize: 18, color: '#7B8794' }}>Change Team Admin</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ fontWeight: 600, fontSize: 18, color: 'hsl(var(--muted-foreground))' }}>Change Team Admin</div>
           <button
             onClick={onClose}
             style={{
               background: 'none',
               border: 'none',
               fontSize: 22,
-              color: '#222',
+              color: 'hsl(var(--foreground))',
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -142,26 +142,19 @@ export function ChangeAdminModal({
         </div>
 
         {/* Task Info */}
-        <div style={{ padding: '12px 16px', background: '#F9FAFB', borderRadius: 12 }}>
-          <div style={{ fontSize: 15, fontWeight: 600, color: '#222', marginBottom: 4 }}>
+        <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg">
+          <div className="text-sm font-semibold text-gray-900 dark:text-white mb-1">
             {task.title}
           </div>
-          <div style={{ fontSize: 13, color: '#7B8794' }}>
+          <div className="text-xs text-gray-600 dark:text-gray-400">
             Select a new admin from the team members below
           </div>
         </div>
 
         {/* Permission Warning */}
         {!isOwner && (
-          <div
-            style={{
-              padding: '12px 16px',
-              background: '#FEF2F2',
-              borderRadius: 12,
-              border: '1px solid #FCA5A5',
-            }}
-          >
-            <div style={{ fontSize: 13, color: '#DC2626', fontWeight: 500 }}>
+          <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-300 dark:border-red-700">
+            <div className="text-xs text-red-700 dark:text-red-400 font-medium">
               Only the task owner can change the admin
             </div>
           </div>
@@ -179,11 +172,11 @@ export function ChangeAdminModal({
           }}
         >
           {loading ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: '#7B8794', fontSize: 15 }}>
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'hsl(var(--muted-foreground))', fontSize: 15 }}>
               Loading team members...
             </div>
           ) : teamMembers.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '40px 0', color: '#7B8794', fontSize: 15 }}>
+            <div style={{ textAlign: 'center', padding: '40px 0', color: 'hsl(var(--muted-foreground))', fontSize: 15 }}>
               <Shield size={40} style={{ margin: '0 auto 12px', opacity: 0.5 }} />
               <div>No team members found</div>
             </div>
@@ -204,39 +197,39 @@ export function ChangeAdminModal({
                     padding: '12px',
                     borderRadius: 12,
                     cursor: isOwner ? 'pointer' : 'not-allowed',
-                    border: isSelected ? '2px solid #7C3AED' : '2px solid transparent',
-                    background: isSelected ? '#F5F3FF' : '#FFF',
+                    border: isSelected ? '2px solid hsl(var(--primary))' : '2px solid transparent',
+                    background: isSelected ? 'hsl(var(--secondary))' : 'hsl(var(--card))',
                     transition: 'all 0.2s',
                     opacity: isOwner ? 1 : 0.6,
                   }}
                   onMouseEnter={(e) => {
                     if (isOwner && !isSelected) {
-                      e.currentTarget.style.background = '#F9FAFB';
+                      e.currentTarget.style.background = 'hsl(var(--surface))';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (isOwner && !isSelected) {
-                      e.currentTarget.style.background = '#FFF';
+                      e.currentTarget.style.background = 'hsl(var(--card))';
                     }
                   }}
                 >
                   {/* Avatar */}
                   <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: member.avatar
-                        ? `url(${member.avatar}) center/cover`
-                        : `linear-gradient(135deg, ${getColorFromString(member.name || member.email)})`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#FFF',
-                      fontWeight: 600,
-                      fontSize: 16,
-                      position: 'relative',
-                    }}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        background: member.avatar
+                          ? `url(${member.avatar}) center/cover`
+                          : `linear-gradient(135deg, ${getColorFromString(member.name || member.email)})`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'hsl(var(--primary-foreground))',
+                        fontWeight: 600,
+                        fontSize: 16,
+                        position: 'relative',
+                      }}
                   >
                     {!member.avatar && getInitials(member.name || member.email)}
                     {isCurrentAdmin && (
@@ -248,14 +241,14 @@ export function ChangeAdminModal({
                           width: 18,
                           height: 18,
                           borderRadius: '50%',
-                          background: '#7C3AED',
-                          border: '2px solid #FFF',
+                          background: 'hsl(var(--primary))',
+                          border: '2px solid hsl(var(--card))',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                         }}
                       >
-                        <Shield size={10} color="#FFF" />
+                        <Shield size={10} color="hsl(var(--primary-foreground))" />
                       </div>
                     )}
                   </div>
@@ -263,7 +256,7 @@ export function ChangeAdminModal({
                   {/* User Info */}
                   <div style={{ flex: 1 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                      <div style={{ fontWeight: 600, fontSize: 15, color: '#222' }}>
+                      <div style={{ fontWeight: 600, fontSize: 15, color: 'hsl(var(--foreground))' }}>
                         {member.name || 'Unknown User'}
                       </div>
                       {isTaskOwner && (
@@ -271,8 +264,8 @@ export function ChangeAdminModal({
                           style={{
                             fontSize: 11,
                             fontWeight: 600,
-                            color: '#7C3AED',
-                            background: '#F5F3FF',
+                            color: 'hsl(var(--primary))',
+                            background: 'hsl(var(--secondary))',
                             padding: '2px 6px',
                             borderRadius: 4,
                           }}
@@ -285,8 +278,8 @@ export function ChangeAdminModal({
                           style={{
                             fontSize: 11,
                             fontWeight: 600,
-                            color: '#7C3AED',
-                            background: '#F5F3FF',
+                            color: 'hsl(var(--primary))',
+                            background: 'hsl(var(--secondary))',
                             padding: '2px 6px',
                             borderRadius: 4,
                           }}
@@ -295,24 +288,24 @@ export function ChangeAdminModal({
                         </span>
                       )}
                     </div>
-                    <div style={{ fontSize: 13, color: '#7B8794' }}>{member.email}</div>
+                    <div style={{ fontSize: 13, color: 'hsl(var(--muted-foreground))' }}>{member.email}</div>
                   </div>
 
                   {/* Selection Indicator */}
                   <div
-                    style={{
+                      style={{
                       width: 20,
                       height: 20,
                       borderRadius: 6,
-                      border: isSelected ? '2px solid #7C3AED' : '2px solid #D1D5DB',
-                      background: isSelected ? '#7C3AED' : '#FFF',
+                      border: isSelected ? '2px solid hsl(var(--primary))' : '2px solid hsl(var(--border))',
+                      background: isSelected ? 'hsl(var(--primary))' : 'hsl(var(--card))',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       transition: 'all 0.2s',
                     }}
                   >
-                    {isSelected && <Check size={14} color="#FFF" strokeWidth={3} />}
+                    {isSelected && <Check size={14} color="hsl(var(--primary-foreground))" strokeWidth={3} />}
                   </div>
                 </div>
               );
@@ -329,18 +322,18 @@ export function ChangeAdminModal({
               padding: '12px 24px',
               fontSize: 15,
               fontWeight: 600,
-              border: '2px solid #E5E7EB',
+              border: '2px solid hsl(var(--border))',
               borderRadius: 12,
-              background: '#FFF',
-              color: '#222',
+              background: 'hsl(var(--card))',
+              color: 'hsl(var(--foreground))',
               cursor: 'pointer',
               transition: 'all 0.2s',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = '#F9FAFB';
+              e.currentTarget.style.background = 'hsl(var(--surface))';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = '#FFF';
+              e.currentTarget.style.background = 'hsl(var(--card))';
             }}
           >
             Cancel
@@ -357,9 +350,9 @@ export function ChangeAdminModal({
               borderRadius: 12,
               background:
                 !isOwner || !selectedAdminId || selectedAdminId === task.admin
-                  ? '#E5E7EB'
-                  : '#7C3AED',
-              color: '#FFF',
+                  ? 'hsl(var(--border))'
+                  : 'hsl(var(--primary))',
+              color: 'hsl(var(--primary-foreground))',
               cursor:
                 !isOwner || !selectedAdminId || selectedAdminId === task.admin
                   ? 'not-allowed'
@@ -370,12 +363,12 @@ export function ChangeAdminModal({
             }}
             onMouseEnter={(e) => {
               if (isOwner && selectedAdminId && selectedAdminId !== task.admin) {
-                e.currentTarget.style.background = '#6D28D9';
+                e.currentTarget.style.background = 'hsl(var(--primary-hover))';
               }
             }}
             onMouseLeave={(e) => {
               if (isOwner && selectedAdminId && selectedAdminId !== task.admin) {
-                e.currentTarget.style.background = '#7C3AED';
+                e.currentTarget.style.background = 'hsl(var(--primary))';
               }
             }}
           >

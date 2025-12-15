@@ -74,7 +74,7 @@ export function EditProfileModal({ isOpen, onClose, user, onSave }: EditProfileM
       <div
         style={{
           borderRadius: 24,
-          background: '#FFF',
+          background: 'hsl(var(--card))',
           boxShadow: '0 4px 16px 0 rgba(0, 0, 0, 0.20), 35px 45px 73px 0 rgba(32, 32, 35, 0.07)',
           width: 600,
           maxHeight: '90vh',
@@ -89,14 +89,14 @@ export function EditProfileModal({ isOpen, onClose, user, onSave }: EditProfileM
       >
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ fontWeight: 600, fontSize: 20, color: '#222' }}>Edit Profile</div>
+          <div style={{ fontWeight: 600, fontSize: 20, color: 'hsl(var(--foreground))' }}>Edit Profile</div>
           <button
             onClick={onClose}
             style={{
               background: 'none',
               border: 'none',
               fontSize: 22,
-              color: '#222',
+              color: 'hsl(var(--foreground))',
               cursor: 'pointer',
               padding: 0,
               display: 'flex',
@@ -121,11 +121,11 @@ export function EditProfileModal({ isOpen, onClose, user, onSave }: EditProfileM
                   borderRadius: '50%',
                   background: formData.avatar
                     ? `url(${formData.avatar}) center/cover`
-                    : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    : `linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)))`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: '#FFF',
+                  color: 'hsl(var(--primary-foreground))',
                   fontSize: 28,
                   fontWeight: 600,
                   flexShrink: 0,
@@ -140,7 +140,7 @@ export function EditProfileModal({ isOpen, onClose, user, onSave }: EditProfileM
                   onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
                   placeholder="Enter avatar URL or leave empty for default"
                 />
-                <p style={{ fontSize: 12, color: '#7B8794', marginTop: 6 }}>
+                <p style={{ fontSize: 12, color: 'hsl(var(--muted-foreground))', marginTop: 6 }}>
                   Paste an image URL to set your profile picture
                 </p>
               </div>
@@ -207,7 +207,7 @@ export function EditProfileModal({ isOpen, onClose, user, onSave }: EditProfileM
                 />
               </div>
               <div>
-                <Label className="text-sm text-muted-foreground">City, State</Label>
+                    <Label className="text-sm text-muted-foreground">City, State</Label>
                 <Input
                   value={formData.cityState}
                   onChange={(e) => setFormData({ ...formData, cityState: e.target.value })}
@@ -242,7 +242,7 @@ export function EditProfileModal({ isOpen, onClose, user, onSave }: EditProfileM
           </Button>
           <Button
             onClick={handleSave}
-            style={{ flex: 1, background: '#846BD2', color: '#FFF' }}
+            className="flex-1 bg-purple-600 dark:bg-purple-700 text-white hover:bg-purple-700 dark:hover:bg-purple-600"
             disabled={loading}
           >
             {loading ? 'Saving...' : 'Save Changes'}

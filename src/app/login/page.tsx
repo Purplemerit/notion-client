@@ -77,23 +77,24 @@ export default function LoginPage() {
   };
 
   return (
-    <main 
-      className="min-h-screen flex items-center justify-center p-4"
+    <main
+      className="min-h-screen flex items-center justify-center p-4 light-mode-only"
       style={{
-        background: 'linear-gradient(117deg, #C9C4EE -14.47%, #EFEDFA 42.76%, #E1DEF6 100%)'
+        background: 'linear-gradient(117deg, #C9C4EE -14.47%, #EFEDFA 42.76%, #E1DEF6 100%)',
+        colorScheme: 'light'
       }}
     >
       <div className="w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-start">
         {/* Left Panel - Login Form */}
         <div className="rounded-2xl p-4 sm:p-6 lg:p-8">
           <div className="mb-6 lg:mb-8 text-center">
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">Welcome Back</h1>
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Welcome Back</h1>
             <p className="text-gray-600 text-sm sm:text-base">Sign in to access your dashboard</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="email" className="text-sm font-medium text-gray-600">
                 Username or Email
               </Label>
               <Input
@@ -102,13 +103,13 @@ export default function LoginPage() {
                 placeholder="eg. 123@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-12 bg-white border-gray-200"
+                className="h-12 bg-white border-gray-200 text-gray-700"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+              <Label htmlFor="password" className="text-sm font-medium text-gray-600">
                 Password
               </Label>
               <div className="relative">
@@ -118,13 +119,13 @@ export default function LoginPage() {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 bg-white border-gray-200 pr-10"
+                  className="h-12 bg-white border-gray-200 text-gray-700 pr-10"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-500"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -146,7 +147,7 @@ export default function LoginPage() {
               <div>
                 <label
                   htmlFor="remember"
-                  className="text-sm font-medium text-gray-700 cursor-pointer"
+                  className="text-sm font-medium text-gray-600 cursor-pointer"
                 >
                   Remember this device
                 </label>
@@ -176,7 +177,7 @@ export default function LoginPage() {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-3 bg-transparent text-gray-500">or continue with</span>
+                <span className="px-4 text-gray-500" style={{ backgroundColor: 'transparent' }}>or continue with</span>
               </div>
             </div>
 
@@ -208,9 +209,9 @@ export default function LoginPage() {
                     });
                   }}
                 >
-                  <Building2 className="w-5 h-5 mr-3" />
+                  <Building2 className="w-5 h-5 mr-3 text-gray-500" />
                   <div className="flex flex-col items-start">
-                    <span className="font-medium">Google</span>
+                    <span className="font-medium text-gray-700">Google</span>
                     <span className="text-xs subtitle-text text-gray-500">Use your google corporate account</span>
                   </div>
                 </Button>
@@ -219,7 +220,7 @@ export default function LoginPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 bg-white hover:text-white text-gray-700 border border-gray-200 rounded-lg justify-start transition-colors"
+                className="w-full h-12 bg-white hover:text-white text-gray-600 border border-gray-200 rounded-lg justify-start transition-colors"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#846BD2';
                   e.currentTarget.style.color = 'white';
@@ -228,20 +229,28 @@ export default function LoginPage() {
                   subtitles.forEach(el => {
                     (el as HTMLElement).style.color = 'white';
                   });
+                  const icons = e.currentTarget.querySelectorAll('svg');
+                  icons.forEach(el => {
+                    (el as SVGElement).style.color = 'white';
+                  });
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'white';
-                  e.currentTarget.style.color = 'rgb(55, 65, 81)';
+                  e.currentTarget.style.color = 'rgb(75, 85, 99)';
                   e.currentTarget.style.borderColor = 'rgb(229, 231, 235)';
                   const subtitles = e.currentTarget.querySelectorAll('.subtitle-text');
                   subtitles.forEach(el => {
                     (el as HTMLElement).style.color = 'rgb(107, 114, 128)';
                   });
+                  const icons = e.currentTarget.querySelectorAll('svg');
+                  icons.forEach(el => {
+                    (el as SVGElement).style.color = 'rgb(107, 114, 128)';
+                  });
                 }}
               >
-                <Mail className="w-5 h-5 mr-3 text-gray-600" />
+                <Mail className="w-5 h-5 mr-3 text-gray-500" />
                 <div className="flex flex-col items-start">
-                  <span className="font-medium">Microsoft Active Directory</span>
+                  <span className="font-medium text-gray-700">Microsoft Active Directory</span>
                   <span className="text-xs subtitle-text text-gray-500">Sign in with your corporate account</span>
                 </div>
               </Button>
@@ -249,7 +258,7 @@ export default function LoginPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-12 bg-white hover:text-white text-gray-700 border border-gray-200 rounded-lg justify-start transition-colors"
+                className="w-full h-12 bg-white hover:text-white text-gray-600 border border-gray-200 rounded-lg justify-start transition-colors"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.backgroundColor = '#846BD2';
                   e.currentTarget.style.color = 'white';
@@ -258,32 +267,40 @@ export default function LoginPage() {
                   subtitles.forEach(el => {
                     (el as HTMLElement).style.color = 'white';
                   });
+                  const icons = e.currentTarget.querySelectorAll('svg');
+                  icons.forEach(el => {
+                    (el as SVGElement).style.color = 'white';
+                  });
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.backgroundColor = 'white';
-                  e.currentTarget.style.color = 'rgb(55, 65, 81)';
+                  e.currentTarget.style.color = 'rgb(75, 85, 99)';
                   e.currentTarget.style.borderColor = 'rgb(229, 231, 235)';
                   const subtitles = e.currentTarget.querySelectorAll('.subtitle-text');
                   subtitles.forEach(el => {
                     (el as HTMLElement).style.color = 'rgb(107, 114, 128)';
                   });
+                  const icons = e.currentTarget.querySelectorAll('svg');
+                  icons.forEach(el => {
+                    (el as SVGElement).style.color = 'rgb(107, 114, 128)';
+                  });
                 }}
               >
-                <Shield className="w-5 h-5 mr-3 text-gray-600" />
+                <Shield className="w-5 h-5 mr-3 text-gray-500" />
                 <div className="flex flex-col items-start">
-                  <span className="font-medium">Okta SSO</span>
+                  <span className="font-medium text-gray-700">Okta SSO</span>
                   <span className="text-xs subtitle-text text-gray-500">Enterprise identity provider</span>
                 </div>
               </Button>
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-purple-50 border border-purple-100 rounded-lg">
+          <div className="mt-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
             <div className="flex items-start gap-2">
               <Info className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-sm font-medium text-purple-900">Corporate Authentication</p>
-                <p className="text-xs text-purple-700 mt-1">
+                <p className="text-sm font-semibold text-purple-700">Corporate Authentication</p>
+                <p className="text-xs text-purple-600 mt-1">
                   Use your corporate credentials to access this portal. Contact IT support if you experience any authentication issues.
                 </p>
               </div>
@@ -301,11 +318,12 @@ export default function LoginPage() {
 
         {/* Right Panel - Security & System Status */}
         <div 
-          className="space-y-4 sm:space-y-6 p-4 sm:p-6 lg:p-8 lg:min-w-[720px]"
+          className="space-y-4 sm:space-y-6 p-4 sm:p-6 lg:p-8 lg:min-w-[720px] bg-white"
           style={{
             borderRadius: '16px',
             border: '1px solid #E5E2FF',
             background: '#F9F6FF',
+            backgroundColor: '#F9F6FF'
           }}
         >
           {/* Security Status Card */}
@@ -313,46 +331,46 @@ export default function LoginPage() {
             <CardContent className="p-4 sm:p-6 lg:p-8">
               <div className="flex items-center gap-2 mb-4 sm:mb-6">
                 <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Security Status</h2>
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-700">Security Status</h2>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-lg bg-gray-50">
-                    <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+                    <Lock className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm sm:text-base text-gray-900">SSL Encrypted</p>
+                    <p className="font-semibold text-sm sm:text-base text-gray-700">SSL Encrypted</p>
                     <p className="text-xs sm:text-sm text-gray-500">256-bit encryption</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-lg bg-gray-50">
-                    <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+                    <Building2 className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm sm:text-base text-gray-900">Active Directory</p>
+                    <p className="font-semibold text-sm sm:text-base text-gray-700">Active Directory</p>
                     <p className="text-xs sm:text-sm text-gray-500">Corporate integration</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-lg bg-gray-50">
-                    <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+                    <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm sm:text-base text-gray-900">Multi-Factor Auth</p>
+                    <p className="font-semibold text-sm sm:text-base text-gray-700">Multi-Factor Auth</p>
                     <p className="text-xs sm:text-sm text-gray-500">Enhanced security</p>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3">
                   <div className="p-2 rounded-lg bg-gray-50">
-                    <FileCheck className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700" />
+                    <FileCheck className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm sm:text-base text-gray-900">Audit Logging</p>
+                    <p className="font-semibold text-sm sm:text-base text-gray-700">Audit Logging</p>
                     <p className="text-xs sm:text-sm text-gray-500">Compliance tracking</p>
                   </div>
                 </div>
@@ -365,21 +383,21 @@ export default function LoginPage() {
             <CardContent className="p-4 sm:p-6 lg:p-8">
               <div className="flex items-center gap-2 mb-4 sm:mb-6">
                 <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Compliance Standards</h2>
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-700">Compliance Standards</h2>
               </div>
 
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 rounded-lg">
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-teal-500" />
-                  <span className="text-xs sm:text-sm font-medium text-gray-700">Sox Compliant</span>
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">Sox Compliant</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 rounded-lg">
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-teal-500" />
-                  <span className="text-xs sm:text-sm font-medium text-gray-700">GDPR Ready</span>
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">GDPR Ready</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 rounded-lg">
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-teal-500" />
-                  <span className="text-xs sm:text-sm font-medium text-gray-700">IOS 27001</span>
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
+                  <span className="text-xs sm:text-sm font-medium text-gray-600">ISO 27001</span>
                 </div>
               </div>
             </CardContent>
@@ -390,29 +408,29 @@ export default function LoginPage() {
             <CardContent className="p-4 sm:p-6 lg:p-8">
               <div className="flex items-center gap-2 mb-4 sm:mb-6">
                 <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
-                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">System Health</h2>
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-700">System Health</h2>
               </div>
 
               <div className="space-y-3 sm:space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm sm:text-base text-gray-900">Authentication Service</span>
+                  <span className="text-sm sm:text-base text-gray-700">Authentication Service</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-teal-500"></div>
-                    <span className="text-xs sm:text-sm font-medium text-teal-600">Online</span>
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span className="text-xs sm:text-sm font-medium text-green-600">Online</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm sm:text-base text-gray-900">Directory Sync</span>
+                  <span className="text-sm sm:text-base text-gray-700">Directory Sync</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-teal-500"></div>
-                    <span className="text-xs sm:text-sm font-medium text-teal-600">Synced</span>
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span className="text-xs sm:text-sm font-medium text-green-600">Synced</span>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm sm:text-base text-gray-900">Session Management</span>
+                  <span className="text-sm sm:text-base text-gray-700">Session Management</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-teal-500"></div>
-                    <span className="text-xs sm:text-sm font-medium text-teal-600">Active</span>
+                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                    <span className="text-xs sm:text-sm font-medium text-green-600">Active</span>
                   </div>
                 </div>
               </div>

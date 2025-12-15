@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { usersAPI, userAPI } from "@/lib/api";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Sidebar } from "@/components/Sidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,17 +40,17 @@ const SvgSwitch = ({ checked, onCheckedChange }: { checked?: boolean; onCheckedC
   return (
     <button
       onClick={handleClick}
-      className="cursor-pointer transition-all duration-200 hover:opacity-80"
+      className="cursor-pointer transition-all duration-200 hover:opacity-80 dark:hover:opacity-80"
       type="button"
     >
       {isChecked ? (
         <svg width="45" height="20" viewBox="0 0 45 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="45" height="20" rx="10" fill="#846BD2"/>
+          <rect width="45" height="20" rx="10" fill="hsl(var(--primary))"/>
           <rect x="25" y="1" width="18" height="18" rx="9" fill="white"/>
         </svg>
       ) : (
         <svg width="45" height="20" viewBox="0 0 45 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="45" height="20" rx="10" fill="#BDBDBD"/>
+          <rect width="45" height="20" rx="10" fill="hsl(var(--muted-foreground))"/>
           <rect x="2" y="1" width="18" height="18" rx="9" fill="white"/>
         </svg>
       )}
@@ -59,6 +60,7 @@ const SvgSwitch = ({ checked, onCheckedChange }: { checked?: boolean; onCheckedC
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { theme, actualTheme, setTheme } = useTheme();
   const [currentView, setCurrentView] = useState("settings");
   const [activeSection, setActiveSection] = useState("profile");
   const [user, setUser] = useState<any>(null);
@@ -95,6 +97,17 @@ export default function SettingsPage() {
 
   const handleUpdatePreference = async (key: string, value: any) => {
     try {
+      // Handle theme preference separately using ThemeContext
+      if (key === 'theme') {
+        await setTheme(value);
+        toast({
+          title: "Theme Updated",
+          description: "Your theme preference has been saved",
+        });
+        return;
+      }
+
+      // Handle other preferences normally
       const updates = { [key]: value };
       const updatedPreferences = await userAPI.updatePreferences(updates);
       setPreferences(updatedPreferences);
@@ -172,8 +185,12 @@ export default function SettingsPage() {
         return (
           <div className="space-y-6">
             <div
-              style={{ borderRadius: '12px', border: '1px solid #A5A5A5', background: '#FFF' }}
-              className="p-6"
+              style={{ borderRadius: '12px', background: 'hsl(var(--card))' }}
+              className={`p-6 border ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-900 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}
             >
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-4">
@@ -182,15 +199,23 @@ export default function SettingsPage() {
                     <AvatarFallback>{user ? (user.name || user.email || "U").split(' ').map((n: string) => n[0]).join('') : "U"}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <h2 className="text-xl font-semibold text-foreground">{user?.name || "-"}</h2>
+                    <h2 className={`text-xl font-semibold ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>{user?.name || "-"}</h2>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-sm text-muted-foreground">{user?.role || "-"}</p>
+                      <p className={`text-sm ${
+                        actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`}>{user?.role || "-"}</p>
                       {user?.role === 'admin' && (
                         <div className="flex items-center gap-1">
-                          <span className="w-1 h-1 bg-muted-foreground rounded-full"></span>
+                          <span className={`w-1 h-1 rounded-full ${
+                            actualTheme === 'dark' ? 'bg-gray-400' : 'bg-gray-500'
+                          }`}></span>
                           <button
                             onClick={handleAdminPanelClick}
-                            className="text-xs bg-gradient-to-r from-[#8B7BE8] to-[#9B8CE8] text-white px-2 py-1 rounded-full hover:from-[#7A6BD7] hover:to-[#8A7BD7] transition-all duration-200 flex items-center gap-1"
+                            className={`text-xs bg-gradient-to-r from-primary to-purple-500 text-white px-2 py-1 rounded-full hover:opacity-90 transition-all duration-200 flex items-center gap-1 ${
+                              actualTheme === 'dark' ? 'dark:from-primary dark:to-purple-600 dark:hover:opacity-80' : ''
+                            }`}
                           >
                             <Settings size={10} />
                             Go to Admin Panel
@@ -198,7 +223,9 @@ export default function SettingsPage() {
                         </div>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">{user?.location || "-"}</p>
+                    <p className={`text-sm ${
+                      actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>{user?.location || "-"}</p>
                   </div>
                 </div>
                 <Button variant="outline" size="sm" onClick={() => setShowEditProfile(true)}>
@@ -209,11 +236,17 @@ export default function SettingsPage() {
             </div>
 
             <div
-              style={{ borderRadius: '12px', border: '1px solid #A5A5A5', background: '#FFF' }}
-              className="p-6"
+              style={{ borderRadius: '12px', background: 'hsl(var(--card))' }}
+              className={`p-6 border ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-900 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-foreground">Personal Information</h2>
+                <h2 className={`text-xl font-semibold ${
+                  actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>Personal Information</h2>
                 <Button variant="outline" size="sm" onClick={() => setShowEditProfile(true)}>
                   <Edit3 className="h-4 w-4 mr-2" />
                   Edit
@@ -222,34 +255,50 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
-                  <Label className="text-sm font-medium text-foreground">First name</Label>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>First name</Label>
                   <Input value={user?.firstName || "-"} className="mt-2" readOnly />
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-foreground">Last name</Label>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Last name</Label>
                   <Input value={user?.lastName || "-"} className="mt-2" readOnly />
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-foreground">Email Address</Label>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Email Address</Label>
                   <Input value={user?.email || "-"} className="mt-2" readOnly />
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-foreground">Phone</Label>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Phone</Label>
                   <Input value={user?.phone || "-"} className="mt-2" readOnly />
                 </div>
                 <div className="sm:col-span-2">
-                  <Label className="text-sm font-medium text-foreground">Bio</Label>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Bio</Label>
                   <Input value={user?.bio || "-"} className="mt-2" readOnly />
                 </div>
               </div>
             </div>
 
             <div
-              style={{ borderRadius: '12px', border: '1px solid #A5A5A5', background: '#FFF' }}
-              className="p-6"
+              style={{ borderRadius: '12px', background: 'hsl(var(--card))' }}
+              className={`p-6 border ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-900 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-foreground">Location Details</h2>
+                <h2 className={`text-xl font-semibold ${
+                  actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                }`}>Location Details</h2>
                 <Button variant="outline" size="sm" onClick={() => setShowEditProfile(true)}>
                   <Edit3 className="h-4 w-4 mr-2" />
                   Edit
@@ -258,16 +307,28 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
-                  <Label className="text-sm font-medium text-foreground">Country</Label>
-                  <p className="text-sm text-muted-foreground mt-2">{user?.country || "-"}</p>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Country</Label>
+                  <p className={`text-sm mt-2 ${
+                    actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>{user?.country || "-"}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-foreground">City, State</Label>
-                  <p className="text-sm text-muted-foreground mt-2">{user?.cityState || user?.location || "-"}</p>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>City, State</Label>
+                  <p className={`text-sm mt-2 ${
+                    actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>{user?.cityState || user?.location || "-"}</p>
                 </div>
                 <div>
-                  <Label className="text-sm font-medium text-foreground">Postal Code</Label>
-                  <p className="text-sm text-muted-foreground mt-2">{user?.postalCode || "-"}</p>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Postal Code</Label>
+                  <p className={`text-sm mt-2 ${
+                    actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                  }`}>{user?.postalCode || "-"}</p>
                 </div>
               </div>
             </div>
@@ -277,19 +338,30 @@ export default function SettingsPage() {
       case "security":
         return (
           <div className="space-y-6">
-            {/* ...existing code... */}
             <div
-              style={{ borderRadius: '12px', border: '1px solid #A5A5A5', background: '#FFF' }}
-              className="p-6"
+              style={{ borderRadius: '12px', background: 'hsl(var(--card))' }}
+              className={`p-6 border ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-900 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}
             >
-              <h2 className="text-xl font-semibold text-foreground mb-2">Account Security</h2>
-              <p className="text-sm text-muted-foreground mb-6">Set up security measures for better protection</p>
+              <h2 className={`text-xl font-semibold mb-2 ${
+                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>Account Security</h2>
+              <p className={`text-sm mb-6 ${
+                actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>Set up security measures for better protection</p>
 
               <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-foreground">Email</h3>
-                    <p className="text-sm text-muted-foreground truncate">{user?.email || "-"}</p>
+                    <h3 className={`font-medium ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>Email</h3>
+                    <p className={`text-sm truncate ${
+                      actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>{user?.email || "-"}</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => setShowChangeEmail(true)} className="w-full sm:w-auto">
                     Change email
@@ -298,8 +370,12 @@ export default function SettingsPage() {
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="flex-1">
-                    <h3 className="font-medium text-foreground">Password</h3>
-                    <p className="text-sm text-muted-foreground">Change your password to keep your account secure</p>
+                    <h3 className={`font-medium ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>Password</h3>
+                    <p className={`text-sm ${
+                      actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>Change your password to keep your account secure</p>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => setShowChangePassword(true)} className="w-full sm:w-auto">
                     Change password
@@ -308,8 +384,12 @@ export default function SettingsPage() {
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="flex-1">
-                    <h3 className="font-medium text-foreground">2-Step verification</h3>
-                    <p className="text-sm text-muted-foreground">An extra layer of protection to your account during log in</p>
+                    <h3 className={`font-medium ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>2-Step verification</h3>
+                    <p className={`text-sm ${
+                      actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>An extra layer of protection to your account during log in</p>
                   </div>
                   <div className="flex items-center gap-2 sm:flex-shrink-0">
                     <Badge variant="secondary">Enabled</Badge>
@@ -319,8 +399,12 @@ export default function SettingsPage() {
 
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div className="flex-1">
-                    <h3 className="font-medium text-foreground">Recovery codes</h3>
-                    <p className="text-sm text-muted-foreground">Generated Oct 10, 2025</p>
+                    <h3 className={`font-medium ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>Recovery codes</h3>
+                    <p className={`text-sm ${
+                      actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>Generated Oct 10, 2025</p>
                   </div>
                   <Button variant="outline" size="sm" className="w-full sm:w-auto">
                     Regenerate Codes
@@ -330,30 +414,48 @@ export default function SettingsPage() {
             </div>
 
             <div
-              style={{ borderRadius: '12px', border: '1px solid #A5A5A5', background: '#FFF' }}
-              className="p-6"
+              style={{ borderRadius: '12px', background: 'hsl(var(--card))' }}
+              className={`p-6 border ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-900 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}
             >
-              <h2 className="text-xl font-semibold text-foreground mb-2">Recovery Settings</h2>
-              <p className="text-sm text-muted-foreground mb-6">Keep your recovery methods ready</p>
+              <h2 className={`text-xl font-semibold mb-2 ${
+                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>Recovery Settings</h2>
+              <p className={`text-sm mb-6 ${
+                actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>Keep your recovery methods ready</p>
 
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-medium text-foreground">Recovery Email</h3>
-                    <p className="text-sm text-muted-foreground">Setup Recovery Email To Secure Your Account</p>
+                    <h3 className={`font-medium ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>Recovery Email</h3>
+                    <p className={`text-sm ${
+                      actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>Setup Recovery Email To Secure Your Account</p>
                   </div>
                   <Button size="sm">Save</Button>
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-foreground">Another Email Address</Label>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Another Email Address</Label>
                   <Input placeholder="recovery@example.com" className="mt-2" />
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-medium text-foreground">Recovery Phone Number</h3>
-                    <p className="text-sm text-muted-foreground">Add Phone Number To Setup SMS Recovery For Your Account</p>
+                    <h3 className={`font-medium ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>Recovery Phone Number</h3>
+                    <p className={`text-sm ${
+                      actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>Add Phone Number To Setup SMS Recovery For Your Account</p>
                   </div>
                   <Button variant="outline" size="sm">Setup</Button>
                 </div>
@@ -365,17 +467,26 @@ export default function SettingsPage() {
       case "accessibility":
         return (
           <div className="space-y-6">
-            {/* ...existing code... */}
             <div
-              style={{ borderRadius: '12px', border: '1px solid #A5A5A5', background: '#FFF' }}
-              className="p-6"
+              style={{ borderRadius: '12px', background: 'hsl(var(--card))' }}
+              className={`p-6 border ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-900 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}
             >
-              <h2 className="text-xl font-semibold text-foreground mb-2">Language</h2>
-              <p className="text-sm text-muted-foreground mb-6">Make The Platform Easy And Comfortable To Use For Everyone</p>
+              <h2 className={`text-xl font-semibold mb-2 ${
+                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>Language</h2>
+              <p className={`text-sm mb-6 ${
+                actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>Make The Platform Easy And Comfortable To Use For Everyone</p>
 
               <div className="space-y-6">
                 <div>
-                  <Label className="text-sm font-medium text-foreground">Interface Language</Label>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Interface Language</Label>
                   <Select
                     value={preferences?.language || "english"}
                     onValueChange={(value) => handleUpdatePreference('language', value)}
@@ -383,7 +494,7 @@ export default function SettingsPage() {
                     <SelectTrigger className="mt-2">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white">
+                    <SelectContent className={actualTheme === 'dark' ? 'bg-gray-800' : 'bg-white'}>
                       <SelectItem value="english">English</SelectItem>
                       <SelectItem value="spanish">Spanish</SelectItem>
                       <SelectItem value="french">French</SelectItem>
@@ -392,7 +503,9 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-foreground">Font Size</Label>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Font Size</Label>
                   <Select
                     value={preferences?.fontSize || "medium"}
                     onValueChange={(value) => handleUpdatePreference('fontSize', value)}
@@ -400,7 +513,7 @@ export default function SettingsPage() {
                     <SelectTrigger className="mt-2">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white">
+                    <SelectContent className={actualTheme === 'dark' ? 'bg-gray-800' : 'bg-white'}>
                       <SelectItem value="small">Small</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
                       <SelectItem value="large">Large</SelectItem>
@@ -409,15 +522,17 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-foreground">Theme</Label>
+                  <Label className={`text-sm font-medium ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Theme</Label>
                   <Select
-                    value={preferences?.theme || "light"}
+                    value={theme}
                     onValueChange={(value) => handleUpdatePreference('theme', value)}
                   >
                     <SelectTrigger className="mt-2">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white">
+                    <SelectContent className={actualTheme === 'dark' ? 'bg-gray-800' : 'bg-white'}>
                       <SelectItem value="light">Light Mode</SelectItem>
                       <SelectItem value="dark">Dark Mode</SelectItem>
                       <SelectItem value="auto">Auto</SelectItem>
@@ -426,9 +541,13 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <h3 className="font-medium text-foreground mb-4">Caption Preferences</h3>
+                  <h3 className={`font-medium mb-4 ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Caption Preferences</h3>
                   <div>
-                    <Label className="text-sm font-medium text-foreground">Caption Language</Label>
+                    <Label className={`text-sm font-medium ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>Caption Language</Label>
                     <Select
                       value={preferences?.captionLanguage || "english"}
                       onValueChange={(value) => handleUpdatePreference('captionLanguage', value)}
@@ -436,7 +555,7 @@ export default function SettingsPage() {
                       <SelectTrigger className="mt-2">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-white">
+                      <SelectContent className={actualTheme === 'dark' ? 'bg-gray-800' : 'bg-white'}>
                         <SelectItem value="english">English</SelectItem>
                         <SelectItem value="spanish">Spanish</SelectItem>
                       </SelectContent>
@@ -449,7 +568,9 @@ export default function SettingsPage() {
                       checked={preferences?.enableCaptions || false}
                       onCheckedChange={(checked) => handleUpdatePreference('enableCaptions', checked)}
                     />
-                    <Label htmlFor="captions" className="text-sm text-foreground">
+                    <Label htmlFor="captions" className={`text-sm ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
                       Enable AI Live Captions (For Calls / Meetings)
                     </Label>
                   </div>
@@ -462,20 +583,29 @@ export default function SettingsPage() {
       case "notification":
         return (
           <div className="space-y-6">
-            {/* ...existing code... */}
             <div
-              style={{ borderRadius: '12px', border: '1px solid #A5A5A5', background: '#FFF' }}
-              className="p-6"
+              style={{ borderRadius: '12px', background: 'hsl(var(--card))' }}
+              className={`p-6 border ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-900 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}
             >
-              <h2 className="text-xl font-semibold text-foreground mb-2">Notifications</h2>
-              <p className="text-sm text-muted-foreground mb-6">Customize How You Can Stay Informed Across TaskHub</p>
+              <h2 className={`text-xl font-semibold mb-2 ${
+                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>Notifications</h2>
+              <p className={`text-sm mb-6 ${
+                actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+              }`}>Customize How You Can Stay Informed Across TaskHub</p>
 
               <div className="space-y-6">
                 <div>
-                  <h3 className="font-medium text-foreground mb-4">Notification Types</h3>
+                  <h3 className={`font-medium mb-4 ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Notification Types</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-foreground">Chat Notifications</span>
+                      <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>Chat Notifications</span>
                       <SvgSwitch
                         checked={preferences?.notificationTypes?.chatNotifications ?? true}
                         onCheckedChange={(checked) => handleUpdatePreference('notificationTypes', {
@@ -485,7 +615,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-foreground">Meeting Invites</span>
+                      <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>Meeting Invites</span>
                       <SvgSwitch
                         checked={preferences?.notificationTypes?.meetingInvites ?? true}
                         onCheckedChange={(checked) => handleUpdatePreference('notificationTypes', {
@@ -495,7 +625,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-foreground">Task Updates</span>
+                      <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>Task Updates</span>
                       <SvgSwitch
                         checked={preferences?.notificationTypes?.taskUpdates ?? true}
                         onCheckedChange={(checked) => handleUpdatePreference('notificationTypes', {
@@ -505,7 +635,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-foreground">Calendar Changes</span>
+                      <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>Calendar Changes</span>
                       <SvgSwitch
                         checked={preferences?.notificationTypes?.calendarChanges ?? false}
                         onCheckedChange={(checked) => handleUpdatePreference('notificationTypes', {
@@ -518,10 +648,12 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <h3 className="font-medium text-foreground mb-4">Notification Channels</h3>
+                  <h3 className={`font-medium mb-4 ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Notification Channels</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-foreground">Email</span>
+                      <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>Email</span>
                       <SvgSwitch
                         checked={preferences?.notificationChannels?.email ?? true}
                         onCheckedChange={(checked) => handleUpdatePreference('notificationChannels', {
@@ -531,7 +663,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-foreground">In-App</span>
+                      <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>In-App</span>
                       <SvgSwitch
                         checked={preferences?.notificationChannels?.inApp ?? true}
                         onCheckedChange={(checked) => handleUpdatePreference('notificationChannels', {
@@ -541,7 +673,7 @@ export default function SettingsPage() {
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-foreground">Push Notifications</span>
+                      <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>Push Notifications</span>
                       <SvgSwitch
                         checked={preferences?.notificationChannels?.push ?? false}
                         onCheckedChange={(checked) => handleUpdatePreference('notificationChannels', {
@@ -554,7 +686,9 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <h3 className="font-medium text-foreground mb-4">Frequency</h3>
+                  <h3 className={`font-medium mb-4 ${
+                    actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+                  }`}>Frequency</h3>
                   <Select
                     value={preferences?.notificationFrequency || "realtime"}
                     onValueChange={(value) => handleUpdatePreference('notificationFrequency', value)}
@@ -562,7 +696,7 @@ export default function SettingsPage() {
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white">
+                    <SelectContent className={actualTheme === 'dark' ? 'bg-gray-800' : 'bg-white'}>
                       <SelectItem value="realtime">Real-Time</SelectItem>
                       <SelectItem value="hourly">Hourly</SelectItem>
                       <SelectItem value="daily">Daily</SelectItem>
@@ -577,44 +711,49 @@ export default function SettingsPage() {
       case "ai":
         return (
           <div className="space-y-6 h-full flex flex-col">
-            {/* ...existing code... */}
             <div
-              style={{ borderRadius: '12px', border: '1px solid #A5A5A5', background: '#FFF' }}
-              className="p-6 flex-1"
+              style={{ borderRadius: '12px', background: 'hsl(var(--card))' }}
+              className={`p-6 flex-1 border ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-900 border-gray-700' 
+                  : 'bg-white border-gray-200'
+              }`}
             >
-              <h2 className="text-xl font-semibold text-foreground mb-6">AI Settings</h2>
+              <h2 className={`text-xl font-semibold mb-6 ${
+                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+              }`}>AI Settings</h2>
 
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <span className="text-foreground">Enable Automatic Summaries</span>
+                  <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>Enable Automatic Summaries</span>
                   <SvgSwitch
                     checked={preferences?.enableAutoSummaries ?? true}
                     onCheckedChange={(checked) => handleUpdatePreference('enableAutoSummaries', checked)}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-foreground">Smart Suggestions In Chat</span>
+                  <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>Smart Suggestions In Chat</span>
                   <SvgSwitch
                     checked={preferences?.enableSmartSuggestions ?? true}
                     onCheckedChange={(checked) => handleUpdatePreference('enableSmartSuggestions', checked)}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-foreground">AI Voice Detection For Translations</span>
+                  <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>AI Voice Detection For Translations</span>
                   <SvgSwitch
                     checked={preferences?.enableVoiceDetection ?? true}
                     onCheckedChange={(checked) => handleUpdatePreference('enableVoiceDetection', checked)}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-foreground">Language For Captions/Translation</span>
+                  <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>Language For Captions/Translation</span>
                   <SvgSwitch
                     checked={preferences?.enableLanguageTranslation ?? true}
                     onCheckedChange={(checked) => handleUpdatePreference('enableLanguageTranslation', checked)}
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-foreground">AI Task Prioritization</span>
+                  <span className={actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'}>AI Task Prioritization</span>
                   <SvgSwitch
                     checked={preferences?.enableTaskPrioritization ?? true}
                     onCheckedChange={(checked) => handleUpdatePreference('enableTaskPrioritization', checked)}
@@ -631,20 +770,26 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className={`flex min-h-screen w-full ${
+      actualTheme === 'dark' ? 'bg-gray-950' : 'bg-white'
+    }`}>
       <Sidebar currentView={currentView} onViewChange={handleViewChange} />
 
       <div className="flex-1 flex flex-col p-4 sm:p-6 md:p-8">
         {/* Main Heading Section */}
         <div className="flex flex-col items-start gap-2 sm:gap-3 mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-semibold text-foreground">
+          <h1 className={`text-2xl sm:text-3xl font-semibold ${
+            actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
             {activeSection === "profile" && "Account Settings"}
             {activeSection === "security" && "Security"}
             {activeSection === "accessibility" && "Accessibility"}
             {activeSection === "notification" && "Notifications"}
             {activeSection === "ai" && "AI Settings"}
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
+          <p className={`text-sm sm:text-base ${
+            actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+          }`}>
             {activeSection === "profile" && "Manage your personal details and preferences."}
             {activeSection === "security" && "Protect your account with advanced security options."}
             {activeSection === "accessibility" && "Customize language and accessibility for your needs."}
@@ -655,8 +800,12 @@ export default function SettingsPage() {
 
         {/* Body Section - Responsive flex layout */}
         <div className="flex flex-col lg:flex-row items-stretch gap-4 sm:gap-6 lg:gap-8 flex-1">
-          {/* Settings Sidebar - Hidden on mobile, visible as tabs or fixed sidebar on desktop */}
-          <div className="bg-white w-full lg:w-64 lg:flex-shrink-0 h-full p-4 sm:p-6 rounded-xl border border-gray-300 flex flex-col">
+          {/* Settings Sidebar */}
+          <div className={`w-full lg:w-64 lg:flex-shrink-0 h-full p-4 sm:p-6 rounded-xl border flex flex-col ${
+            actualTheme === 'dark' 
+              ? 'bg-gray-900 border-gray-700' 
+              : 'bg-white border-gray-300'
+          }`}>
             <div className="space-y-2">
               {settingsMenu.map((item) => (
                 <Button
@@ -664,9 +813,13 @@ export default function SettingsPage() {
                   variant={activeSection === item.id ? "default" : "ghost"}
                   className={`w-full justify-start h-12 ${
                     activeSection === item.id
-                      ? "bg-[#E8E3FF] text-[#7C3AED] hover:bg-[#E8E3FF]"
-                      : "text-foreground hover:bg-muted"
-                  } ${item.id === "admin" ? "border border-[#8B7BE8] bg-gradient-to-r from-[#8B7BE8] to-[#9B8CE8] text-white hover:from-[#7A6BD7] hover:to-[#8A7BD7]" : ""}`}
+                      ? actualTheme === 'dark'
+                        ? "bg-[#3E3B5C] text-[#C4B5FD] hover:bg-[#3E3B5C]"
+                        : "bg-[#E8E3FF] text-[#7C3AED] hover:bg-[#E8E3FF]"
+                      : actualTheme === 'dark'
+                        ? "text-gray-100 hover:bg-gray-800"
+                        : "text-gray-900 hover:bg-gray-100"
+                  } ${item.id === "admin" ? `border border-primary bg-gradient-to-r from-primary to-purple-500 text-white hover:opacity-90 ${actualTheme === 'dark' ? 'dark:from-primary dark:to-purple-600 dark:hover:opacity-80' : ''}` : ""}`}
                   onClick={() => {
                     if (item.id === "admin") {
                       handleAdminPanelClick();

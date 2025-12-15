@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { meetingsAPI, userAPI, tasksAPI, projectsAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Meeting {
   _id: string;
@@ -61,11 +62,13 @@ interface Meeting {
 const CalendarWithMeetings = ({
   upcomingMeetings,
   loading,
-  router
+  router,
+  actualTheme
 }: {
   upcomingMeetings: Meeting[];
   loading: boolean;
   router: any;
+  actualTheme: string;
 }) => {
   const [viewMonth, setViewMonth] = useState(new Date().getMonth());
   const [viewYear, setViewYear] = useState(new Date().getFullYear());
@@ -116,37 +119,53 @@ const CalendarWithMeetings = ({
 
   return (
     <Card
-      className="bg-white shadow-sm w-full flex flex-col rounded-2xl border-gray-300 p-4"
+      className={`shadow-sm w-full flex flex-col rounded-2xl p-4 ${
+        actualTheme === 'dark' 
+          ? 'bg-gray-900 border-gray-700' 
+          : 'bg-white border-gray-300'
+      }`}
     >
       {/* Calendar Section */}
       <div className="mb-6">
         <div className="flex flex-row items-center justify-between pb-2 px-2">
-          <h2 className="text-lg font-bold">
+          <h2 className={`text-lg font-bold ${
+            actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+          }`}>
             {new Date(viewYear, viewMonth).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
           </h2>
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="icon"
-              className="w-8 h-8 rounded-full hover:bg-gray-100"
+              className={`w-8 h-8 rounded-full ${
+                actualTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              }`}
               onClick={handlePrevMonth}
             >
-              <ChevronLeft className="w-5 h-5 text-gray-400" />
+              <ChevronLeft className={`w-5 h-5 ${
+                actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+              }`} />
             </Button>
             <Button
               variant="ghost"
               size="icon"
-              className="w-8 h-8 rounded-full hover:bg-gray-100"
+              className={`w-8 h-8 rounded-full ${
+                actualTheme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
+              }`}
               onClick={handleNextMonth}
             >
-              <ChevronRight className="w-5 h-5 text-gray-400" />
+              <ChevronRight className={`w-5 h-5 ${
+                actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+              }`} />
             </Button>
           </div>
         </div>
         <div className="px-2">
           <div className="grid grid-cols-7 text-center text-sm">
             {daysOfWeek.map((day) => (
-              <div key={day} className="font-semibold text-gray-400 py-2">{day}</div>
+              <div key={day} className={`font-semibold py-2 ${
+                actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+              }`}>{day}</div>
             ))}
             {dates.map((date, index) => {
               const isCurrentMonth = index >= startDay && index < startDay + daysInMonth;
@@ -156,8 +175,20 @@ const CalendarWithMeetings = ({
                 <div
                   key={index}
                   className={`w-9 h-9 font-semibold mx-auto rounded-full flex items-center justify-center cursor-pointer transition-colors
-                    ${isCurrentDay ? 'bg-black text-white' : ''}
-                    ${!isCurrentMonth ? 'text-gray-300' : 'text-gray-700 hover:bg-gray-100'}
+                    ${isCurrentDay 
+                      ? actualTheme === 'dark' 
+                        ? 'bg-white text-gray-900' 
+                        : 'bg-black text-white'
+                      : ''
+                    }
+                    ${!isCurrentMonth 
+                      ? actualTheme === 'dark' 
+                        ? 'text-gray-600' 
+                        : 'text-gray-300'
+                      : actualTheme === 'dark' 
+                        ? 'text-gray-300 hover:bg-gray-700' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }
                   `}
                 >
                   {date}
@@ -170,24 +201,36 @@ const CalendarWithMeetings = ({
 
       {/* Upcoming Meetings Section */}
       <div className="flex flex-col gap-4 flex-1">
-        <h3 className="text-lg font-semibold text-gray-800 px-2">Upcoming Meetings</h3>
+        <h3 className={`text-lg font-semibold px-2 ${
+          actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+        }`}>Upcoming Meetings</h3>
         {loading ? (
           <div className="flex items-center justify-center h-32">
             <Loader2 className="w-6 h-6 animate-spin text-primary" />
           </div>
         ) : upcomingMeetings.length === 0 ? (
-          <p className="text-sm text-gray-500 text-center py-4">No upcoming meetings</p>
+          <p className={`text-sm text-center py-4 ${
+            actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+          }`}>No upcoming meetings</p>
         ) : (
           upcomingMeetings.map((meeting) => (
             <Card
               key={meeting._id}
-              className="bg-gray-50 shadow-sm rounded-xl border-gray-300 w-full"
+              className={`shadow-sm rounded-xl w-full ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-800 border-gray-700' 
+                  : 'bg-gray-50 border-gray-300'
+              }`}
             >
               <CardContent className="p-3">
                 <div className="flex items-start justify-between mb-2">
                   <div>
-                    <h4 className="font-semibold text-gray-800 text-sm">{meeting.title}</h4>
-                    <p className="text-xs text-gray-500">{meeting.startTime} - {meeting.endTime}</p>
+                    <h4 className={`font-semibold text-sm ${
+                      actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+                    }`}>{meeting.title}</h4>
+                    <p className={`text-xs ${
+                      actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>{meeting.startTime} - {meeting.endTime}</p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     <Switch />
@@ -200,7 +243,9 @@ const CalendarWithMeetings = ({
                       <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${meeting.createdBy?._id}`} />
                       <AvatarFallback>{meeting.createdBy?.name?.charAt(0) || 'H'}</AvatarFallback>
                     </Avatar>
-                    <span className="text-xs font-semibold text-gray-700">{meeting.createdBy?.name || 'Host'}</span>
+                    <span className={`text-xs font-semibold ${
+                      actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                    }`}>{meeting.createdBy?.name || 'Host'}</span>
                   </div>
                   <Badge variant="outline" className="text-xs">{meeting.status}</Badge>
                 </div>
@@ -214,7 +259,15 @@ const CalendarWithMeetings = ({
 };
 
 // Create Schedule Card Component
-const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: () => void, onCancel: () => void }) => {
+const CreateScheduleCard = ({ 
+  onMeetingCreated, 
+  onCancel, 
+  actualTheme 
+}: { 
+  onMeetingCreated: () => void, 
+  onCancel: () => void,
+  actualTheme: string 
+}) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const today = new Date().toISOString().split('T')[0];
@@ -297,31 +350,51 @@ const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: 
 
   if (createdMeeting) {
     return (
-      <Card className="bg-white rounded-xl shadow-sm">
+      <Card className={`rounded-xl shadow-sm ${
+        actualTheme === 'dark' ? 'bg-gray-900' : 'bg-white'
+      }`}>
         <CardContent className="p-8">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-16 h-16 bg-green-100 rounded-lg flex items-center justify-center border">
-              <Check className="w-8 h-8 text-green-600"/>
+            <div className={`w-16 h-16 rounded-lg flex items-center justify-center border ${
+              actualTheme === 'dark' 
+                ? 'bg-green-900 border-green-700' 
+                : 'bg-green-100 border-green-200'
+            }`}>
+              <Check className={`w-8 h-8 ${
+                actualTheme === 'dark' ? 'text-green-400' : 'text-green-600'
+              }`}/>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-800">Meeting Created!</h3>
-              <p className="text-md text-gray-500">Share this link with participants</p>
+              <h3 className={`text-2xl font-bold ${
+                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+              }`}>Meeting Created!</h3>
+              <p className={`text-md ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>Share this link with participants</p>
             </div>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-semibold text-gray-600">Meeting Title</label>
-              <p className="text-lg font-medium text-gray-800 mt-1">{createdMeeting.title}</p>
+              <label className={`text-sm font-semibold ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Meeting Title</label>
+              <p className={`text-lg font-medium mt-1 ${
+                actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+              }`}>{createdMeeting.title}</p>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-gray-600">Room ID</label>
+              <label className={`text-sm font-semibold ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Room ID</label>
               <p className="text-lg font-mono text-primary mt-1">{createdMeeting.roomId}</p>
             </div>
 
             <div>
-              <label className="text-sm font-semibold text-gray-600">Shareable Link</label>
+              <label className={`text-sm font-semibold ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Shareable Link</label>
               <div className="flex items-center gap-2 mt-1">
                 <Input
                   value={`${window.location.origin}/meeting-room/${createdMeeting.roomId}`}
@@ -357,21 +430,35 @@ const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: 
   }
 
   return (
-    <Card className="bg-white rounded-xl shadow-sm">
+    <Card className={`rounded-xl shadow-sm ${
+      actualTheme === 'dark' ? 'bg-gray-900' : 'bg-white'
+    }`}>
       <CardContent className="p-8">
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border">
-            <CalendarIcon className="w-8 h-8 text-gray-600"/>
+          <div className={`w-16 h-16 rounded-lg flex items-center justify-center border ${
+            actualTheme === 'dark' 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-gray-100 border-gray-200'
+          }`}>
+            <CalendarIcon className={`w-8 h-8 ${
+              actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}/>
           </div>
           <div>
-            <h3 className="text-2xl font-bold text-gray-800">Create Schedule</h3>
-            <p className="text-md text-gray-500">Fill in the details to schedule a meeting</p>
+            <h3 className={`text-2xl font-bold ${
+              actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+            }`}>Create Schedule</h3>
+            <p className={`text-md ${
+              actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`}>Fill in the details to schedule a meeting</p>
           </div>
         </div>
 
         <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); handleCreateMeeting(); }}>
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-600">Title</label>
+            <label className={`text-sm font-semibold ${
+              actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>Title</label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -381,7 +468,9 @@ const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: 
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-600">Description (Optional)</label>
+            <label className={`text-sm font-semibold ${
+              actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>Description (Optional)</label>
             <Input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -391,9 +480,13 @@ const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: 
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-600">Date</label>
+            <label className={`text-sm font-semibold ${
+              actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>Date</label>
             <div className="relative">
-              <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <CalendarDays className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${
+                actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+              }`} />
               <Input
                 type="date"
                 value={scheduledDate}
@@ -405,10 +498,14 @@ const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: 
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-600">Time</label>
+            <label className={`text-sm font-semibold ${
+              actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+            }`}>Time</label>
             <div className="flex items-center gap-4">
               <div className="relative flex-1">
-                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Clock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${
+                  actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`} />
                 <Input
                   type="time"
                   value={startTime.replace(/ AM| PM/, '')}
@@ -417,9 +514,11 @@ const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: 
                   required
                 />
               </div>
-              <span className="text-gray-400">-</span>
+              <span className={actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'}>-</span>
               <div className="relative flex-1">
-                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Clock className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${
+                  actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`} />
                 <Input
                   type="time"
                   value={endTime.replace(/ AM| PM/, '')}
@@ -434,8 +533,12 @@ const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: 
           {/* Related Tasks */}
           {!loadingTasksProjects && tasks.length > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-600">Related Tasks (Optional)</label>
-              <div className="border rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
+              <label className={`text-sm font-semibold ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Related Tasks (Optional)</label>
+              <div className={`border rounded-lg p-3 max-h-48 overflow-y-auto space-y-2 ${
+                actualTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+              }`}>
                 {tasks.slice(0, 10).map((task) => (
                   <div key={task._id} className="flex items-center space-x-2">
                     <Checkbox
@@ -467,8 +570,12 @@ const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: 
           {/* Related Projects */}
           {!loadingTasksProjects && projects.length > 0 && (
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-600">Related Projects (Optional)</label>
-              <div className="border rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
+              <label className={`text-sm font-semibold ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+              }`}>Related Projects (Optional)</label>
+              <div className={`border rounded-lg p-3 max-h-48 overflow-y-auto space-y-2 ${
+                actualTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+              }`}>
                 {projects.slice(0, 10).map((project) => (
                   <div key={project._id} className="flex items-center space-x-2">
                     <Checkbox
@@ -498,7 +605,16 @@ const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: 
           )}
 
           <div className="flex justify-end gap-4 pt-4">
-            <Button type="button" variant="outline" className="text-gray-700 font-semibold h-12 px-8 border-gray-300" onClick={onCancel}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              className={`font-semibold h-12 px-8 ${
+                actualTheme === 'dark' 
+                  ? 'text-gray-300 border-gray-600' 
+                  : 'text-gray-700 border-gray-300'
+              }`}
+              onClick={onCancel}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={creating} className="font-semibold h-12 px-8">
@@ -518,7 +634,7 @@ const CreateScheduleCard = ({ onMeetingCreated, onCancel }: { onMeetingCreated: 
   );
 };
 
-// New Meeting Card (redesigned UI like image)
+// New Meeting Card
 const NewMeetingCard = ({
   meetingUrl,
   setMeetingUrl,
@@ -526,7 +642,8 @@ const NewMeetingCard = ({
   meetingName,
   setMeetingName,
   onSchedule,
-  currentUser
+  currentUser,
+  actualTheme
 }: {
   meetingUrl: string;
   setMeetingUrl: (v: string) => void;
@@ -535,20 +652,31 @@ const NewMeetingCard = ({
   setMeetingName: (v: string) => void;
   onSchedule: () => void;
   currentUser: any;
+  actualTheme: string;
 }) => {
   return (
     <Card
-      className="bg-white shadow-sm w-full rounded-2xl border-gray-300 p-4 sm:p-6 md:p-8"
+      className={`shadow-sm w-full rounded-2xl p-4 sm:p-6 md:p-8 ${
+        actualTheme === 'dark' 
+          ? 'bg-gray-900 border-gray-700' 
+          : 'bg-white border-gray-300'
+      }`}
     >
       <CardContent className="p-0">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-6 sm:mb-8">
+        <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 ${
+          actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-900'
+        }`}>
           Hello {currentUser?.name || 'User'}
         </h1>
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-center gap-3 mb-6">
           <Button
             onClick={onJoin}
-            className="inline-flex items-center justify-center gap-3 px-6 sm:px-10 py-3 text-sm sm:text-base font-semibold rounded-xl bg-purple-200 hover:bg-purple-300 text-gray-800"
+            className={`inline-flex items-center justify-center gap-3 px-6 sm:px-10 py-3 text-sm sm:text-base font-semibold rounded-xl ${
+              actualTheme === 'dark' 
+                ? 'bg-purple-900 hover:bg-purple-800 text-gray-100' 
+                : 'bg-purple-200 hover:bg-purple-300 text-gray-800'
+            }`}
           >
             <Video className="w-5 h-5" />
             New Meeting
@@ -556,7 +684,11 @@ const NewMeetingCard = ({
           <Button
             onClick={onSchedule}
             variant="outline"
-            className="inline-flex items-center justify-center gap-3 px-6 sm:px-10 py-3 text-sm sm:text-base font-semibold rounded-xl border-gray-300 bg-white hover:bg-gray-50 text-gray-800"
+            className={`inline-flex items-center justify-center gap-3 px-6 sm:px-10 py-3 text-sm sm:text-base font-semibold rounded-xl ${
+              actualTheme === 'dark' 
+                ? 'border-gray-600 bg-gray-800 hover:bg-gray-700 text-gray-100' 
+                : 'border-gray-300 bg-white hover:bg-gray-50 text-gray-800'
+            }`}
           >
             <CalendarIcon className="w-5 h-5" />
             Schedule Meeting
@@ -569,23 +701,29 @@ const NewMeetingCard = ({
               placeholder="Name of your meeting"
               value={meetingName}
               onChange={(e) => setMeetingName(e.target.value)}
-              className="h-14 text-base rounded-xl border-gray-300"
+              className={`h-14 text-base rounded-xl ${
+                actualTheme === 'dark' ? 'border-gray-600' : 'border-gray-300'
+              }`}
             />
-            <Input 
-              placeholder="Paste Your Meeting Url Here" 
-              value={meetingUrl} 
+            <Input
+              placeholder="Paste Your Meeting Url Here"
+              value={meetingUrl}
               onChange={(e) => setMeetingUrl(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && onJoin()}
-              className="h-14 text-base rounded-xl border-gray-300"
+              className={`h-14 text-base rounded-xl ${
+                actualTheme === 'dark' ? 'border-gray-600' : 'border-gray-300'
+              }`}
             />
           </div>
 
           <div className="lg:col-span-4 flex flex-col items-stretch gap-3">
             <Select>
-              <SelectTrigger className="h-14 text-base rounded-xl border-gray-300">
+              <SelectTrigger className={`h-14 text-base rounded-xl ${
+                actualTheme === 'dark' ? 'border-gray-600' : 'border-gray-300'
+              }`}>
                 <SelectValue placeholder="English" />
               </SelectTrigger>
-              <SelectContent className="bg-white">
+              <SelectContent className={actualTheme === 'dark' ? 'bg-gray-900' : 'bg-white'}>
                 <SelectItem value="en">
                   <div className="flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7410 3900" className="w-5 h-3">
@@ -676,6 +814,7 @@ const NewMeetingCard = ({
 // Main Meeting Component
 export default function Meeting() {
   const router = useRouter();
+  const { actualTheme } = useTheme();
   const [currentView, setCurrentView] = useState("meetings");
   const [meetingUrl, setMeetingUrl] = useState('');
   const [meetingName, setMeetingName] = useState('');
@@ -744,7 +883,9 @@ export default function Meeting() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-gray-50">
+    <div className={`flex min-h-screen w-full ${
+      actualTheme === 'dark' ? 'bg-gray-950' : 'bg-gray-50'
+    }`}>
       <Sidebar currentView={currentView} onViewChange={setCurrentView} />
 
       <main className="flex-1 p-4 flex gap-4 justify-center max-w-[1600px] mx-auto">
@@ -754,14 +895,20 @@ export default function Meeting() {
           <header className="flex items-center justify-between w-full">
             <div className="flex-1">
               <div className="relative max-w-lg">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${
+                  actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                }`} />
                 <Input
                   placeholder="Search Meeting"
-                  className="pl-11 bg-white h-10 w-full"
+                  className={`pl-11 h-10 w-full ${
+                    actualTheme === 'dark' 
+                      ? 'bg-gray-800 text-gray-100' 
+                      : 'bg-white text-gray-900'
+                  }`}
                   style={{
                     borderRadius: '24px',
                     border: '1px solid #E6E6E6',
-                    background: '#FFF',
+                    background: 'var(--tw-bg-opacity)',
                     boxShadow: '0 4px 4px 0 rgba(221, 221, 221, 0.25)',
                   }}
                 />
@@ -779,6 +926,7 @@ export default function Meeting() {
               setMeetingName={setMeetingName}
               onSchedule={handleScheduleMeeting}
               currentUser={currentUser}
+              actualTheme={actualTheme}
             />
           ) : (
             <CreateScheduleCard 
@@ -787,34 +935,60 @@ export default function Meeting() {
                 setShowScheduleForm(false);
               }}
               onCancel={() => setShowScheduleForm(false)}
+              actualTheme={actualTheme}
             />
           )}
 
           {/* Recent Meetings */}
           <div>
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Recent Meeting</h2>
+            <h2 className={`text-2xl font-bold mb-4 ${
+              actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+            }`}>Recent Meeting</h2>
             {loading ? (
               <div className="flex items-center justify-center h-32">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
               </div>
             ) : meetings.length === 0 ? (
-              <p className="text-sm text-gray-500 py-4">No meetings scheduled</p>
+              <p className={`text-sm py-4 ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>No meetings scheduled</p>
             ) : (
               <div className="space-y-4">
                 {meetings.map((meeting) => (
-                  <Card key={meeting._id} className="bg-white rounded-xl shadow-sm border-gray-100" style={{ borderLeftWidth: 6, borderLeftColor: meeting.status === 'ongoing' ? '#34D399' : meeting.status === 'scheduled' ? '#C084FC' : '#FDE68A' }}>
+                  <Card 
+                    key={meeting._id} 
+                    className={`rounded-xl shadow-sm ${
+                      actualTheme === 'dark' 
+                        ? 'bg-gray-800 border-gray-700' 
+                        : 'bg-white border-gray-100'
+                    }`}
+                    style={{ 
+                      borderLeftWidth: 6, 
+                      borderLeftColor: meeting.status === 'ongoing' 
+                        ? '#34D399' 
+                        : meeting.status === 'scheduled' 
+                          ? '#C084FC' 
+                          : '#FDE68A' 
+                    }}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-center gap-4 mb-3">
                         <div className="flex-1">
-                          <span className="text-sm text-gray-500">
+                          <span className={`text-sm ${
+                            actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                          }`}>
                             {new Date(meeting.scheduledDate).toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' })}
                           </span>
-                          <div className="text-sm text-gray-500">{meeting.startTime} - {meeting.endTime}</div>
+                          <div className={`text-sm ${
+                            actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                          }`}>{meeting.startTime} - {meeting.endTime}</div>
                         </div>
                         <div className="flex items-center gap-2">
                           <div className="flex -space-x-2">
                             {meeting.participants?.slice(0,3).map((p, i) => (
-                              <Avatar key={i} className="h-8 w-8 border-2 border-white">
+                              <Avatar key={i} className={`h-8 w-8 border-2 ${
+                                actualTheme === 'dark' ? 'border-gray-800' : 'border-white'
+                              }`}>
                                 <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${p?._id || i}`} />
                                 <AvatarFallback>{p?.name?.charAt(0) || 'U'}</AvatarFallback>
                               </Avatar>
@@ -822,9 +996,13 @@ export default function Meeting() {
                           </div>
                         </div>
                       </div>
-                      <h3 className="font-bold text-lg text-gray-800 mb-2">{meeting.title}</h3>
+                      <h3 className={`font-bold text-lg mb-2 ${
+                        actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+                      }`}>{meeting.title}</h3>
                       {meeting.description && (
-                        <p className="text-sm text-gray-500 mb-3">{meeting.description}</p>
+                        <p className={`text-sm mb-3 ${
+                          actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                        }`}>{meeting.description}</p>
                       )}
                       {/* Related Tasks and Projects */}
                       {((meeting.relatedTasks && meeting.relatedTasks.length > 0) ||
@@ -832,7 +1010,9 @@ export default function Meeting() {
                         <div className="mb-3 space-y-2">
                           {meeting.relatedTasks && meeting.relatedTasks.length > 0 && (
                             <div className="flex flex-wrap gap-1">
-                              <span className="text-xs font-semibold text-gray-600">Tasks:</span>
+                              <span className={`text-xs font-semibold ${
+                                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                              }`}>Tasks:</span>
                               {(meeting.relatedTasks as any[]).map((task: any, idx: number) => (
                                 <Badge key={idx} variant="secondary" className="text-xs">
                                   {task.title || task}
@@ -842,9 +1022,19 @@ export default function Meeting() {
                           )}
                           {meeting.relatedProjects && meeting.relatedProjects.length > 0 && (
                             <div className="flex flex-wrap gap-1">
-                              <span className="text-xs font-semibold text-gray-600">Projects:</span>
+                              <span className={`text-xs font-semibold ${
+                                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                              }`}>Projects:</span>
                               {(meeting.relatedProjects as any[]).map((project: any, idx: number) => (
-                                <Badge key={idx} variant="secondary" className="text-xs bg-blue-100 text-blue-800">
+                                <Badge 
+                                  key={idx} 
+                                  variant="secondary" 
+                                  className={`text-xs ${
+                                    actualTheme === 'dark' 
+                                      ? 'bg-blue-900 text-blue-200' 
+                                      : 'bg-blue-100 text-blue-800'
+                                  }`}
+                                >
                                   {project.name || project}
                                 </Badge>
                               ))}
@@ -854,7 +1044,9 @@ export default function Meeting() {
                       )}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-gray-500 font-mono">Room: {meeting.roomId}</span>
+                          <span className={`text-sm font-mono ${
+                            actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                          }`}>Room: {meeting.roomId}</span>
                           <Button variant="ghost" size="sm" onClick={() => copyMeetingLink(meeting.roomId)} className="h-6 px-2">
                             <Copy className="w-3 h-3" />
                           </Button>
@@ -874,20 +1066,33 @@ export default function Meeting() {
         {/* Right Sidebar */}
         <aside className="hidden lg:flex lg:min-w-[360px] flex-shrink-0 flex-col gap-4">
           <div className="flex items-center gap-1 justify-end">
-            <Button variant="ghost" size="icon" className="w-10 h-10 border border-gray-300">
-              <MessageSquare className="w-5 h-5 text-gray-500" />
+            <Button variant="ghost" size="icon" className={`w-10 h-10 border ${
+              actualTheme === 'dark' ? 'border-gray-600' : 'border-gray-300'
+            }`}>
+              <MessageSquare className={`w-5 h-5 ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`} />
             </Button>
-            <Button variant="ghost" size="icon" className="w-10 h-10 border border-gray-300">
-              <Bell className="w-5 h-5 text-gray-500" />
+            <Button variant="ghost" size="icon" className={`w-10 h-10 border ${
+              actualTheme === 'dark' ? 'border-gray-600' : 'border-gray-300'
+            }`}>
+              <Bell className={`w-5 h-5 ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`} />
             </Button>
-            <Button variant="ghost" size="icon" className="w-10 h-10 border border-gray-300">
-              <MoreHorizontal className="w-5 h-5 text-gray-500" />
+            <Button variant="ghost" size="icon" className={`w-10 h-10 border ${
+              actualTheme === 'dark' ? 'border-gray-600' : 'border-gray-300'
+            }`}>
+              <MoreHorizontal className={`w-5 h-5 ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`} />
             </Button>
           </div>
           <CalendarWithMeetings 
             upcomingMeetings={upcomingMeetings}
             loading={loading}
             router={router}
+            actualTheme={actualTheme}
           />
         </aside>
       </main>

@@ -40,8 +40,8 @@ export default function Dashboard() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-transparent">
+        <div className="text-xl text-gray-900 dark:text-gray-100">Loading...</div>
       </div>
     );
   }
@@ -51,7 +51,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 flex">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 dark:from-gray-900 dark:to-gray-800 flex">
       <Sidebar currentView={currentView} onViewChange={handleViewChange} />
 
       <div className="flex-1 flex flex-col">

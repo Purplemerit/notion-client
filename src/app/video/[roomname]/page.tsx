@@ -70,13 +70,13 @@ const VideoChatRoom = () => {
   if (!roomName) return <p>Loading room...</p>;
 
   return (
-    <div className="relative h-screen w-screen bg-gray-900 flex flex-col overflow-hidden">
+    <div className="relative h-screen w-screen bg-gray-900 dark:bg-gray-950 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/50 to-transparent p-4">
+      <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/50 dark:from-black/70 to-transparent p-4">
         <div className="flex items-center justify-between">
-          <div className="text-white">
+          <div className="text-white dark:text-gray-100">
             <h1 className="text-lg font-semibold">Room: {roomName}</h1>
-            <p className="text-sm text-gray-300">
+            <p className="text-sm text-gray-300 dark:text-gray-400">
               {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
@@ -90,9 +90,9 @@ const VideoChatRoom = () => {
             <VideoFeed mediaStream={guestStream} userName="Guest" />
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center text-white">
-            <div className="w-32 h-32 bg-gray-700 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+          <div className="flex flex-col items-center justify-center text-white dark:text-gray-100">
+            <div className="w-32 h-32 bg-gray-700 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-16 h-16 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
               </svg>
             </div>
@@ -103,19 +103,19 @@ const VideoChatRoom = () => {
 
       {/* Local Video (Picture-in-Picture) */}
       {localStream && (
-        <div className="absolute bottom-24 right-6 w-64 h-48 bg-gray-800 rounded-lg overflow-hidden shadow-2xl border-2 border-gray-700">
+        <div className="absolute bottom-24 right-6 w-64 h-48 bg-gray-800 dark:bg-gray-900 rounded-lg overflow-hidden shadow-2xl border-2 border-gray-700 dark:border-gray-800">
           <VideoFeed mediaStream={localStream} isMuted userName="You" />
         </div>
       )}
 
       {/* Control Bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/80 to-transparent p-6">
+      <div className="absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/80 dark:from-black/90 to-transparent p-6">
         <div className="flex items-center justify-center gap-4">
           {/* Microphone Toggle */}
           <button
             onClick={toggleMic}
             className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
-              isMicOn ? 'bg-gray-700 hover:bg-gray-600' : 'bg-red-600 hover:bg-red-700'
+              isMicOn ? 'bg-gray-700 dark:bg-gray-800 hover:bg-gray-600 dark:hover:bg-gray-700' : 'bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800'
             }`}
             title={isMicOn ? 'Mute' : 'Unmute'}
           >
@@ -134,7 +134,7 @@ const VideoChatRoom = () => {
           <button
             onClick={toggleCamera}
             className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
-              isCameraOn ? 'bg-gray-700 hover:bg-gray-600' : 'bg-red-600 hover:bg-red-700'
+              isCameraOn ? 'bg-gray-700 dark:bg-gray-800 hover:bg-gray-600 dark:hover:bg-gray-700' : 'bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800'
             }`}
             title={isCameraOn ? 'Turn off camera' : 'Turn on camera'}
           >
@@ -153,7 +153,7 @@ const VideoChatRoom = () => {
           {/* Leave Call */}
           <button
             onClick={leaveCall}
-            className="w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 flex items-center justify-center transition-all"
+            className="w-14 h-14 rounded-full bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 flex items-center justify-center transition-all"
             title="Leave call"
           >
             <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">

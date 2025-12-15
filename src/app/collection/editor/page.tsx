@@ -25,6 +25,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { collectionsAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface CellContent {
   id: string;
@@ -37,6 +38,7 @@ function CollectionEditorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
+  const { actualTheme } = useTheme();
   const collectionId = searchParams.get('id');
   
   const [rows, setRows] = useState(2);
@@ -254,7 +256,9 @@ function CollectionEditorContent() {
     if (!cell.type) {
       return (
         <div className="flex items-center justify-center h-full">
-          <span className="text-gray-400 text-sm">Empty cell</span>
+          <span className={`text-sm ${
+            actualTheme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+          }`}>Empty cell</span>
         </div>
       );
     }
@@ -264,12 +268,18 @@ function CollectionEditorContent() {
         return (
           <div className="p-3 h-full overflow-y-auto">
             {(cell.data as string[]).length === 0 ? (
-              <span className="text-gray-400 text-sm">No items yet</span>
+              <span className={`text-sm ${
+                actualTheme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+              }`}>No items yet</span>
             ) : (
               <ul className="space-y-2">
                 {(cell.data as string[]).map((item, index) => (
-                  <li key={index} className="flex items-center gap-2 text-sm group">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-600 flex-shrink-0"></span>
+                  <li key={index} className={`flex items-center gap-2 text-sm group ${
+                    actualTheme === 'dark' ? 'text-gray-200' : ''
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                      actualTheme === 'dark' ? 'bg-gray-400' : 'bg-gray-600'
+                    }`}></span>
                     <span className="flex-1">{item}</span>
                     <button
                       onClick={() => removeListItem(cell.id, index)}
@@ -283,46 +293,58 @@ function CollectionEditorContent() {
             )}
           </div>
         );
-      
+
       case 'image':
         return (
           <div className="p-3 h-full flex items-center justify-center">
             {cell.data ? (
-              <img 
-                src={cell.data as string} 
-                alt="Cell content" 
+              <img
+                src={cell.data as string}
+                alt="Cell content"
                 className="max-w-full max-h-full object-contain rounded"
               />
             ) : (
               <div className="text-center">
-                <ImageIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <span className="text-gray-400 text-xs">No image URL</span>
+                <ImageIcon className={`w-8 h-8 mx-auto mb-2 ${
+                  actualTheme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+                }`} />
+                <span className={`text-xs ${
+                  actualTheme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+                }`}>No image URL</span>
               </div>
             )}
           </div>
         );
-      
+
       case 'url':
         return (
           <div className="p-3 h-full flex items-center justify-center">
             {cell.data ? (
-              <a 
-                href={cell.data as string} 
-                target="_blank" 
+              <a
+                href={cell.data as string}
+                target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 underline text-sm break-all"
+                className={`underline text-sm break-all ${
+                  actualTheme === 'dark' 
+                    ? 'text-blue-400 hover:text-blue-300' 
+                    : 'text-blue-600 hover:text-blue-800'
+                }`}
               >
                 {cell.data as string}
               </a>
             ) : (
               <div className="text-center">
-                <LinkIcon className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <span className="text-gray-400 text-xs">No URL added</span>
+                <LinkIcon className={`w-8 h-8 mx-auto mb-2 ${
+                  actualTheme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+                }`} />
+                <span className={`text-xs ${
+                  actualTheme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+                }`}>No URL added</span>
               </div>
             )}
           </div>
         );
-      
+
       default:
         return null;
     }
@@ -330,26 +352,38 @@ function CollectionEditorContent() {
 
   return (
     <AppLayout>
-      <div className="flex-1 bg-white overflow-hidden flex flex-col">
+      <div className={`flex-1 overflow-hidden flex flex-col ${
+        actualTheme === 'dark' ? 'bg-gray-900' : 'bg-white'
+      }`}>
         {/* Header */}
-        <header className="border-b border-gray-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+        <header className={`border-b px-6 py-4 flex items-center justify-between flex-shrink-0 ${
+          actualTheme === 'dark' ? 'border-gray-700' : 'border-gray-200'
+        }`}>
           <div className="flex items-center gap-6">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => router.back()}
-              className="hover:bg-gray-100"
+              className={actualTheme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-100'}
               disabled={isSaving}
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className={`w-5 h-5 ${
+                actualTheme === 'dark' ? 'text-gray-300' : ''
+              }`} />
             </Button>
-            
+
             <div className="flex flex-col gap-1">
-              <label className="text-xs text-gray-500 font-medium">Collection Name</label>
+              <label className={`text-xs font-medium ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>Collection Name</label>
               <Input
                 value={fileName}
                 onChange={(e) => setFileName(e.target.value)}
-                className="text-lg font-semibold border-2 border-gray-300 focus-visible:ring-2 focus-visible:ring-primary px-3 py-2 rounded-lg"
+                className={`text-lg font-semibold border-2 focus-visible:ring-2 focus-visible:ring-primary px-3 py-2 rounded-lg ${
+                  actualTheme === 'dark' 
+                    ? 'border-gray-600 bg-gray-800 text-gray-100' 
+                    : 'border-gray-300'
+                }`}
                 style={{ minWidth: '320px' }}
                 disabled={isLoading || isSaving}
                 placeholder="Enter collection name..."
@@ -358,17 +392,25 @@ function CollectionEditorContent() {
           </div>
           
           <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              className="rounded-lg px-4 gap-2"
+            <Button
+              variant="outline"
+              className={`rounded-lg px-4 gap-2 ${
+                actualTheme === 'dark' 
+                  ? 'border-gray-600 text-gray-200 hover:bg-gray-800' 
+                  : ''
+              }`}
               onClick={handleSaveDraft}
               disabled={isSaving || isLoading}
             >
               <FileText className="w-4 h-4" />
               {isSaving ? 'Saving...' : 'Save as Draft'}
             </Button>
-            <Button 
-              className="bg-gray-800 text-white hover:bg-gray-900 rounded-lg px-4 gap-2"
+            <Button
+              className={`rounded-lg px-4 gap-2 ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-700 hover:bg-gray-600' 
+                  : 'bg-gray-800 hover:bg-gray-900'
+              } text-white`}
               onClick={handlePublish}
               disabled={isSaving || isLoading}
             >
@@ -379,12 +421,16 @@ function CollectionEditorContent() {
         </header>
 
         {/* Grid Container */}
-        <div className="flex-1 overflow-y-auto p-8 flex items-center justify-center">
+        <div className={`flex-1 overflow-y-auto p-8 flex items-center justify-center ${
+          actualTheme === 'dark' ? 'bg-gray-800' : ''
+        }`}>
           <div className="flex flex-col items-start gap-3">
             <div className="flex items-start gap-3">
               {/* Grid */}
-              <div 
-                className="grid gap-0 bg-gray-200 p-0"
+              <div
+                className={`grid gap-0 p-0 ${
+                  actualTheme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
+                }`}
                 style={{
                   gridTemplateColumns: `repeat(${cols}, 224px)`,
                   gridTemplateRows: `repeat(${rows}, 56px)`,
@@ -410,8 +456,10 @@ function CollectionEditorContent() {
                   return (
                     <div
                       key={cellId}
-                      className="relative group bg-white overflow-hidden"
-                      style={{ 
+                      className={`relative group overflow-hidden ${
+                        actualTheme === 'dark' ? 'bg-gray-800' : 'bg-white'
+                      }`}
+                      style={{
                         backgroundColor: cell.backgroundColor,
                         border: '1px solid #AAA',
                         borderRadius: borderRadius
@@ -424,17 +472,27 @@ function CollectionEditorContent() {
                       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button 
-                              size="icon" 
-                              variant="secondary" 
-                              className="h-7 w-7 bg-white/90 hover:bg-white shadow-sm"
+                            <Button
+                              size="icon"
+                              variant="secondary"
+                              className={`h-7 w-7 shadow-sm ${
+                                actualTheme === 'dark' 
+                                  ? 'bg-gray-700/90 hover:bg-gray-600' 
+                                  : 'bg-white/90 hover:bg-white'
+                              }`}
                             >
-                              <List className="w-4 h-4" />
+                              <List className={`w-4 h-4 ${
+                                actualTheme === 'dark' ? 'text-gray-300' : ''
+                              }`} />
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-64 p-3 bg-white">
+                          <PopoverContent className={`w-64 p-3 ${
+                            actualTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'
+                          }`}>
                             <div className="space-y-2">
-                              <h4 className="font-medium text-sm">Add List Items</h4>
+                              <h4 className={`font-medium text-sm ${
+                                actualTheme === 'dark' ? 'text-gray-200' : ''
+                              }`}>Add List Items</h4>
                               <div className="flex gap-2">
                                 <Input
                                   placeholder="Enter item..."
@@ -451,7 +509,11 @@ function CollectionEditorContent() {
                                       addListItem(cellId);
                                     }
                                   }}
-                                  className="text-sm"
+                                  className={`text-sm ${
+                                    actualTheme === 'dark' 
+                                      ? 'bg-gray-700 text-gray-200 border-gray-600' 
+                                      : ''
+                                  }`}
                                 />
                                 <Button 
                                   size="sm"
@@ -471,17 +533,27 @@ function CollectionEditorContent() {
 
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button 
-                              size="icon" 
-                              variant="secondary" 
-                              className="h-7 w-7 bg-white/90 hover:bg-white shadow-sm"
+                            <Button
+                              size="icon"
+                              variant="secondary"
+                              className={`h-7 w-7 shadow-sm ${
+                                actualTheme === 'dark' 
+                                  ? 'bg-gray-700/90 hover:bg-gray-600' 
+                                  : 'bg-white/90 hover:bg-white'
+                              }`}
                             >
-                              <ImageIcon className="w-4 h-4" />
+                              <ImageIcon className={`w-4 h-4 ${
+                                actualTheme === 'dark' ? 'text-gray-300' : ''
+                              }`} />
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-64 p-3 bg-white">
+                          <PopoverContent className={`w-64 p-3 ${
+                            actualTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'
+                          }`}>
                             <div className="space-y-2">
-                              <h4 className="font-medium text-sm">Add Image URL</h4>
+                              <h4 className={`font-medium text-sm ${
+                                actualTheme === 'dark' ? 'text-gray-200' : ''
+                              }`}>Add Image URL</h4>
                               <Input
                                 placeholder="https://example.com/image.jpg"
                                 value={cell.type === 'image' ? (cell.data as string) : ''}
@@ -491,7 +563,11 @@ function CollectionEditorContent() {
                                   }
                                   updateCellData(cellId, e.target.value);
                                 }}
-                                className="text-sm"
+                                className={`text-sm ${
+                                  actualTheme === 'dark' 
+                                    ? 'bg-gray-700 text-gray-200 border-gray-600' 
+                                    : ''
+                                }`}
                               />
                             </div>
                           </PopoverContent>
@@ -499,17 +575,27 @@ function CollectionEditorContent() {
 
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button 
-                              size="icon" 
-                              variant="secondary" 
-                              className="h-7 w-7 bg-white/90 hover:bg-white shadow-sm"
+                            <Button
+                              size="icon"
+                              variant="secondary"
+                              className={`h-7 w-7 shadow-sm ${
+                                actualTheme === 'dark' 
+                                  ? 'bg-gray-700/90 hover:bg-gray-600' 
+                                  : 'bg-white/90 hover:bg-white'
+                              }`}
                             >
-                              <LinkIcon className="w-4 h-4" />
+                              <LinkIcon className={`w-4 h-4 ${
+                                actualTheme === 'dark' ? 'text-gray-300' : ''
+                              }`} />
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-64 p-3 bg-white">
+                          <PopoverContent className={`w-64 p-3 ${
+                            actualTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'
+                          }`}>
                             <div className="space-y-2">
-                              <h4 className="font-medium text-sm">Add URL</h4>
+                              <h4 className={`font-medium text-sm ${
+                                actualTheme === 'dark' ? 'text-gray-200' : ''
+                              }`}>Add URL</h4>
                               <Input
                                 placeholder="https://example.com"
                                 value={cell.type === 'url' ? (cell.data as string) : ''}
@@ -519,7 +605,11 @@ function CollectionEditorContent() {
                                   }
                                   updateCellData(cellId, e.target.value);
                                 }}
-                                className="text-sm"
+                                className={`text-sm ${
+                                  actualTheme === 'dark' 
+                                    ? 'bg-gray-700 text-gray-200 border-gray-600' 
+                                    : ''
+                                }`}
                               />
                             </div>
                           </PopoverContent>
@@ -527,22 +617,36 @@ function CollectionEditorContent() {
 
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button 
-                              size="icon" 
-                              variant="secondary" 
-                              className="h-7 w-7 bg-white/90 hover:bg-white shadow-sm"
+                            <Button
+                              size="icon"
+                              variant="secondary"
+                              className={`h-7 w-7 shadow-sm ${
+                                actualTheme === 'dark' 
+                                  ? 'bg-gray-700/90 hover:bg-gray-600' 
+                                  : 'bg-white/90 hover:bg-white'
+                              }`}
                             >
-                              <Palette className="w-4 h-4" />
+                              <Palette className={`w-4 h-4 ${
+                                actualTheme === 'dark' ? 'text-gray-300' : ''
+                              }`} />
                             </Button>
                           </PopoverTrigger>
-                          <PopoverContent className="w-48 p-3 bg-white">
+                          <PopoverContent className={`w-48 p-3 ${
+                            actualTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white'
+                          }`}>
                             <div className="space-y-2">
-                              <h4 className="font-medium text-sm">Background Color</h4>
+                              <h4 className={`font-medium text-sm ${
+                                actualTheme === 'dark' ? 'text-gray-200' : ''
+                              }`}>Background Color</h4>
                               <div className="grid grid-cols-5 gap-2">
                                 {colors.map((color) => (
                                   <button
                                     key={color}
-                                    className="w-8 h-8 rounded border-2 border-gray-300 hover:border-gray-600 transition-colors"
+                                    className={`w-8 h-8 rounded border-2 transition-colors ${
+                                      actualTheme === 'dark' 
+                                        ? 'border-gray-600 hover:border-gray-400' 
+                                        : 'border-gray-300 hover:border-gray-600'
+                                    }`}
                                     style={{ backgroundColor: color }}
                                     onClick={() => updateCellBackground(cellId, color)}
                                   />
@@ -562,7 +666,11 @@ function CollectionEditorContent() {
             <Button
               variant="ghost"
               onClick={addColumn}
-              className="rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
+              className={`rounded-lg flex items-center justify-center ${
+                actualTheme === 'dark' 
+                  ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
+                  : 'bg-gray-100 hover:bg-gray-200'
+              }`}
               style={{
                 width: '32px',
                 height: `${rows * 56 + (rows - 1) * 12 + 2}px`,
@@ -580,7 +688,11 @@ function CollectionEditorContent() {
           <Button
             variant="ghost"
             onClick={addRow}
-            className="rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center"
+            className={`rounded-lg flex items-center justify-center ${
+              actualTheme === 'dark' 
+                ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
+                : 'bg-gray-100 hover:bg-gray-200'
+            }`}
             style={{
               width: `${cols * 224 + (cols - 1) * 12 + 2}px`,
               height: '32px',
@@ -600,8 +712,8 @@ function CollectionEditorContent() {
 export default function CollectionEditorPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-gray-500">Loading editor...</div>
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
+        <div className="text-gray-500 dark:text-gray-400">Loading editor...</div>
       </div>
     }>
       <CollectionEditorContent />

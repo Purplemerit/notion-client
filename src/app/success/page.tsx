@@ -101,8 +101,8 @@ function SuccessContent() {
   }, [searchParams, router]);
 
   return (
-    <main className="min-h-screen flex items-center justify-center">
-      <div className="text-xl">Redirecting to dashboard...</div>
+    <main className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+      <div className="text-xl text-gray-900 dark:text-gray-100">Redirecting to dashboard...</div>
     </main>
   );
 }
@@ -110,8 +110,8 @@ function SuccessContent() {
 export default function SuccessPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
+      <main className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
+        <div className="text-xl text-gray-900 dark:text-gray-100">Loading...</div>
       </main>
     }>
       <SuccessContent />

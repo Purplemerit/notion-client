@@ -225,7 +225,7 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
+    <div className="dark:bg-gray-900" style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
       {/* Sidebar */}
       <div style={{ flexShrink: 0, height: "100vh" }}>
         <AdminSidebar />
@@ -243,6 +243,7 @@ export default function AdminUsersPage() {
 
         {/* Main Content Area */}
         <main
+          className="dark:bg-gray-800"
           style={{
             flex: 1,
             overflow: "auto",
@@ -251,13 +252,14 @@ export default function AdminUsersPage() {
         >
           {/* Page Title & Stats */}
           <div style={{ marginBottom: 32 }}>
-            <h1 style={{ fontSize: 32, fontWeight: 600, color: "#000", marginBottom: 16 }}>
+            <h1 className="dark:text-gray-100" style={{ fontSize: 32, fontWeight: 600, color: "#000", marginBottom: 16 }}>
               User Management
             </h1>
 
             {/* Statistics Cards */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginTop: 24 }}>
               <div
+                className="dark:bg-gray-700 dark:border-gray-600"
                 style={{
                   background: "#FFF",
                   borderRadius: 12,
@@ -318,6 +320,7 @@ export default function AdminUsersPage() {
 
           {/* Users Table */}
           <div
+            className="dark:bg-gray-700 dark:border-gray-600"
             style={{
               background: "#FFF",
               borderRadius: 16,
@@ -325,14 +328,14 @@ export default function AdminUsersPage() {
               border: "1px solid #E5E5E5",
             }}
           >
-            <div style={{ marginBottom: 20, fontSize: 18, fontWeight: 600, color: "#000" }}>
+            <div className="dark:text-gray-100" style={{ marginBottom: 20, fontSize: 18, fontWeight: 600, color: "#000" }}>
               All Users ({filteredUsers.length})
             </div>
 
             {filteredUsers.length === 0 ? (
               <div style={{ textAlign: "center", padding: "60px 20px" }}>
                 <AlertCircle size={48} color="#999" style={{ marginBottom: 16 }} />
-                <p style={{ fontSize: 16, color: "#999" }}>
+                <p className="dark:text-gray-400" style={{ fontSize: 16, color: "#999" }}>
                   {searchQuery ? "No users found matching your search" : "No users available"}
                 </p>
               </div>
@@ -340,18 +343,18 @@ export default function AdminUsersPage() {
               <div style={{ overflowX: "auto" }}>
                 <table style={{ width: "100%", borderCollapse: "collapse" }}>
                   <thead>
-                    <tr style={{ borderBottom: "2px solid #E5E5E5" }}>
-                      <th style={{ textAlign: "left", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>User</th>
-                      <th style={{ textAlign: "left", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>Email</th>
-                      <th style={{ textAlign: "left", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>Role</th>
-                      <th style={{ textAlign: "left", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>Provider</th>
-                      <th style={{ textAlign: "left", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>Joined</th>
-                      <th style={{ textAlign: "center", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>Actions</th>
+                    <tr className="dark:border-gray-600" style={{ borderBottom: "2px solid #E5E5E5" }}>
+                      <th className="dark:text-gray-300" style={{ textAlign: "left", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>User</th>
+                      <th className="dark:text-gray-300" style={{ textAlign: "left", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>Email</th>
+                      <th className="dark:text-gray-300" style={{ textAlign: "left", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>Role</th>
+                      <th className="dark:text-gray-300" style={{ textAlign: "left", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>Provider</th>
+                      <th className="dark:text-gray-300" style={{ textAlign: "left", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>Joined</th>
+                      <th className="dark:text-gray-300" style={{ textAlign: "center", padding: "12px", fontSize: 14, fontWeight: 600, color: "#666" }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredUsers.map((user) => (
-                      <tr key={user._id} style={{ borderBottom: "1px solid #F0F0F0" }}>
+                      <tr key={user._id} className="dark:border-gray-600" style={{ borderBottom: "1px solid #F0F0F0" }}>
                         {/* User */}
                         <td style={{ padding: "16px 12px" }}>
                           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -363,7 +366,7 @@ export default function AdminUsersPage() {
                               </div>
                             )}
                             <div>
-                              <div style={{ fontSize: 14, fontWeight: 600, color: "#000" }}>
+                              <div className="dark:text-gray-100" style={{ fontSize: 14, fontWeight: 600, color: "#000" }}>
                                 {getUserDisplayName(user)}
                                 {currentUser?._id === user._id && (
                                   <span style={{ marginLeft: 8, fontSize: 12, color: "#8B7BE8" }}>(You)</span>
@@ -375,7 +378,7 @@ export default function AdminUsersPage() {
 
                         {/* Email */}
                         <td style={{ padding: "16px 12px" }}>
-                          <div style={{ fontSize: 14, color: "#666" }}>{user.email}</div>
+                          <div className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>{user.email}</div>
                         </td>
 
                         {/* Role */}
@@ -395,12 +398,12 @@ export default function AdminUsersPage() {
 
                         {/* Provider */}
                         <td style={{ padding: "16px 12px" }}>
-                          <div style={{ fontSize: 14, color: "#666", textTransform: "capitalize" }}>{user.provider}</div>
+                          <div className="dark:text-gray-300" style={{ fontSize: 14, color: "#666", textTransform: "capitalize" }}>{user.provider}</div>
                         </td>
 
                         {/* Joined */}
                         <td style={{ padding: "16px 12px" }}>
-                          <div style={{ fontSize: 14, color: "#666" }}>{formatDate(user.createdAt)}</div>
+                          <div className="dark:text-gray-300" style={{ fontSize: 14, color: "#666" }}>{formatDate(user.createdAt)}</div>
                         </td>
 
                         {/* Actions */}

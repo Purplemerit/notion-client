@@ -119,7 +119,7 @@ export default function ProjectListView({ onProjectClick }: ProjectListViewProps
 
   if (loading) {
     return (
-      <main className="bg-white p-8">
+      <main className="bg-white dark:bg-gray-800 p-8">
         <div className="flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
         </div>
@@ -129,8 +129,8 @@ export default function ProjectListView({ onProjectClick }: ProjectListViewProps
 
   if (error) {
     return (
-      <main className="bg-white p-8">
-        <div className="text-center text-red-600">
+      <main className="bg-white dark:bg-gray-800 p-8">
+        <div className="text-center text-red-600 dark:text-red-400">
           <p className="text-lg font-semibold">Error loading projects</p>
           <p className="text-sm">{error}</p>
         </div>
@@ -139,18 +139,18 @@ export default function ProjectListView({ onProjectClick }: ProjectListViewProps
   }
 
   return (
-    <main className="bg-white">
+    <main className="bg-white dark:bg-gray-800">
       {/* Filter Button */}
       <div className="mb-4">
-        <Button variant="outline" className="flex items-center gap-2 px-4 py-2 rounded-lg border-2">
+        <Button variant="outline" className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 text-gray-900 dark:text-white border-gray-300 dark:border-gray-600">
           <Settings2 className="h-5 w-5" />
           <span className="font-medium">Filter</span>
         </Button>
       </div>
 
       {/* Table Header */}
-      <div className="border-b border-gray-200">
-        <div className="grid grid-cols-12 gap-4 px-4 py-3 text-sm font-semibold text-gray-700">
+      <div className="border-b border-gray-200 dark:border-gray-700">
+        <div className="grid grid-cols-12 gap-4 px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
           <div className="col-span-3">Name</div>
           <div className="col-span-2">Progress</div>
           <div className="col-span-2">Priority</div>
@@ -162,7 +162,7 @@ export default function ProjectListView({ onProjectClick }: ProjectListViewProps
 
       {/* Table Rows */}
       {projects.length === 0 ? (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">
           <p className="text-lg font-medium">No projects found</p>
           <p className="text-sm">Create your first project to get started</p>
         </div>
@@ -170,15 +170,15 @@ export default function ProjectListView({ onProjectClick }: ProjectListViewProps
         projects.map((project) => (
           <div
             key={project._id}
-            className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
+            className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors"
             onClick={() => handleProjectClick(project._id)}
           >
             <div className="grid grid-cols-12 gap-4 px-4 py-4 items-center">
               {/* Name */}
               <div className="col-span-3 flex items-center gap-3">
-                <span className="font-medium text-gray-900 truncate">{project.name}</span>
+                <span className="font-medium text-gray-900 dark:text-white truncate">{project.name}</span>
                 {project.createdAt && (
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -201,11 +201,11 @@ export default function ProjectListView({ onProjectClick }: ProjectListViewProps
               {/* Progress */}
               <div className="col-span-2 flex items-center gap-2">
                 {getStatusIndicator(project.status)}
-                <span className="text-sm text-gray-700">
+                <span className="text-sm text-gray-700 dark:text-gray-300">
                   {project.status === 'active' ? 'On track' : project.status}
                 </span>
                 {project.updatedAt && (
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     • {format(new Date(project.updatedAt), 'relative')}
                   </span>
                 )}
@@ -235,26 +235,26 @@ export default function ProjectListView({ onProjectClick }: ProjectListViewProps
                   <>
                     <Avatar className="h-6 w-6">
                       <AvatarImage src={project.lead.avatar} alt={project.lead.name} />
-                      <AvatarFallback className="bg-purple-200 text-purple-800 text-xs">
+                      <AvatarFallback className="bg-purple-200 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs">
                         {getInitials(project.lead.name)}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm text-gray-700 truncate">{project.lead.name}</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{project.lead.name}</span>
                   </>
                 ) : (
                   <>
                     <Avatar className="h-6 w-6">
-                      <AvatarFallback className="bg-orange-200 text-orange-800 text-xs">?</AvatarFallback>
+                      <AvatarFallback className="bg-orange-200 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs">?</AvatarFallback>
                     </Avatar>
-                    <span className="text-sm text-gray-700">No Lead</span>
+                    <span className="text-sm text-gray-700 dark:text-gray-300">No Lead</span>
                   </>
                 )}
               </div>
 
               {/* Target Date */}
               <div className="col-span-2 flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-500" />
-                <span className="text-sm text-gray-700">
+                <Calendar className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
                   {project.endDate ? format(new Date(project.endDate), 'MMM d') : 'No date'}
                 </span>
               </div>
@@ -266,7 +266,7 @@ export default function ProjectListView({ onProjectClick }: ProjectListViewProps
                     project.progress
                   )} flex items-center justify-center`}
                 >
-                  <span className="text-xs font-semibold text-gray-800">
+                  <span className="text-xs font-semibold text-gray-800 dark:text-gray-200">
                     {project.progress || 0}%
                   </span>
                 </div>

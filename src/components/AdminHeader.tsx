@@ -72,8 +72,8 @@ export default function AdminHeader({
         padding: "16px 26px",
         justifyContent: "space-between",
         alignItems: "center",
-        borderBottom: "1px solid rgba(199, 199, 199, 0.70)",
-        background: "#FFF",
+        borderBottom: "1px solid hsl(var(--border) / 0.7)",
+        background: "hsl(var(--surface))",
         alignSelf: "stretch",
       }}
     >
@@ -82,12 +82,12 @@ export default function AdminHeader({
         {showSearch && (
           <div style={{ position: "relative", width: "100%", maxWidth: 400, minWidth: 200 }}>
             <Search
-              style={{
+                style={{
                 position: "absolute",
                 left: 12,
                 top: "50%",
                 transform: "translateY(-50%)",
-                color: "#999",
+                color: "hsl(var(--muted-foreground))",
               }}
               size={20}
             />
@@ -97,7 +97,7 @@ export default function AdminHeader({
               onChange={(e) => onSearchChange?.(e.target.value)}
               style={{
                 paddingLeft: 40,
-                background: "#F5F5FF",
+                background: "hsl(var(--secondary))",
                 border: "none",
                 borderRadius: 12,
                 width: "100%",
@@ -111,13 +111,13 @@ export default function AdminHeader({
       <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
         {/* Language Selector */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-          <div
+            <div
             style={{
               width: 24,
               height: 16,
               borderRadius: 2,
               background: "linear-gradient(to bottom, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%)",
-              border: "1px solid #ddd",
+              border: "1px solid hsl(var(--border))",
               flexShrink: 0,
             }}
           />
@@ -131,7 +131,7 @@ export default function AdminHeader({
           onClick={() => router.push("/chat")}
           title="Go to Messages"
         >
-          <MessageSquare size={24} color="#666" />
+          <MessageSquare size={24} color="hsl(var(--muted-foreground))" />
           {/* Badge count can be added here if needed */}
         </div>
 
@@ -142,15 +142,15 @@ export default function AdminHeader({
             onClick={() => setShowNotifications(!showNotifications)}
             title="Notifications"
           >
-            <Bell size={24} color="#666" />
+            <Bell size={24} color="hsl(var(--muted-foreground))" />
             {unreadCount > 0 && (
               <span
                 style={{
                   position: "absolute",
                   top: -4,
                   right: -4,
-                  background: "#8B7BE8",
-                  color: "white",
+                  background: "hsl(var(--primary))",
+                  color: "hsl(var(--primary-foreground))",
                   borderRadius: "50%",
                   width: 16,
                   height: 16,
@@ -176,16 +176,16 @@ export default function AdminHeader({
                 maxHeight: 500,
                 overflowY: "auto",
                 padding: 24,
-                background: "#FFF",
+                background: "hsl(var(--card))",
                 borderRadius: 16,
-                border: "1px solid #E1DEF6",
+                border: "1px solid hsl(var(--border))",
                 boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12)",
                 zIndex: 1000,
               }}
             >
               <div style={{ fontSize: 18, fontWeight: 600, marginBottom: 20 }}>Notifications</div>
               {notifications.length === 0 ? (
-                <div style={{ textAlign: "center", color: "#999", padding: "20px 0" }}>
+                <div style={{ textAlign: "center", color: "hsl(var(--muted-foreground))", padding: "20px 0" }}>
                   No notifications
                 </div>
               ) : (
@@ -197,7 +197,7 @@ export default function AdminHeader({
                       gap: 12,
                       marginBottom: 16,
                       paddingBottom: 16,
-                      borderBottom: idx !== notifications.length - 1 ? "1px solid #F0F0F0" : "none",
+                      borderBottom: idx !== notifications.length - 1 ? "1px solid hsl(var(--border))" : "none",
                     }}
                   >
                     <div
@@ -205,11 +205,11 @@ export default function AdminHeader({
                         width: 40,
                         height: 40,
                         borderRadius: 8,
-                        background: "#D4CCFA",
+                        background: "hsl(var(--primary) / 0.12)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        color: "#FFF",
+                        color: "hsl(var(--primary-foreground))",
                         fontSize: 16,
                         fontWeight: 600,
                         flexShrink: 0,
@@ -221,10 +221,10 @@ export default function AdminHeader({
                       <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
                         by {notification.user}
                       </div>
-                      <div style={{ fontSize: 12, color: "#666", wordWrap: "break-word" }}>
+                      <div style={{ fontSize: 12, color: "hsl(var(--muted-foreground))", wordWrap: "break-word" }}>
                         {notification.action}
                       </div>
-                      <div style={{ fontSize: 11, color: "#BBB", marginTop: 4 }}>
+                      <div style={{ fontSize: 11, color: "hsl(var(--muted-foreground))", marginTop: 4 }}>
                         {notification.time}
                       </div>
                     </div>
@@ -242,19 +242,19 @@ export default function AdminHeader({
           title="Go to Settings"
         >
           {currentUser?.avatar ? (
-            <Image
-              src={currentUser.avatar}
-              alt={currentUser.name || "User"}
-              width={40}
-              height={40}
-              style={{ borderRadius: "50%", objectFit: "cover" }}
-            />
-          ) : (
             <div
               style={{
                 width: 40,
                 height: 40,
-                borderRadius: "50%",
+                borderRadius: '50%',
+                background: 'hsl(var(--primary) / 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'hsl(var(--primary))',
+                fontWeight: 600,
+                fontSize: 16,
+              }}
                 background: "#D4CCFA",
                 display: "flex",
                 alignItems: "center",
@@ -269,7 +269,7 @@ export default function AdminHeader({
           )}
           <div>
             <div style={{ fontSize: 14, fontWeight: 600 }}>{currentUser?.name || "User"}</div>
-            <div style={{ fontSize: 12, color: "#999" }}>
+            <div style={{ fontSize: 12, color: "hsl(var(--muted-foreground))" }}>
               {currentUser?.role === "admin" ? "Admin" : "User"}
             </div>
           </div>

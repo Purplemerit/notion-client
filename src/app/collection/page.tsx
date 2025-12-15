@@ -18,6 +18,7 @@ import { Search, Folder, MoreVertical, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { collectionsAPI } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Collection {
   _id: string;
@@ -33,6 +34,7 @@ interface Collection {
 export default function CollectionPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { actualTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [recentDrafts, setRecentDrafts] = useState<Collection[]>([]);
   const [savedCollections, setSavedCollections] = useState<Collection[]>([]);
@@ -123,22 +125,32 @@ export default function CollectionPage() {
 
   return (
     <AppLayout>
-      <div className="flex-1 bg-white p-8 overflow-y-auto">
+      <div className={`flex-1 p-8 overflow-y-auto ${
+        actualTheme === 'dark' ? 'bg-gray-900' : 'bg-white'
+      }`}>
         {/* Row 1: Collections Title and Search Bar */}
         <header className="flex items-center justify-between mb-8">
           <div className="flex items-center" style={{ gap: '64px' }}>
-            <h1 className="text-3xl font-bold text-gray-800">Collections</h1>
+            <h1 className={`text-3xl font-bold ${
+              actualTheme === 'dark' ? 'text-gray-100' : 'text-gray-800'
+            }`}>Collections</h1>
             <div className="relative" style={{ width: '528px', height: '40px', flexShrink: 0 }}>
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 ${
+                actualTheme === 'dark' ? 'text-gray-600' : 'text-gray-400'
+              }`} />
               <Input
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 bg-white h-full w-full"
+                className={`pl-11 h-full w-full ${
+                  actualTheme === 'dark' 
+                    ? 'bg-gray-800 text-gray-100 placeholder-gray-500' 
+                    : 'bg-white'
+                }`}
                 style={{
                   borderRadius: '24px',
                   border: '1px solid #E6E6E6',
-                  background: '#FFF',
+                  background: actualTheme === 'dark' ? '#1F2937' : '#FFF',
                   boxShadow: '0 4px 4px 0 rgba(221, 221, 221, 0.25)'
                 }}
               />
@@ -148,11 +160,17 @@ export default function CollectionPage() {
 
         {/* Row 2: Recent Drafts */}
         <section className="mb-10">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Recent Drafts</h2>
+          <h2 className={`text-xl font-semibold mb-4 ${
+            actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+          }`}>Recent Drafts</h2>
           <div className="flex gap-4 overflow-x-auto">
             {/* Create New Card */}
-            <Card 
-              className="border-2 border-dashed border-gray-300 bg-white hover:border-gray-400 transition-colors cursor-pointer"
+            <Card
+              className={`border-2 border-dashed transition-colors cursor-pointer ${
+                actualTheme === 'dark' 
+                  ? 'border-gray-600 bg-gray-800 hover:border-gray-500' 
+                  : 'border-gray-300 bg-white hover:border-gray-400'
+              }`}
               style={{
                 width: '160px',
                 height: '200px',
@@ -162,43 +180,61 @@ export default function CollectionPage() {
               onClick={() => router.push('/collection/editor')}
             >
               <CardContent className="flex flex-col items-center justify-center h-full p-4">
-                <div className="w-14 h-14 rounded-full border-2 border-dashed border-gray-400 flex items-center justify-center mb-3">
-                  <Plus className="h-6 w-6 text-gray-400" />
+                <div className={`w-14 h-14 rounded-full border-2 border-dashed flex items-center justify-center mb-3 ${
+                  actualTheme === 'dark' ? 'border-gray-600' : 'border-gray-400'
+                }`}>
+                  <Plus className={`h-6 w-6 ${
+                    actualTheme === 'dark' ? 'text-gray-500' : 'text-gray-400'
+                  }`} />
                 </div>
-                <span className="text-sm text-gray-500 font-medium">Create New</span>
+                <span className={`text-sm font-medium ${
+                  actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                }`}>Create New</span>
               </CardContent>
             </Card>
 
             {/* Recent Draft Cards */}
             {isLoading ? (
-              <div className="text-gray-500">Loading drafts...</div>
+              <div className={actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>Loading drafts...</div>
             ) : recentDrafts.length === 0 ? (
-              <div className="text-gray-500 text-sm">No drafts yet. Create one to get started!</div>
+              <div className={`text-sm ${
+                actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+              }`}>No drafts yet. Create one to get started!</div>
             ) : (
               recentDrafts.map((draft) => (
-                <Card 
-                  key={draft._id} 
-                  className="hover:shadow-md transition-shadow cursor-pointer"
+                <Card
+                  key={draft._id}
+                  className={`hover:shadow-md transition-shadow cursor-pointer ${
+                    actualTheme === 'dark' ? 'bg-gray-800 border-gray-700' : ''
+                  }`}
                   style={{
                     width: '160px',
                     height: '200px',
                     borderRadius: '16px',
                     border: '1px solid #E8E8E8',
-                    background: 'rgba(135, 135, 135, 0.06)',
+                    background: actualTheme === 'dark' ? '#1F2937' : 'rgba(135, 135, 135, 0.06)',
                     flexShrink: 0
                   }}
                   onClick={() => router.push(`/collection/editor?id=${draft._id}`)}
                 >
                   <CardContent className="p-4 h-full flex flex-col justify-between">
                     <div className="flex items-start justify-between mb-4">
-                      <Folder className="h-8 w-8 text-gray-600" />
+                      <Folder className={`h-8 w-8 ${
+                        actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                      }`} />
                       <Button variant="ghost" size="icon" className="h-8 w-8 -mt-2 -mr-2">
-                        <MoreVertical className="h-4 w-4 text-gray-600" />
+                        <MoreVertical className={`h-4 w-4 ${
+                          actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-600'
+                        }`} />
                       </Button>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800 mb-2 truncate">{draft.name}</p>
-                      <div className="flex items-center justify-between text-xs text-gray-500">
+                      <p className={`text-sm font-medium mb-2 truncate ${
+                        actualTheme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+                      }`}>{draft.name}</p>
+                      <div className={`flex items-center justify-between text-xs ${
+                        actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
                         <span>{calculateSize(draft)}</span>
                         <span>{formatDate(draft.updatedAt)}</span>
                       </div>
@@ -212,11 +248,15 @@ export default function CollectionPage() {
 
         {/* Row 4: Saved Collections */}
         <section>
-          <h2 className="text-xl font-semibold text-gray-700 mb-4">Saved Collections</h2>
+          <h2 className={`text-xl font-semibold mb-4 ${
+            actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+          }`}>Saved Collections</h2>
           {isLoading ? (
-            <div className="text-gray-500">Loading collections...</div>
+            <div className={actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'}>Loading collections...</div>
           ) : filteredCollections.length === 0 ? (
-            <div className="text-gray-500 text-sm">
+            <div className={`text-sm ${
+              actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+            }`}>
               {searchQuery ? 'No collections found matching your search.' : 'No saved collections yet. Create and publish one!'}
             </div>
           ) : (
@@ -227,9 +267,11 @@ export default function CollectionPage() {
               }}
             >
               {filteredCollections.map((collection) => (
-                <Card 
-                  key={collection._id} 
-                  className="border-gray-200 hover:shadow-lg transition-shadow cursor-pointer overflow-hidden"
+                <Card
+                  key={collection._id}
+                  className={`hover:shadow-lg transition-shadow cursor-pointer overflow-hidden ${
+                    actualTheme === 'dark' ? 'bg-gray-800 border-gray-700' : 'border-gray-200'
+                  }`}
                   style={{
                     width: '224px',
                     height: '240px',
@@ -237,7 +279,7 @@ export default function CollectionPage() {
                     flexShrink: 0
                   }}
                 >
-                  <div 
+                  <div
                     className="relative h-40"
                     style={{
                       backgroundImage: collection.thumbnail ? `url(${collection.thumbnail})` : 'none',
@@ -250,8 +292,19 @@ export default function CollectionPage() {
                   >
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-8 w-8 bg-white/80 hover:bg-white" onClick={e => e.stopPropagation()}>
-                          <MoreVertical className="h-4 w-4 text-gray-700" />
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className={`absolute top-2 right-2 h-8 w-8 ${
+                            actualTheme === 'dark' 
+                              ? 'bg-gray-900/80 hover:bg-gray-800' 
+                              : 'bg-white/80 hover:bg-white'
+                          }`}
+                          onClick={e => e.stopPropagation()}
+                        >
+                          <MoreVertical className={`h-4 w-4 ${
+                            actualTheme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                          }`} />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -273,8 +326,12 @@ export default function CollectionPage() {
                     </DropdownMenu>
                   </div>
                   <CardContent className="p-4" onClick={() => router.push(`/collection/editor?id=${collection._id}`)}>
-                    <p className="text-sm font-medium text-gray-800 mb-2 truncate">{collection.name}</p>
-                    <div className="flex items-center justify-between text-xs text-gray-500">
+                    <p className={`text-sm font-medium mb-2 truncate ${
+                      actualTheme === 'dark' ? 'text-gray-200' : 'text-gray-800'
+                    }`}>{collection.name}</p>
+                    <div className={`flex items-center justify-between text-xs ${
+                      actualTheme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
                       <span>{calculateSize(collection)}</span>
                       <span>{formatDate(collection.updatedAt)}</span>
                     </div>

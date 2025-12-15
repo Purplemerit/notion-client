@@ -205,7 +205,7 @@ export default function ProjectDetailPage() {
   if (isLoading) {
     return (
       <AppLayout>
-        <div className="flex-1 bg-white flex items-center justify-center">
+        <div className="flex-1 bg-white dark:bg-gray-900 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
         </div>
       </AppLayout>
@@ -215,8 +215,8 @@ export default function ProjectDetailPage() {
   if (!project) {
     return (
       <AppLayout>
-        <div className="flex-1 bg-white flex flex-col items-center justify-center">
-          <p className="text-lg text-gray-500 mb-4">Project not found</p>
+        <div className="flex-1 bg-white dark:bg-gray-900 flex flex-col items-center justify-center">
+          <p className="text-lg text-gray-500 dark:text-gray-400 mb-4">Project not found</p>
           <Button onClick={() => router.push('/dashboard')}>Back to Dashboard</Button>
         </div>
       </AppLayout>
@@ -225,19 +225,19 @@ export default function ProjectDetailPage() {
 
   return (
     <AppLayout>
-      <div className="flex-1 bg-white p-8 overflow-y-auto">
+      <div className="flex-1 bg-white dark:bg-gray-900 p-8 overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
               onClick={() => router.push('/dashboard')}
-              className="hover:bg-gray-100"
+              className="hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               <ArrowLeft className="h-5 w-5 mr-2" />
               Back
             </Button>
-            <h1 className="text-3xl font-bold text-gray-800">Project Details</h1>
+            <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">Project Details</h1>
           </div>
           <div className="flex gap-3">
             {isEditing ? (
@@ -251,6 +251,7 @@ export default function ProjectDetailPage() {
                     setEditStatus(project.status);
                   }}
                   disabled={isSaving}
+                  className="dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
                 >
                   Cancel
                 </Button>
@@ -277,7 +278,7 @@ export default function ProjectDetailPage() {
                 <Button
                   variant="outline"
                   onClick={() => setIsEditing(true)}
-                  className="border-gray-300"
+                  className="border-gray-300 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
                 >
                   <Edit2 className="mr-2 h-4 w-4" />
                   Edit
@@ -308,27 +309,27 @@ export default function ProjectDetailPage() {
         <div className="max-w-4xl space-y-8">
           {/* Project Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Project Name</label>
             {isEditing ? (
               <Input
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
-                className="text-2xl font-bold"
+                className="text-2xl font-bold dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
                 placeholder="Enter project name"
               />
             ) : (
-              <h2 className="text-2xl font-bold text-gray-800">{project.name}</h2>
+              <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{project.name}</h2>
             )}
           </div>
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
             {isEditing ? (
               <select
                 value={editStatus}
                 onChange={(e) => setEditStatus(e.target.value as any)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-gray-800 dark:text-gray-100"
               >
                 <option value="active">Active</option>
                 <option value="completed">Completed</option>
@@ -339,10 +340,10 @@ export default function ProjectDetailPage() {
                 variant="outline"
                 className={
                   project.status === 'active'
-                    ? 'bg-green-50 text-green-700 border-green-200'
+                    ? 'bg-green-50 dark:bg-green-900 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700'
                     : project.status === 'completed'
-                    ? 'bg-blue-50 text-blue-700 border-blue-200'
-                    : 'bg-gray-50 text-gray-700 border-gray-200'
+                    ? 'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700'
+                    : 'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600'
                 }
               >
                 {project.status}
@@ -352,24 +353,24 @@ export default function ProjectDetailPage() {
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
             {isEditing ? (
               <Textarea
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
                 placeholder="Add a description..."
                 rows={4}
-                className="resize-none"
+                className="resize-none dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
               />
             ) : (
-              <p className="text-gray-600">{project.description || 'No description'}</p>
+              <p className="text-gray-600 dark:text-gray-400">{project.description || 'No description'}</p>
             )}
           </div>
 
           {/* Dates */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Calendar className="inline h-4 w-4 mr-1" />
                 Start Date
               </label>
@@ -378,15 +379,16 @@ export default function ProjectDetailPage() {
                   type="date"
                   value={editStartDate}
                   onChange={(e) => setEditStartDate(e.target.value)}
+                  className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
                 />
               ) : (
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   {project.startDate ? format(new Date(project.startDate), 'PPP') : 'Not set'}
                 </p>
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 <Calendar className="inline h-4 w-4 mr-1" />
                 End Date
               </label>
@@ -396,9 +398,10 @@ export default function ProjectDetailPage() {
                   value={editEndDate}
                   onChange={(e) => setEditEndDate(e.target.value)}
                   min={editStartDate}
+                  className="dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600"
                 />
               ) : (
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   {project.endDate ? format(new Date(project.endDate), 'PPP') : 'Not set'}
                 </p>
               )}
@@ -408,7 +411,7 @@ export default function ProjectDetailPage() {
           {/* Members */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 <Users className="inline h-4 w-4 mr-1" />
                 Team Members ({project.members?.length || 0})
               </label>
@@ -417,7 +420,7 @@ export default function ProjectDetailPage() {
                   size="sm"
                   variant="outline"
                   onClick={() => setShowMemberSearch(!showMemberSearch)}
-                  className="border-purple-300 text-purple-700 hover:bg-purple-50"
+                  className="border-purple-300 text-purple-700 dark:border-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900"
                 >
                   <Plus className="h-4 w-4 mr-1" />
                   Add Member
@@ -427,16 +430,16 @@ export default function ProjectDetailPage() {
 
             {/* Member Search */}
             {showMemberSearch && !isEditing && (
-              <div className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <div className="mb-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800">
                 <Input
                   placeholder="Search users by name or email..."
                   value={userSearch}
                   onChange={(e) => handleUserSearch(e.target.value)}
-                  className="mb-3"
+                  className="mb-3 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
                 />
                 {isSearching ? (
                   <div className="text-center py-4">
-                    <Loader2 className="h-5 w-5 animate-spin mx-auto text-gray-500" />
+                    <Loader2 className="h-5 w-5 animate-spin mx-auto text-gray-500 dark:text-gray-400" />
                   </div>
                 ) : searchResults.length > 0 ? (
                   <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -445,7 +448,7 @@ export default function ProjectDetailPage() {
                       .map((user) => (
                         <div
                           key={user._id}
-                          className="flex items-center justify-between p-2 hover:bg-white rounded cursor-pointer"
+                          className="flex items-center justify-between p-2 hover:bg-white dark:hover:bg-gray-700 rounded cursor-pointer"
                           onClick={() => handleAddMember(user)}
                         >
                           <div className="flex items-center gap-2">
@@ -454,8 +457,8 @@ export default function ProjectDetailPage() {
                               <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                             </Avatar>
                             <div>
-                              <div className="font-medium text-sm">{user.name}</div>
-                              <div className="text-xs text-gray-500">{user.email}</div>
+                              <div className="font-medium text-sm dark:text-gray-100">{user.name}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">{user.email}</div>
                             </div>
                           </div>
                           <Button size="sm" variant="ghost">
@@ -465,9 +468,9 @@ export default function ProjectDetailPage() {
                       ))}
                   </div>
                 ) : userSearch ? (
-                  <p className="text-center text-sm text-gray-500 py-4">No users found</p>
+                  <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">No users found</p>
                 ) : (
-                  <p className="text-center text-sm text-gray-500 py-4">
+                  <p className="text-center text-sm text-gray-500 dark:text-gray-400 py-4">
                     Start typing to search users
                   </p>
                 )}
@@ -480,7 +483,7 @@ export default function ProjectDetailPage() {
                 project.members.map((member) => (
                   <div
                     key={member._id}
-                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+                    className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
                   >
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
@@ -488,8 +491,8 @@ export default function ProjectDetailPage() {
                         <AvatarFallback>{getInitials(member.name)}</AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-medium">{member.name}</div>
-                        <div className="text-sm text-gray-500">{member.email}</div>
+                        <div className="font-medium dark:text-gray-100">{member.name}</div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">{member.email}</div>
                       </div>
                     </div>
                     {!isEditing && member._id !== project.createdBy._id && (
@@ -497,7 +500,7 @@ export default function ProjectDetailPage() {
                         size="sm"
                         variant="ghost"
                         onClick={() => handleRemoveMember(member._id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        className="text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900"
                       >
                         <X className="h-4 w-4" />
                       </Button>
@@ -505,14 +508,14 @@ export default function ProjectDetailPage() {
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500 col-span-2 text-center py-4">No members yet</p>
+                <p className="text-gray-500 dark:text-gray-400 col-span-2 text-center py-4">No members yet</p>
               )}
             </div>
           </div>
 
           {/* Metadata */}
-          <div className="pt-6 border-t border-gray-200">
-            <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+          <div className="pt-6 border-t border-gray-200 dark:border-gray-600">
+            <div className="grid grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
               <div>
                 <span className="font-medium">Created by:</span> {project.createdBy.name}
               </div>

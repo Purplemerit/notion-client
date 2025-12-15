@@ -137,7 +137,7 @@ export default function DocumentsPage() {
       <div className="p-4 sm:p-6 md:p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Documents</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Documents</h1>
             <Button
               className="bg-purple-600 hover:bg-purple-700 w-full sm:w-auto"
               onClick={() => setShowUploadDialog(!showUploadDialog)}
@@ -151,7 +151,7 @@ export default function DocumentsPage() {
           {showUploadDialog && (
             <Card className="mb-6">
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Upload New Document</h3>
+                <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Upload New Document</h3>
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="title">Document Title</Label>
@@ -171,7 +171,7 @@ export default function DocumentsPage() {
                       onChange={handleFileSelect}
                     />
                     {selectedFile && (
-                      <p className="text-sm text-gray-600 mt-2">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                         Selected: {selectedFile.name} ({formatFileSize(selectedFile.size)})
                       </p>
                     )}
@@ -215,27 +215,27 @@ export default function DocumentsPage() {
               {loading ? (
                 <div className="text-center py-12">
                   <Loader2 className="w-8 h-8 animate-spin mx-auto text-purple-600" />
-                  <p className="mt-4 text-gray-600">Loading documents...</p>
+                  <p className="mt-4 text-gray-600 dark:text-gray-400">Loading documents...</p>
                 </div>
               ) : documents.length === 0 ? (
                 <div className="text-center py-12">
-                  <FileText className="w-16 h-16 mx-auto text-gray-400" />
-                  <p className="mt-4 text-gray-600">No documents yet. Upload your first document!</p>
+                  <FileText className="w-16 h-16 mx-auto text-gray-400 dark:text-gray-600" />
+                  <p className="mt-4 text-gray-600 dark:text-gray-400">No documents yet. Upload your first document!</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-4">
                   {documents.map((doc) => (
                     <div
                       key={doc._id}
-                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border rounded-lg hover:bg-purple-50 transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-purple-50 dark:hover:bg-gray-800 transition-colors"
                     >
                       <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
-                        <div className="bg-purple-100 p-2 sm:p-3 rounded-lg flex-shrink-0">
-                          <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+                        <div className="bg-purple-100 dark:bg-purple-900 p-2 sm:p-3 rounded-lg flex-shrink-0">
+                          <FileText className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold text-gray-900 truncate">{doc.title}</h3>
-                          <p className="text-xs sm:text-sm text-gray-600">
+                          <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">{doc.title}</h3>
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                             {formatFileSize(doc.fileSize)} • Uploaded {formatDate(doc.createdAt)}
                           </p>
                         </div>
@@ -244,7 +244,7 @@ export default function DocumentsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 flex-1 sm:flex-none"
+                          className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:bg-purple-50 dark:hover:bg-gray-800 flex-1 sm:flex-none"
                           onClick={() => window.open(doc.fileUrl, '_blank')}
                         >
                           <Download className="w-4 h-4 sm:mr-2" />
@@ -253,7 +253,7 @@ export default function DocumentsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-gray-800"
                           onClick={() => handleDelete(doc._id)}
                         >
                           <Trash2 className="w-4 h-4" />

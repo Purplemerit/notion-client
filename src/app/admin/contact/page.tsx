@@ -52,6 +52,7 @@ const ContactCard: React.FC<ContactCardProps> = ({
 
   return (
     <div
+      className="dark:bg-gray-800 dark:border-gray-700"
       style={{
         background: "#FFF",
         borderRadius: 16,
@@ -143,14 +144,14 @@ const ContactCard: React.FC<ContactCardProps> = ({
 
       {/* Contact Info */}
       <div style={{ textAlign: "center", marginBottom: 20, width: "100%" }}>
-        <div style={{ fontSize: 16, fontWeight: 600, color: "#252525", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+        <div className="dark:text-gray-100" style={{ fontSize: 16, fontWeight: 600, color: "#252525", marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
           {contact.name}
         </div>
-        <div style={{ fontSize: 14, color: "#999", marginBottom: 8 }}>
+        <div className="dark:text-gray-400" style={{ fontSize: 14, color: "#999", marginBottom: 8 }}>
           {contact.position}
         </div>
         {contact.email && (
-          <div style={{ fontSize: 12, color: "#BBB", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+          <div className="dark:text-gray-500" style={{ fontSize: 12, color: "#BBB", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {contact.email}
           </div>
         )}
@@ -518,7 +519,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
+    <div className="dark:bg-gray-900" style={{ display: "flex", minHeight: "100vh", background: "#F7F5FD" }}>
       {/* Sidebar */}
       <div style={{ flexShrink: 0, height: "100vh" }}>
         <AdminSidebar />
@@ -536,6 +537,7 @@ export default function ContactPage() {
 
         {/* Main Content Area */}
         <main
+          className="dark:bg-gray-800"
           style={{
             flex: 1,
             overflow: "auto",
@@ -544,7 +546,7 @@ export default function ContactPage() {
         >
           {/* Page Title */}
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
-            <h1 style={{ fontSize: 32, fontWeight: 600, color: "#252525" }}>
+            <h1 className="dark:text-gray-100" style={{ fontSize: 32, fontWeight: 600, color: "#252525" }}>
               Contact ({filteredContacts.length})
             </h1>
           </div>
@@ -555,10 +557,10 @@ export default function ContactPage() {
             </div>
           ) : filteredContacts.length === 0 ? (
             <div style={{ textAlign: "center", padding: "60px 20px" }}>
-              <p style={{ fontSize: 18, color: "#999", marginBottom: 16 }}>
+              <p className="dark:text-gray-400" style={{ fontSize: 18, color: "#999", marginBottom: 16 }}>
                 {searchQuery ? "No contacts found matching your search" : "No contacts available"}
               </p>
-              <p style={{ fontSize: 14, color: "#BBB" }}>
+              <p className="dark:text-gray-500" style={{ fontSize: 14, color: "#BBB" }}>
                 {searchQuery ? "Try a different search term" : "Add team members to see them here"}
               </p>
             </div>

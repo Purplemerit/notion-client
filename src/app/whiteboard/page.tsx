@@ -11,14 +11,12 @@ import { useToast } from '@/hooks/use-toast';
 import { usersAPI } from '@/lib/api';
 import { useTheme } from '@/contexts/ThemeContext';
 import '@excalidraw/excalidraw/index.css';
-// @ts-ignore
-import type { ExcalidrawImperativeAPI } from '@excalidraw/excalidraw/types/types';
-// @ts-ignore  
-import type { ExcalidrawElement } from '@excalidraw/excalidraw/types/element/types';
-// @ts-ignore
-import type { AppState } from '@excalidraw/excalidraw/types/types';
-
 import io, { Socket } from 'socket.io-client';
+
+// Type definitions to avoid import errors
+type ExcalidrawImperativeAPI = any;
+type ExcalidrawElement = any;
+type AppState = any;
 
 // Dynamically import Excalidraw to avoid SSR issues
 const Excalidraw = dynamic(
@@ -153,23 +151,17 @@ function WhiteboardContent() {
         // Get current elements from the canvas
         const currentElements = excalidrawAPI.getSceneElements();
 
-        // Create a map of current elements by ID for fast lookup
-        const currentElementsMap = new Map(
-          currentElements.map(el => [el.id, el])
-        );
-
         // Merge incoming elements with local elements
-        // Keep local elements that are being actively edited
         const mergedElements = [...data.elements];
 
         // Add any local elements that aren't in the update (elements being drawn right now)
-        currentElements.forEach(localEl => {
+        currentElements.forEach((localEl: any) => {
           if (localElementIdsRef.current.has(localEl.id)) {
             // This is a local element we're currently drawing
-            const incomingEl = data.elements.find(el => el.id === localEl.id);
+            const incomingEl = data.elements.find((el: any) => el.id === localEl.id);
             if (!incomingEl || localEl.version > incomingEl.version) {
               // Keep the local version if it's newer or not in incoming data
-              const index = mergedElements.findIndex(el => el.id === localEl.id);
+              const index = mergedElements.findIndex((el: any) => el.id === localEl.id);
               if (index >= 0) {
                 mergedElements[index] = localEl;
               } else {
@@ -220,9 +212,9 @@ function WhiteboardContent() {
 
     // Track new local elements (elements that were just created or modified)
     const lastSentElements = lastSentElementsRef.current;
-    elements.forEach(element => {
+    elements.forEach((element: any) => {
       // Check if this element is new or was modified
-      const wasInLastSent = lastSentElements.find(el => el.id === element.id);
+      const wasInLastSent = lastSentElements.find((el: any) => el.id === element.id);
       if (!wasInLastSent || wasInLastSent.version !== element.version) {
         // This is a new or modified element by the current user
         localElementIdsRef.current.add(element.id);
@@ -230,7 +222,7 @@ function WhiteboardContent() {
     });
 
     // Clean up old local element IDs that are no longer in the scene
-    const currentElementIds = new Set(elements.map(el => el.id));
+    const currentElementIds = new Set(elements.map((el: any) => el.id));
     localElementIdsRef.current.forEach(id => {
       if (!currentElementIds.has(id)) {
         localElementIdsRef.current.delete(id);
@@ -274,13 +266,12 @@ function WhiteboardContent() {
         pendingUpdateRef.current = null;
 
         // After sending, clear local element tracking for finished strokes
-        // Keep only elements that are still being modified
         setTimeout(() => {
           localElementIdsRef.current.clear();
         }, 500);
       }
       throttleTimeoutRef.current = null;
-    }, 100); // Send updates at most every 100ms for smooth drawing
+    }, 100);
   }, [roomId]);
 
   // Save whiteboard
@@ -487,7 +478,7 @@ function WhiteboardContent() {
           actualTheme === 'dark' ? 'bg-gray-900' : 'bg-white'
         }`} style={{ height: 'calc(100vh - 80px)' }}>
           <Excalidraw
-            excalidrawAPI={(api) => setExcalidrawAPI(api)}
+            excalidrawAPI={(api: any) => setExcalidrawAPI(api)}
             onChange={handleChange}
             initialData={{
               appState: {

@@ -82,7 +82,7 @@ export default function AdminHeader({
         {showSearch && (
           <div style={{ position: "relative", width: "100%", maxWidth: 400, minWidth: 200 }}>
             <Search
-                style={{
+              style={{
                 position: "absolute",
                 left: 12,
                 top: "50%",
@@ -111,7 +111,7 @@ export default function AdminHeader({
       <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
         {/* Language Selector */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-            <div
+          <div
             style={{
               width: 24,
               height: 16,
@@ -247,26 +247,18 @@ export default function AdminHeader({
                 width: 40,
                 height: 40,
                 borderRadius: '50%',
-                background: 'hsl(var(--primary) / 0.12)',
+                background: '#D4CCFA',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'hsl(var(--primary))',
-                fontWeight: 600,
-                fontSize: 16,
-              }}
-                background: "#D4CCFA",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#8B7BE8",
+                color: '#8B7BE8',
                 fontWeight: 600,
                 fontSize: 16,
               }}
             >
               {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : "U"}
             </div>
-          )}
+          ) : null}
           <div>
             <div style={{ fontSize: 14, fontWeight: 600 }}>{currentUser?.name || "User"}</div>
             <div style={{ fontSize: 12, color: "hsl(var(--muted-foreground))" }}>

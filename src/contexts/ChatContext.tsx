@@ -1,10 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { getChatSocket, setAuthErrorCallback, resetChatSocket, type ChatMessage } from "@/lib/socket";
+import { getChatSocket, setAuthErrorCallback, resetChatSocket, getMessagingSocket, disconnectMessagingSocket, type ChatMessage } from "@/lib/socket";
 import type { Socket } from "socket.io-client";
 import { useToast } from "@/hooks/use-toast";
-import { usersAPI, chatAPI } from "@/lib/api";
+import { usersAPI, chatAPI, messagingAPI } from "@/lib/api";
 import { deduplicateMessages, mergeMessages, setLastConnectionTime } from "@/lib/chatUtils";
 
 export interface Chat {
@@ -477,6 +477,69 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
       socket.off('error');
     };
   }, [currentUserEmail, toast]);
+
+  // Set up messaging socket for real-time unread count updates
+  useEffect(() => {
+    if (!currentUserEmail || !isInitialized) return;
+
+    // Fetch initial unread count from API
+    const fetchUnreadCount = async () => {
+      try {
+        const result = await messagingAPI.getUnreadCount();
+        if (result && typeof result.count === 'number') {
+          // We have a total count, but we need to distribute it to conversations
+          // For now, we'll set a global indicator
+          // The full implementation would fetch per-conversation unread counts
+          console.log('Total unread messages:', result.count);
+        }
+      } catch (error) {
+        console.error('Failed to fetch unread count:', error);
+      }
+    };
+
+    fetchUnreadCount();
+
+    // Connect to messaging socket for real-time updates
+    try {
+      const messagingSocket = getMessagingSocket(currentUserEmail);
+
+      messagingSocket.on('connect', () => {
+        console.log('Messaging socket connected for unread count updates');
+      });
+
+      // Listen for unread count updates
+      messagingSocket.on('unreadCountUpdate', (data: { count: number }) => {
+        console.log('Received unread count update:', data.count);
+        // Update the UI by re-fetching conversations or updating badge count
+        // You can emit an event or use a state management solution here
+      });
+
+      // Listen for new messages to update unread count
+      messagingSocket.on('newMessage', async (message: any) => {
+        console.log('New message received via messaging socket:', message);
+
+        // If message is from someone else, increment unread count for that chat
+        if (message.senderId && message.senderId._id) {
+          const senderId = message.senderId._id.toString();
+          if (senderId !== currentUserEmail) {
+            setUnreadCounts(prev => ({
+              ...prev,
+              [message.senderId.email || senderId]: (prev[message.senderId.email || senderId] || 0) + 1,
+            }));
+          }
+        }
+      });
+
+      return () => {
+        messagingSocket.off('connect');
+        messagingSocket.off('unreadCountUpdate');
+        messagingSocket.off('newMessage');
+        disconnectMessagingSocket();
+      };
+    } catch (error) {
+      console.error('Failed to set up messaging socket:', error);
+    }
+  }, [currentUserEmail, isInitialized]);
 
   const addTeamChat = (chat: Chat) => {
     setTeamChats(prev => {

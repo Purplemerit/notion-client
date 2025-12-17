@@ -20,7 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { CallModal } from "@/components/CallModal";
 import { useChatContext, type Chat, type Message } from "@/contexts/ChatContext";
-import { usersAPI, chatAPI } from "@/lib/api";
+import { usersAPI, chatAPI, messagingAPI } from "@/lib/api";
 import { OfflineMessageQueue, isOnline } from "@/lib/chatUtils";
 import { useTheme } from "@/contexts/ThemeContext";
 
@@ -35,11 +35,11 @@ interface User {
 const DEFAULT_GROUP = "Roboto UX Project";
 
 // Components
-const ChatListItem = ({ chat, onClick, actualTheme }: { chat: Chat; onClick: () => void; actualTheme: string }) => (
+const ChatListItem = ({ chat, onClick, actualTheme, unreadCount }: { chat: Chat; onClick: () => void; actualTheme: string; unreadCount?: number }) => (
   <div
     className={`flex items-start space-x-3 p-2 cursor-pointer rounded-lg border ${
-      actualTheme === 'dark' 
-        ? 'hover:bg-gray-700 border-gray-700 bg-gray-800' 
+      actualTheme === 'dark'
+        ? 'hover:bg-gray-700 border-gray-700 bg-gray-800'
         : 'hover:bg-muted border-gray-300 bg-white'
     }`}
     onClick={onClick}
@@ -64,9 +64,16 @@ const ChatListItem = ({ chat, onClick, actualTheme }: { chat: Chat; onClick: () 
         <p className={`text-sm font-medium truncate ${actualTheme === 'dark' ? 'text-gray-100' : 'text-foreground'}`}>
           {chat.name}
         </p>
-        <span className={`text-xs flex-shrink-0 ml-2 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
-          {chat.time}
-        </span>
+        <div className="flex items-center gap-2 flex-shrink-0 ml-2">
+          {unreadCount && unreadCount > 0 && (
+            <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-purple-600 text-white text-xs font-semibold">
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </span>
+          )}
+          <span className={`text-xs ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
+            {chat.time}
+          </span>
+        </div>
       </div>
       <p className={`text-xs ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
         {chat.role}
@@ -175,6 +182,7 @@ const ChatSidebar = ({
   isOpen,
   onClose,
   actualTheme,
+  unreadCounts,
 }: {
   chats: { team: Chat[]; chitchat: Chat[] };
   onSelectChat: (chat: Chat) => void;
@@ -199,6 +207,7 @@ const ChatSidebar = ({
   isOpen: boolean;
   onClose: () => void;
   actualTheme: string;
+  unreadCounts: { [chatName: string]: number };
 }) => {
   const getInitials = (name: string) => {
     if (!name) return '??';
@@ -307,10 +316,16 @@ const ChatSidebar = ({
               <div className="space-y-1">
                 {filteredTeamChats.length > 0 ? (
                   filteredTeamChats.map((chat, index) => (
-                    <ChatListItem key={index} chat={chat} onClick={() => {
-                      onSelectChat(chat);
-                      onClose();
-                    }} actualTheme={actualTheme} />
+                    <ChatListItem
+                      key={index}
+                      chat={chat}
+                      onClick={() => {
+                        onSelectChat(chat);
+                        onClose();
+                      }}
+                      actualTheme={actualTheme}
+                      unreadCount={0}
+                    />
                   ))
                 ) : teamSearchQuery ? (
                   <p className={`text-xs text-center py-4 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
@@ -416,10 +431,16 @@ const ChatSidebar = ({
               <div className="space-y-1">
                 {filteredChitchats.length > 0 ? (
                   filteredChitchats.map((chat, index) => (
-                    <ChatListItem key={index} chat={chat} onClick={() => {
-                      onSelectChat(chat);
-                      onClose();
-                    }} actualTheme={actualTheme} />
+                    <ChatListItem
+                      key={index}
+                      chat={chat}
+                      onClick={() => {
+                        onSelectChat(chat);
+                        onClose();
+                      }}
+                      actualTheme={actualTheme}
+                      unreadCount={unreadCounts[chat.name] || 0}
+                    />
                   ))
                 ) : chitchatSearchQuery ? (
                   <p className={`text-xs text-center py-4 ${actualTheme === 'dark' ? 'text-gray-400' : 'text-muted-foreground'}`}>
@@ -447,7 +468,7 @@ export default function Chat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { chitChatChats, teamChats, addChitChat, addTeamChat, messages: contextMessages, addMessage: addMessageToContext, setMessagesForChat, markChatAsRead } = useChatContext();
+  const { chitChatChats, teamChats, addChitChat, addTeamChat, messages: contextMessages, addMessage: addMessageToContext, setMessagesForChat, markChatAsRead, unreadCounts } = useChatContext();
 
   const [currentView, setCurrentView] = useState("chat");
   const [message, setMessage] = useState("");
@@ -835,7 +856,7 @@ export default function Chat() {
     try {
       const isGroup = chat.type === 'TEAM' || teamChats.some(t => t.name === chat.name);
       let response;
-      
+
       if (isGroup) {
         response = await chatAPI.getGroupConversation(chat.name, 100);
       } else {
@@ -857,6 +878,17 @@ export default function Chat() {
         }));
 
         setMessagesForChat(chatKey, loadedMessages);
+
+        // Mark all messages in this conversation as read via API
+        // This will trigger the backend to emit unread count update via Socket.io
+        try {
+          // For private conversations, mark as read using the user's ID or email
+          if (!isGroup) {
+            await messagingAPI.markConversationAsRead(chat.name);
+          }
+        } catch (markReadError) {
+          console.error('Failed to mark conversation as read:', markReadError);
+        }
       }
     } catch (error) {
       console.error('Failed to load message history:', error);
@@ -1429,6 +1461,7 @@ export default function Chat() {
           chitchatSearchQuery={chitchatSearchQuery}
           setChitchatSearchQuery={setChitchatSearchQuery}
           actualTheme={actualTheme}
+          unreadCounts={unreadCounts}
         />
       </div>
 

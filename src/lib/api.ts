@@ -592,6 +592,45 @@ export const meetingsAPI = {
     apiRequest(`/meetings/join/${roomId}`, {
       method: 'POST',
     }),
+
+  start: (meetingId: string) =>
+    apiRequest(`/meetings/${meetingId}/start`, {
+      method: 'POST',
+    }),
+
+  complete: (meetingId: string, transcriptData: any) =>
+    apiRequest(`/meetings/${meetingId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify(transcriptData),
+    }),
+
+  getTranscript: (meetingId: string) =>
+    apiRequest(`/meetings/${meetingId}/transcript`),
+};
+
+// Notifications API
+export const notificationsAPI = {
+  getAll: (limit?: number) =>
+    apiRequest(`/notifications${limit ? `?limit=${limit}` : ''}`),
+
+  getUnread: () => apiRequest('/notifications/unread'),
+
+  getUnreadCount: () => apiRequest('/notifications/unread/count'),
+
+  markAsRead: (notificationId: string) =>
+    apiRequest(`/notifications/${notificationId}/read`, {
+      method: 'POST',
+    }),
+
+  markAllAsRead: () =>
+    apiRequest('/notifications/read-all', {
+      method: 'POST',
+    }),
+
+  deleteNotification: (notificationId: string) =>
+    apiRequest(`/notifications/${notificationId}`, {
+      method: 'DELETE',
+    }),
 };
 
 // Documents API

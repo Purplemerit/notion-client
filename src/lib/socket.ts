@@ -300,6 +300,11 @@ export const markMessageAsRead = (userEmail: string, messageId: string) => {
   messagingSocket.emit('markAsRead', { userEmail, messageId });
 };
 
+export const markConversationAsRead = (userEmail: string, otherUserId: string) => {
+  if (!messagingSocket) return;
+  messagingSocket.emit('markConversationAsRead', { userEmail, otherUserId });
+};
+
 export const checkUserOnlineStatus = (userId: string) => {
   if (!messagingSocket) return;
   messagingSocket.emit('checkOnlineStatus', { userId });
